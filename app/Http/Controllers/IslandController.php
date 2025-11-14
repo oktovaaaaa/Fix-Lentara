@@ -33,7 +33,7 @@ public function landing()
         ];
     });
 
-    return view('landing', [
+    return view('home', [
         'carouselData'   => $carouselData,
         'selectedIsland' => null,
         'featuresByType' => [],
@@ -44,8 +44,7 @@ public function landing()
         ],
     ]);
 }
-
-
+// App\Http\Controllers\IslandController.php
 
 public function show(Island $island)
 {
@@ -85,12 +84,21 @@ public function show(Island $island)
         'language'  => $island->demographics->where('type', 'language')->sortBy('order')->values(),
     ];
 
-    return view('landing', [
+    // ====== PILIH VIEW BERDASARKAN SLUG ======
+    $viewName = 'islands.' . $island->slug;
+
+    // optional: kalau file view-nya belum ada, fallback ke default
+    if (!view()->exists($viewName)) {
+        $viewName = 'islands.default';
+    }
+
+    return view($viewName, [
         'carouselData'   => $carouselData,
         'selectedIsland' => $island,
         'featuresByType' => $featuresByType,
         'demographics'   => $demographics,
     ]);
 }
+
 
 }
