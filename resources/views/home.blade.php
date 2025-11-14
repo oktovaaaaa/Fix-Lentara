@@ -76,27 +76,35 @@
             </section>
 
            {{-- STATISTIK INDONESIA --}}
+{{-- STATISTIK INDONESIA --}}
 <section id="stats" class="mt-10">
-    {{-- CSS khusus section ini saja --}}
+    {{-- CSS khusus section ini --}}
     <style>
         #stats .stat-card {
             position: relative;
             border-radius: 18px;
             padding: 18px 18px 16px 18px;
-            background: linear-gradient(135deg, #111827, #020617);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
             cursor: pointer;
             overflow: hidden;
 
-            /* animasi masuk */
             opacity: 0;
             transform: translateY(16px);
             animation: statsFadeUp 0.7s ease-out forwards;
         }
 
-        #stats .stat-card-main {
+        /* varian warna kartu */
+        #stats .stat-card--red {
             background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+
+        #stats .stat-card--purple {
+            background: linear-gradient(135deg, #7c3aed, #4c1d95);
+        }
+
+        #stats .stat-card--green {
+            background: linear-gradient(135deg, #059669, #065f46);
         }
 
         #stats .stat-card::after {
@@ -142,21 +150,47 @@
             transform: translateX(4px);
         }
 
-        /* animasi stagger */
-        #stats .stat-card:nth-child(1) { animation-delay: 0.05s; }
-        #stats .stat-card:nth-child(2) { animation-delay: 0.15s; }
-        #stats .stat-card:nth-child(3) { animation-delay: 0.25s; }
-        #stats .stat-card:nth-child(4) { animation-delay: 0.35s; }
+        /* kartu chart */
+        #stats .chart-card {
+            position: relative;
+            border-radius: 18px;
+            padding: 16px 16px 12px 16px;
+            background: radial-gradient(circle at top left, #111827, #020617);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.55);
+            overflow: hidden;
+
+            opacity: 0;
+            transform: translateY(16px);
+            animation: statsFadeUp 0.7s ease-out forwards;
+        }
+
+        #stats .chart-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        #stats .chart-subtitle {
+            font-size: 0.75rem;
+        }
+
+        #stats .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 220px;
+        }
+
+        /* stagger animasi */
+        #stats .stat-card[data-stat="islands"]     { animation-delay: 0.05s; }
+        #stats .stat-card[data-stat="unesco"]      { animation-delay: 0.12s; }
+        #stats .stat-card[data-stat="population"]  { animation-delay: 0.19s; }
+        #stats .chart-card:nth-child(1)            { animation-delay: 0.26s; }
+        #stats .chart-card:nth-child(2)            { animation-delay: 0.33s; }
+        #stats .chart-card:nth-child(3)            { animation-delay: 0.40s; }
 
         @keyframes statsFadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(18px) scale(0.98);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(18px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         /* ===== Modal (popup) ===== */
@@ -180,9 +214,8 @@
         }
 
         @media (max-width: 640px) {
-            #stats .stat-number {
-                font-size: 2.1rem;
-            }
+            #stats .stat-number { font-size: 2.1rem; }
+            #stats .chart-wrapper { height: 210px; }
         }
     </style>
 
@@ -190,34 +223,31 @@
         Statistik Budaya Indonesia
     </h2>
     <p class="text-sm sm:text-base text-white/70 mb-4 max-w-3xl">
-        Gambaran singkat keragaman Indonesia: jumlah pulau, suku, bahasa daerah,
-        dan komposisi agama. Angka di bawah ini adalah ringkasan data nasional terbaru.
+        Ringkasan keragaman Indonesia: jumlah pulau, warisan budaya takbenda yang diakui
+        UNESCO, serta dinamika jumlah penduduk.
     </p>
 
-    {{-- KARTU STATISTIK --}}
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {{-- Jumlah pulau (kartu utama seperti contoh gambar merah) --}}
+    {{-- TIGA CARD UTAMA --}}
+    <div class="grid gap-4 lg:grid-cols-3 mb-6">
+        {{-- Pulau di Indonesia --}}
         <button
             type="button"
-            class="stat-card stat-card-main text-left text-white"
+            class="stat-card stat-card--red text-left text-white"
             data-stat="islands"
         >
             <div class="flex items-start justify-between gap-3">
                 <div>
-                    <div class="stat-number">17.000+</div>
-                    <div class="stat-label mt-1">Pulau di Indonesia</div>
-                    <p class="mt-2 text-xs text-white/80 max-w-[210px]">
-                        Indonesia adalah negara kepulauan dengan puluhan ribu pulau besar
-                        dan kecil tersebar dari Sabang sampai Merauke.
+                    <div class="stat-number">17.380</div>
+                    <div class="stat-label mt-1">Pulau di Indonesia (2024)</div>
+                    <p class="mt-2 text-xs text-white/80 max-w-[260px]">
+                        Jumlah pulau bernama dan berkoordinat menurut BIG. Angka ini
+                        terus diperbarui karena dinamika geografis dan verifikasi lapangan.
                     </p>
                 </div>
-                <div class="opacity-70">
-                    {{-- icon pie kecil --}}
+                <div class="opacity-80">
                     <svg viewBox="0 0 24 24" class="w-10 h-10">
-                        <path fill="currentColor"
-                              d="M11 3a9 9 0 1 0 9 9h-9z"/>
-                        <path fill="currentColor"
-                              d="M13 3.055V11h7.945A9.002 9.002 0 0 0 13 3.055z"/>
+                        <path fill="#fecaca" d="M11 3a9 9 0 1 0 9 9h-9z" />
+                        <path fill="#fee2e2" d="M13 3.055V11h7.945A9.002 9.002 0 0 0 13 3.055z" />
                     </svg>
                 </div>
             </div>
@@ -227,53 +257,57 @@
             </div>
         </button>
 
-        {{-- Suku bangsa --}}
+        {{-- Warisan Budaya Takbenda UNESCO --}}
         <button
             type="button"
-            class="stat-card text-left text-white"
-            data-stat="ethnic"
+            class="stat-card stat-card--purple text-left text-white"
+            data-stat="unesco"
         >
-            <div class="stat-number">600+</div>
-            <div class="stat-label mt-1">Kelompok etnis / suku</div>
-            <p class="mt-2 text-xs text-white/80">
-                Dari Jawa, Sunda, Batak, Bugis, Dayak, hingga ratusan suku lain
-                yang tersebar di berbagai pulau.
-            </p>
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <div class="stat-number">16</div>
+                    <div class="stat-label mt-1">WBTb Indonesia diakui UNESCO</div>
+                    <p class="mt-2 text-xs text-white/80 max-w-[260px]">
+                        Termasuk Keris, Batik, Angklung, Tari Saman, Gamelan, Reog
+                        Ponorogo, Kebaya, dan lainnya yang tercatat hingga 2024.
+                    </p>
+                </div>
+                <div class="opacity-80">
+                    <svg viewBox="0 0 24 24" class="w-10 h-10">
+                        <circle cx="12" cy="12" r="9" fill="#ddd6fe" />
+                        <path fill="#a855f7" d="M12 3v9l7.8 4.5A9 9 0 0 0 12 3z" />
+                    </svg>
+                </div>
+            </div>
             <div class="stat-more text-white/90">
                 More info
                 <span class="stat-more-icon">➜</span>
             </div>
         </button>
 
-        {{-- Bahasa daerah --}}
+        {{-- Jumlah Penduduk Indonesia --}}
         <button
             type="button"
-            class="stat-card text-left text-white"
-            data-stat="languages"
+            class="stat-card stat-card--green text-left text-white"
+            data-stat="population"
         >
-            <div class="stat-number">700+</div>
-            <div class="stat-label mt-1">Bahasa daerah hidup</div>
-            <p class="mt-2 text-xs text-white/80">
-                Salah satu negara paling kaya bahasa di dunia, setelah Papua Nugini.
-            </p>
-            <div class="stat-more text-white/90">
-                More info
-                <span class="stat-more-icon">➜</span>
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <div class="stat-number">287,6 Jt</div>
+                    <div class="stat-label mt-1">Perkiraan penduduk (Nov 2025)</div>
+                    <p class="mt-2 text-xs text-white/80 max-w-[260px]">
+                        Berbasis data Kemendagri dan BPS, penduduk Indonesia terus
+                        bertambah sejak Sensus 2020 yang mencatat 270,20 juta jiwa.
+                    </p>
+                </div>
+                <div class="opacity-80">
+                    <svg viewBox="0 0 24 24" class="w-10 h-10">
+                        <rect x="3" y="10" width="4" height="9" rx="1" fill="#bbf7d0" />
+                        <rect x="10" y="7" width="4" height="12" rx="1" fill="#6ee7b7" />
+                        <rect x="17" y="4" width="4" height="15" rx="1" fill="#22c55e" />
+                    </svg>
+                </div>
             </div>
-        </button>
-
-        {{-- Agama --}}
-        <button
-            type="button"
-            class="stat-card text-left text-white"
-            data-stat="religion"
-        >
-            <div class="stat-number">6+</div>
-            <div class="stat-label mt-1">Agama & kepercayaan</div>
-            <p class="mt-2 text-xs text-white/80">
-                Islam, Kristen, Katolik, Hindu, Buddha, Konghucu, dan beragam
-                kepercayaan lokal.
-            </p>
             <div class="stat-more text-white/90">
                 More info
                 <span class="stat-more-icon">➜</span>
@@ -281,12 +315,60 @@
         </button>
     </div>
 
+    {{-- TIGA CHART: SUKU (BAR), BAHASA (DONUT), AGAMA (PIE) --}}
+    <div class="grid gap-4 lg:grid-cols-3">
+        {{-- 1. SUKU BANGSA – BAR CHART --}}
+        <div class="chart-card text-white">
+            <div class="flex items-center justify-between mb-2">
+                <p class="chart-title">14 Suku Terbesar (persentase penduduk)</p>
+                <span class="chart-subtitle text-white/60">Bar chart</span>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="ethnicChart"></canvas>
+            </div>
+            <p class="mt-2 text-[11px] text-white/55">
+                Data diadaptasi dari sensus: Jawa &gt;40%, diikuti Sunda, Melayu, Batak,
+                dan suku-suku besar lainnya. Slice terakhir = <em>Lainnya</em>.
+            </p>
+        </div>
+
+        {{-- 2. BAHASA SEHARI-HARI – DONUT CHART --}}
+        <div class="chart-card text-white">
+            <div class="flex items-center justify-between mb-2">
+                <p class="chart-title">Bahasa yang Paling Banyak Digunakan</p>
+                <span class="chart-subtitle text-white/60">Donut chart</span>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="languageChart"></canvas>
+            </div>
+            <p class="mt-2 text-[11px] text-white/55">
+                14 bahasa dengan penutur terbanyak, berdasarkan persentase penggunaan
+                sehari-hari. Sisanya digabung sebagai <em>Lainnya</em>.
+            </p>
+        </div>
+
+        {{-- 3. AGAMA – PIE CHART --}}
+        <div class="chart-card text-white">
+            <div class="flex items-center justify-between mb-2">
+                <p class="chart-title">Komposisi Agama di Indonesia (±2021)</p>
+                <span class="chart-subtitle text-white/60">Pie chart</span>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="religionChart"></canvas>
+            </div>
+            <p class="mt-2 text-[11px] text-white/55">
+                Islam mendominasi populasi, diikuti Protestan, Katolik, Hindu, Buddha,
+                Konghucu, dan agama lainnya.
+            </p>
+        </div>
+    </div>
+
     <p class="mt-3 text-[11px] text-white/50">
-        *Perkiraan jumlah pulau dan bahasa dapat sedikit berbeda antar sumber resmi,
-        namun kisaran angkanya tetap sama.
+        *Angka dibulatkan. Persentase dan jumlah bisa sedikit berbeda antar sumber resmi,
+        tetapi kisaran nilainya tetap sama.
     </p>
 
-    {{-- POPUP DETAIL STATISTIK --}}
+    {{-- POPUP DETAIL UNTUK SEMUA CARD --}}
     <div
         id="stats-modal-backdrop"
         class="fixed inset-0 z-40 bg-black/60 items-center justify-center px-4"
@@ -310,74 +392,101 @@
             </h3>
 
             <div id="stats-modal-body" class="text-sm text-white/80 space-y-2 leading-relaxed">
-                {{-- konten akan diinject via JS --}}
+                {{-- konten diisi via JS --}}
             </div>
 
             <p class="mt-4 text-[11px] text-white/40">
-                Ringkasan berdasarkan data lembaga resmi Indonesia dan publikasi internasional.
+                Ringkasan berdasarkan data lembaga resmi Indonesia, UNESCO, dan publikasi terkait.
             </p>
         </div>
     </div>
 
-    {{-- SCRIPT UNTUK POPUP & ISI DETAIL --}}
+    {{-- SCRIPT POPUP + CHART.JS --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
         (function () {
+            /* ================= DETAIL MODAL UNTUK 3 CARD ================= */
             const detailMap = {
                 islands: {
                     title: 'Jumlah Pulau di Indonesia',
                     body: `
-                        <p>Indonesia terdiri dari lebih dari <strong>17.000 pulau</strong>.
-                        Beberapa sumber resmi menyebut kisaran antara <strong>17.000–18.000 pulau</strong>,
-                        tergantung metode pendataan (apakah termasuk pulau kecil yang muncul saat surut, dsb).</p>
+                        <p>Menurut penelahaan <strong>Badan Informasi Geospasial (BIG)</strong>,
+                        jumlah pulau di Indonesia pada tahun 2024 mencapai
+                        <strong>17.380 pulau</strong>. Angka ini mencakup pulau yang memiliki
+                        <em>nama</em> dan <em>koordinat</em> resmi.</p>
+                        <p>Jika dibandingkan dengan tahun 2023 (17.374 pulau), terdapat
+                        penambahan pulau baru akibat dinamika geografis dan verifikasi di
+                        lapangan, misalnya di <strong>Kepulauan Bangka Belitung</strong>,
+                        <strong>Sulawesi Tenggara</strong>, <strong>Maluku Utara</strong>, dan
+                        <strong>Kalimantan Barat</strong>.</p>
                         <ul class="mt-2 list-disc list-inside space-y-1">
-                            <li>Pulau besar utama: Jawa, Sumatra, Kalimantan, Sulawesi, Papua.</li>
-                            <li>Ribuan pulau kecil tersebar dari Sabang hingga Merauke.</li>
-                            <li>Banyak pulau yang belum berpenghuni tetap.</li>
+                            <li>Pulau harus berupa daratan yang terbentuk alami.</li>
+                            <li>Dikelilingi air dan tetap muncul saat pasang tertinggi.</li>
+                            <li>Pulau bisa hilang atau menyatu karena abrasi, sedimentasi,
+                                dan perubahan ekosistem.</li>
                         </ul>
+                        <p class="mt-2">Data pulau Indonesia terus dimutakhirkan setiap tahun
+                        melalui platform resmi BIG seperti <em>sipulau.big.go.id</em> dan
+                        <em>Gazeter Republik Indonesia</em>.</p>
                     `
                 },
-                ethnic: {
-                    title: 'Keragaman Suku Bangsa',
+                unesco: {
+                    title: 'Warisan Budaya Takbenda Indonesia',
                     body: `
-                        <p>Terdapat lebih dari <strong>600 kelompok etnis/suku</strong> di Indonesia.
-                        Beberapa suku terbesar antara lain:</p>
+                        <p>Hingga Desember 2024, terdapat <strong>16 Warisan Budaya Takbenda
+                        (WBTb) Indonesia</strong> yang telah diakui UNESCO, antara lain:</p>
                         <ul class="mt-2 list-disc list-inside space-y-1">
-                            <li><strong>Jawa</strong> (sekitar 40% penduduk).</li>
-                            <li><strong>Sunda</strong>, <strong>Batak</strong>, <strong>Betawi</strong>,
-                                <strong>Minangkabau</strong>, <strong>Bugis</strong>, <strong>Dayak</strong>, dan lain-lain.</li>
-                            <li>Banyak suku memiliki bahasa, adat, dan pakaian tradisional sendiri.</li>
+                            <li><strong>2008</strong>: Keris; Pertunjukan Wayang.</li>
+                            <li><strong>2009</strong>: Batik; Pendidikan dan Pelatihan Batik.</li>
+                            <li><strong>2010</strong>: Angklung.</li>
+                            <li><strong>2011</strong>: Tari Saman.</li>
+                            <li><strong>2012</strong>: Noken (tas tradisional Papua).</li>
+                            <li><strong>2017</strong>: Tiga genre tari tradisional Bali;
+                                Seni Pembuatan Kapal Pinisi.</li>
+                            <li><strong>2019</strong>: Tradisi Pencak Silat.</li>
+                            <li><strong>2020</strong>: Pantun.</li>
+                            <li><strong>2021</strong>: Gamelan.</li>
+                            <li><strong>2023</strong>: Jamu.</li>
+                            <li><strong>2024</strong>: Kesenian Reog Ponorogo; Kebaya.</li>
                         </ul>
+                        <p class="mt-3">Di tingkat nasional, Kementerian Pendidikan, Kebudayaan,
+                        Riset, dan Teknologi mencatat dan menetapkan WBTb Indonesia:</p>
+                        <ul class="mt-2 list-disc list-inside space-y-1">
+                            <li><strong>Nov 2022</strong>: 11.622 warisan budaya dicatat,
+                                <strong>1.728</strong> telah ditetapkan.</li>
+                            <li><strong>2023</strong>: bertambah 213 menjadi
+                                <strong>1.941</strong> WBTb yang ditetapkan.</li>
+                            <li><strong>2024</strong>: bertambah 272 menjadi
+                                <strong>2.213</strong> penetapan.</li>
+                            <li><strong>2025</strong>: penambahan 514, sehingga total
+                                <strong>2.727 WBTb</strong> Indonesia yang ditetapkan
+                                (periode 2013–2025).</li>
+                        </ul>
+                        <p class="mt-2">UNESCO sendiri tidak mengelompokkan WBTb dunia per kategori
+                        secara global, tetapi Indonesia aktif mengusulkan dan memperkuat
+                        perlindungan warisan budaya, baik yang bersifat <em>takbenda</em> maupun
+                        yang berupa <em>warisan benda</em> seperti situs budaya dan alam.</p>
                     `
                 },
-                languages: {
-                    title: 'Bahasa Daerah di Indonesia',
+                population: {
+                    title: 'Jumlah Penduduk Indonesia',
                     body: `
-                        <p>Indonesia memiliki lebih dari <strong>700 bahasa hidup</strong>,
-                        menjadikannya salah satu negara dengan keragaman bahasa terbesar di dunia.</p>
+                        <p>Jumlah penduduk Indonesia terus meningkat setiap tahun:</p>
                         <ul class="mt-2 list-disc list-inside space-y-1">
-                            <li>Mayoritas termasuk rumpun <strong>Austronesia</strong> (misalnya Jawa, Sunda, Bugis).</li>
-                            <li>Di Papua dan Maluku terdapat ratusan bahasa <strong>Papua</strong> yang sangat beragam.</li>
-                            <li><strong>Bahasa Indonesia</strong> dipakai sebagai bahasa persatuan di seluruh nusantara.</li>
+                            <li><strong>Sensus Penduduk 2020</strong>:
+                                sekitar <strong>270,20 juta jiwa</strong>.</li>
+                            <li><strong>Data Kemendagri (30 Juni 2025)</strong>:
+                                <strong>286.693.693 jiwa</strong>.</li>
+                            <li><strong>Estimasi BPS (13 November 2025)</strong>:
+                                sekitar <strong>287,6 juta jiwa</strong>.</li>
                         </ul>
-                    `
-                },
-                religion: {
-                    title: 'Komposisi Agama di Indonesia',
-                    body: `
-                        <p>Indonesia mengakui beberapa agama resmi dan juga kepercayaan lokal.
-                        Perkiraan komposisi penduduk secara nasional:</p>
-                        <ul class="mt-2 list-disc list-inside space-y-1">
-                            <li><strong>Islam</strong> &plusmn; 87%.</li>
-                            <li><strong>Protestan</strong> sekitar 7,4%.</li>
-                            <li><strong>Katolik</strong> sekitar 3%.</li>
-                            <li><strong>Hindu</strong> sekitar 1,7%.</li>
-                            <li><strong>Buddha</strong> sekitar 0,7%.</li>
-                            <li><strong>Konghucu</strong> dan kepercayaan adat lainnya &lt; 1%.</li>
-                        </ul>
-                        <p class="mt-2">
-                            Meskipun mayoritas Muslim, Indonesia memiliki tradisi toleransi dan keragaman
-                            praktik keagamaan di berbagai daerah.
-                        </p>
+                        <p class="mt-2">Perbedaan angka antara Kemendagri dan BPS wajar terjadi
+                        karena perbedaan waktu rujukan dan metode penghitungan. Namun, semuanya
+                        menunjukkan tren yang sama: penduduk Indonesia terus bertambah sejak 2020.</p>
+                        <p class="mt-2">Data ini penting untuk perencanaan kebijakan, mulai dari
+                        pendidikan, kesehatan, hingga pembangunan infrastruktur di seluruh
+                        wilayah Indonesia.</p>
                     `
                 }
             };
@@ -403,26 +512,139 @@
                 document.body.classList.remove('overflow-hidden');
             }
 
-            // event untuk kartu
-            document.querySelectorAll('#stats .stat-card').forEach(function (card) {
+            document.querySelectorAll('#stats .stat-card[data-stat]').forEach(function (card) {
                 card.addEventListener('click', function () {
-                    const statKey = card.getAttribute('data-stat');
-                    openModal(statKey);
+                    const key = card.getAttribute('data-stat');
+                    openModal(key);
                 });
             });
 
-            // event untuk close
             closeBtn.addEventListener('click', closeModal);
             backdrop.addEventListener('click', function (e) {
-                if (e.target === backdrop) {
-                    closeModal();
+                if (e.target === backdrop) closeModal();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            /* ================= CHART: DATA (SAMA SEPERTI SEBELUMNYA) ================= */
+            const ethnicLabels = [
+                'Jawa', 'Sunda', 'Melayu', 'Batak', 'Madura',
+                'Betawi', 'Minangkabau', 'Bugis', 'Banten', 'Banjar',
+                'Bali', 'Makassar', 'Aceh', 'Sasak', 'Lainnya'
+            ];
+            const ethnicData = [
+                40.06, 15.51, 3.70, 3.58, 3.03,
+                2.88, 2.73, 2.71, 1.96, 1.74,
+                1.50, 1.40, 1.30, 1.10, 17.50
+            ];
+
+            const languageLabels = [
+                'Jawa', 'Indonesia', 'Sunda', 'Melayu', 'Madura',
+                'Minangkabau', 'Banjar', 'Bugis', 'Bali',
+                'Bahasa Batak', 'Cirebon', 'NTT lainnya',
+                'Sasak', 'Aceh', 'Lainnya'
+            ];
+            const languageData = [
+                31.79, 19.94, 15.14, 3.69, 3.62,
+                1.98, 1.71, 1.64, 1.57,
+                1.55, 1.44, 1.40,
+                1.26, 12.08
+            ];
+
+            const religionLabels = [
+                'Islam', 'Protestan', 'Katolik',
+                'Hindu', 'Buddha', 'Konghucu', 'Agama lainnya'
+            ];
+            const religionData = [86.93, 7.47, 3.08, 1.71, 0.74, 0.05, 0.03];
+
+            const palette = [
+                '#60a5fa', '#f97316', '#a855f7', '#22c55e', '#eab308',
+                '#f97373', '#0ea5e9', '#6366f1', '#ec4899', '#14b8a6',
+                '#f59e0b', '#84cc16', '#fb7185', '#2dd4bf', '#9ca3af'
+            ];
+
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 900, easing: 'easeOutQuart' },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                const label = ctx.label || '';
+                                const value = ctx.parsed;
+                                return label + ': ' + value.toFixed(2) + '%';
+                            }
+                        }
+                    },
+                    legend: { labels: { color: '#e5e7eb', font: { size: 11 } } }
+                }
+            };
+
+            const ethnicCtx = document.getElementById('ethnicChart').getContext('2d');
+            new Chart(ethnicCtx, {
+                type: 'bar',
+                data: {
+                    labels: ethnicLabels,
+                    datasets: [{
+                        data: ethnicData,
+                        backgroundColor: palette,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    plugins: { ...commonOptions.plugins, legend: { display: false } },
+                    scales: {
+                        x: {
+                            ticks: { color: '#9ca3af', font: { size: 10 } },
+                            grid: { display: false }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#9ca3af',
+                                callback: value => value + '%'
+                            },
+                            grid: { color: 'rgba(148, 163, 184, 0.15)' }
+                        }
+                    }
                 }
             });
 
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape') {
-                    closeModal();
+            const languageCtx = document.getElementById('languageChart').getContext('2d');
+            new Chart(languageCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: languageLabels,
+                    datasets: [{
+                        data: languageData,
+                        backgroundColor: palette,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    cutout: '55%'
                 }
+            });
+
+            const religionCtx = document.getElementById('religionChart').getContext('2d');
+            new Chart(religionCtx, {
+                type: 'pie',
+                data: {
+                    labels: religionLabels,
+                    datasets: [{
+                        data: religionData,
+                        backgroundColor: [
+                            '#22c55e', '#60a5fa', '#4b5563',
+                            '#eab308', '#f97316', '#f97373', '#a855f7'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: commonOptions
             });
         })();
     </script>
