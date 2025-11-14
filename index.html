@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elegant Travel Cards</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500&display=swap" rel="stylesheet">
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: #1a1a1a;
+  color: #fff;
+  font-family: "Inter", sans-serif;
+  overflow: hidden;
+}
+#demo {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+.card {
+  position: absolute;
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: #FFFFFFDD;
+}
+.card .card-content {
+  background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+  padding: 20px;
+}
+.content-place {
+  font-size: 14px;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+.content-title-1 {
+  font-family: "Oswald", sans-serif;
+  font-size: 28px;
+  line-height: 1;
+}
+.content-title-2 {
+  font-family: "Oswald", sans-serif;
+  font-size: 22px;
+  line-height: 1;
+}
+#pagination {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  color: #fff;
+}
+#slide-numbers {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  font-size: 20px;
+}
+#slide-numbers .item {
+  opacity: 0.5;
+}
+#slide-numbers .item.active {
+  opacity: 1;
+}
+.indicator {
+  position: absolute;
+  bottom: 80px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: #ecad29;
+  transform: translateX(-100%);
+}
+.cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: #1a1a1a;
+  z-index: 99;
+}
+</style>
+</head>
+<body>
+<div class="cover"></div>
+<div id="demo"></div>
+<div id="pagination">
+  <div class="progress-sub-foreground"></div>
+</div>
+<div id="slide-numbers"></div>
+<div class="indicator"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+const data = [
+  {
+    place:'Switzerland Alps',
+    title:'SAINT',
+    title2:'ANTONIEN',
+    description:'Tucked away in the Switzerland Alps, Saint Antönien offers an idyllic retreat for those seeking tranquility and adventure alike.',
+    image:'https://assets.codepen.io/3685267/timed-cards-1.jpg'
+  },
+  {
+    place:'Japan Alps',
+    title:'NANGANO',
+    title2:'PREFECTURE',
+    description:'Nagano Prefecture, set within the majestic Japan Alps, is a cultural treasure trove with its historic shrines and temples.',
+    image:'https://assets.codepen.io/3685267/timed-cards-2.jpg'
+  },
+  {
+    place:'Sahara Desert - Morocco',
+    title:'MARRAKECH',
+    title2:'MEROUGA',
+    description:'The journey from Marrakech to the starlit sands of Merzouga showcases Morocco’s diverse splendor.',
+    image:'https://assets.codepen.io/3685267/timed-cards-3.jpg'
+  },
+  {
+    place:'Sierra Nevada - USA',
+    title:'YOSEMITE',
+    title2:'NATIONAL PARAK',
+    description:'Yosemite National Park is a showcase of wilderness, granite monoliths, and thundering waterfalls.',
+    image:'https://assets.codepen.io/3685267/timed-cards-4.jpg'
+  },
+  {
+    place:'Tarifa - Spain',
+    title:'LOS LANCES',
+    title2:'BEACH',
+    description:'Los Lances Beach is a paradise for kitesurfing and windsurfing, with a vibrant coastal atmosphere.',
+    image:'https://assets.codepen.io/3685267/timed-cards-5.jpg'
+  },
+  {
+    place:'Cappadocia - Turkey',
+    title:'Göreme',
+    title2:'Valley',
+    description:'Göreme Valley is a historical marvel with unique rock formations and enchanting hot air balloons.',
+    image:'https://assets.codepen.io/3685267/timed-cards-6.jpg'
+  },
+];
+
+const _ = (id)=>document.getElementById(id);
+const cards = data.map((i, index)=>`
+  <div class="card" id="card${index}" style="background-image:url(${i.image})">
+    <div class="card-content">
+      <div class="content-place">${i.place}</div>
+      <div class="content-title-1">${i.title}</div>
+      <div class="content-title-2">${i.title2}</div>
+    </div>
+  </div>`).join('');
+_('demo').innerHTML = cards;
+
+const sildeNumbers = data.map((_, index)=>`<div class="item" id="slide-item-${index}">${index+1}</div>`).join('');
+_('slide-numbers').innerHTML = sildeNumbers;
+
+const range = (n)=>Array(n).fill(0).map((_, j)=>j);
+const set = gsap.set;
+const ease = "sine.inOut";
+
+function getCard(index) { return `#card${index}`; }
+function getSliderItem(index) { return `#slide-item-${index}`; }
+
+let order = [0, 1, 2, 3, 4, 5];
+let offsetTop = 200;
+let offsetLeft = 700;
+let cardWidth = 200;
+let cardHeight = 300;
+let gap = 40;
+let numberSize = 50;
+
+function animate(target, duration, properties) {
+  return new Promise((resolve)=>{ gsap.to(target, {...properties, duration, onComplete:resolve}); });
+}
+
+function init() {
+  const [active, ...rest] = order;
+  const { innerHeight: height, innerWidth: width } = window;
+  offsetTop = height - 430;
+  offsetLeft = width - 830;
+
+  gsap.set(".cover",{x:0});
+  gsap.set(getCard(active),{x:0,y:0,width:width,height:height});
+  rest.forEach((i, index)=>{
+    gsap.set(getCard(i),{
+      x:offsetLeft + 400 + index*(cardWidth + gap),
+      y:offsetTop,
+      width:cardWidth,
+      height:cardHeight,
+      zIndex:30
+    });
+  });
+  gsap.to(".cover",{x:width+400,duration:1.2,ease,onComplete:()=>loop()});
+}
+
+function step(){
+  return new Promise((resolve)=>{
+    order.push(order.shift());
+    const [active,...rest] = order;
+    const prv = rest[rest.length-1];
+
+    gsap.set(getCard(prv),{zIndex:10});
+    gsap.set(getCard(active),{zIndex:20});
+    gsap.to(getCard(prv),{scale:1.5,ease});
+
+    gsap.to(getCard(active),{
+      x:0,y:0,ease,width:window.innerWidth,height:window.innerHeight,borderRadius:0,
+      onComplete:()=>{
+        const xNew = offsetLeft + (rest.length-1)*(cardWidth + gap);
+        gsap.set(getCard(prv),{
+          x:xNew,y:offsetTop,width:cardWidth,height:cardHeight,zIndex:30,scale:1,borderRadius:10
+        });
+        gsap.set(getSliderItem(prv),{x:rest.length*numberSize});
+        resolve();
+      }
+    });
+
+    rest.forEach((i,index)=>{
+      if(i!==prv){
+        const xNew = offsetLeft + index*(cardWidth + gap);
+        gsap.to(getCard(i),{
+          x:xNew,y:offsetTop,width:cardWidth,height:cardHeight,ease,delay:0.1*(index+1)
+        });
+      }
+    });
+  });
+}
+
+async function loop(){
+  await animate(".indicator",2,{x:0});
+  await animate(".indicator",0.8,{x:window.innerWidth,delay:0.3});
+  set(".indicator",{x:-window.innerWidth});
+  await step();
+  loop();
+}
+
+function loadImage(src){
+  return new Promise((resolve,reject)=>{
+    const img = new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=reject;
+    img.src=src;
+  });
+}
+
+async function loadImages(){
+  const promises=data.map(({image})=>loadImage(image));
+  return Promise.all(promises);
+}
+
+async function start(){
+  try{ await loadImages(); init(); }
+  catch(e){ console.error("Image failed to load", e); }
+}
+start();
+</script>
+</body>
+</html>
