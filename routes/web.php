@@ -5,6 +5,8 @@ use App\Http\Controllers\IslandController;
 use App\Http\Controllers\Admin\IslandStatController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\NusantaraChatController;
+use App\Http\Controllers\Admin\IslandHistoryController;
+
 
 Route::post('/nusantara-ai/chat', [NusantaraChatController::class, 'chat'])
     ->name('nusantara.chat');
@@ -56,15 +58,35 @@ Route::prefix('admin')
     ->middleware('auth')
     ->group(function () {
 
-        // Dashboard sederhana (pakai view saja dulu)
-        // -> buat file resources/views/admin/dashboard.blade.php sendiri
         Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
 
-        // CRUD Statistik pulau (index, create, store, show, edit, update, destroy)
+        // ⬇️ CRUD history UNTUK SEMUA PULAU
+        Route::resource('histories', IslandHistoryController::class)
+            ->except(['show']);
+            
         Route::resource('stats', IslandStatController::class)
             ->names('stats');
 
-        // Tambahan route khusus statistik (population & demographics)
+        Route::post('stats/population/{island}', [IslandStatController::class, 'updatePopulation'])
+            ->name('stats.population.update');
+
+        Route::post('stats/{island}/demographics', [IslandStatController::class, 'storeDemographic'])
+            ->name('stats.demographics.store');
+
+        Route::delete('stats/{island}/demographics/{demographic}', [IslandStatController::class, 'destroyDemographic'])
+            ->name('stats.demographics.destroy');
+
+
+               Route::resource('sumatera-histories', SumateraHistoryController::class)
+            ->except(['show']);
+        // URL contoh:
+        // - GET  /admin/sumatera-histories           -> index
+        // - GET  /admin/sumatera-histories/create    -> create
+        // - POST /admin/sumatera-histories           -> store
+        // - GET  /admin/sumatera-histories/{id}/edit -> edit
+        // - PUT  /admin/sumatera-histories/{id}      -> update
+        // - DELETE /admin/sumatera-histories/{id}    -> destroy
+
         Route::post('stats/population/{island}', [IslandStatController::class, 'updatePopulation'])
             ->name('stats.population.update');
 

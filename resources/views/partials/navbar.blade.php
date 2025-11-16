@@ -8,7 +8,11 @@
     $currentIslandName = $isIslandMode ? $selectedIsland->title ?? $selectedIsland->name : null;
 
     // daftar pulau untuk dropdown navbar (dari DB supaya lengkap)
-    $navbarIslands = Island::query()->where('is_active', true)->orderBy('order')->orderBy('name')->get();
+    $navbarIslands = Island::query()
+        ->where('is_active', true)
+        ->orderBy('order')
+        ->orderBy('name')
+        ->get();
 @endphp
 
 <header class="site-header" id="top">
@@ -21,8 +25,9 @@
 
         {{-- Brand / Logo --}}
         <a class="brand" href="{{ route('home') }}" data-nav="home">
-            <span class="brand-icon" aria-hidden="true"></span>
-            <span class="brand-text">Lentara</span>
+            <img src="{{ asset('images/icon/icon_lentara.png') }}"
+                 alt="Lentara"
+                 class="brand-logo">
         </a>
 
         {{-- Link navbar (desktop) --}}
@@ -39,9 +44,7 @@
                     <button class="nav-btn nav-dropdown-toggle" type="button" data-target="#islands"
                         aria-haspopup="true" aria-expanded="false">
                         <span class="icon">🗺️</span>
-                        <span class="dropdown-label">
-                            Pulau
-                        </span>
+                        <span class="dropdown-label">Pulau</span>
                         <span class="chevron">▾</span>
                     </button>
 
@@ -52,7 +55,7 @@
                                 $label = $island->subtitle ?: $island->name;
                             @endphp
                             <a href="{{ $url }}" class="dropdown-item" role="menuitem"
-                                data-island="{{ $label }}" data-url="{{ $url }}">
+                               data-island="{{ $label }}" data-url="{{ $url }}">
                                 {{ $label }}
                             </a>
                         @endforeach
@@ -97,7 +100,7 @@
                                 $label = $island->subtitle ?: $island->name;
                             @endphp
                             <a href="{{ $url }}" class="dropdown-item" role="menuitem"
-                                data-island="{{ $label }}" data-url="{{ $url }}">
+                               data-island="{{ $label }}" data-url="{{ $url }}">
                                 {{ $label }}
                             </a>
                         @endforeach
@@ -153,7 +156,11 @@
     {{-- ===== DRAWER / SIDEBAR MOBILE ===== --}}
     <aside class="drawer" id="drawer" aria-hidden="true">
         <div class="drawer-header">
-            <div class="drawer-brand">Lentara</div>
+            <div class="drawer-brand">
+                <img src="{{ asset('images/icon/icon_lentara.png') }}"
+                     alt="Lentara"
+                     class="drawer-logo">
+            </div>
             {{-- Tombol X untuk menutup drawer --}}
             <button id="closeDrawer" class="close-drawer" aria-label="Tutup menu">✕</button>
         </div>
@@ -175,7 +182,7 @@
                             $label = $island->subtitle ?: $island->name;
                         @endphp
                         <a href="{{ $url }}" class="drawer-link drawer-sublink"
-                            data-url="{{ $url }}" data-island="{{ $label }}">
+                           data-url="{{ $url }}" data-island="{{ $label }}">
                             • {{ $label }}
                         </a>
                     @endforeach
@@ -199,7 +206,7 @@
                             $label = $island->subtitle ?: $island->name;
                         @endphp
                         <a href="{{ $url }}" class="drawer-link drawer-sublink"
-                            data-url="{{ $url }}" data-island="{{ $label }}">
+                           data-url="{{ $url }}" data-island="{{ $label }}">
                             • {{ $label }}
                         </a>
                     @endforeach

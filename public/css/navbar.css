@@ -1,5 +1,7 @@
 /* ====== THEME GLOBAL (LIGHT & DARK) ====== */
 
+
+
 :root {
   /* light mode (default) */
   --bg-body: #fdfaf5;
@@ -33,8 +35,24 @@ body {
 }
 
 /* ========== Navbar Floating ========== */
+
+
+/* ==== Logo navbar & drawer ==== */
+.brand-logo {
+    height: 32px;    /* ini yang bikin navbar tidak ikut setinggi gambar asli */
+    width: auto;
+    display: block;
+}
+
+.drawer-logo {
+    height: 28px;
+    width: auto;
+    display: block;
+}
+
+/* ==== Wrapper navbar di atas konten ==== */
 .site-header{
-  position: fixed;        /* dulu: sticky -> sekarang fixed supaya tidak dorong konten */
+  position: fixed;
   top: 12px;
   left: 0;
   right: 0;
@@ -42,39 +60,41 @@ body {
   display: flex;
   justify-content: center;
   padding: 6px;
-  background: transparent;   /* pastikan tidak menambah warna sendiri */
+  background: transparent;
 }
 
+/* ==== Capsule navbar ==== */
 .nav-pill{
   display: flex;
   align-items: center;
   gap: 10px;
-  /* background lama: color-mix(in oklab, var(--card, #ffffff) 85%, transparent); */
-  background: transparent;   /* navbar jadi transparan */
+  background: transparent;
   backdrop-filter: blur(12px);
   border: 1px solid var(--line, #e9e1d6);
   border-radius: 999px;
-  padding: 10px 12px;
+  padding: 8px 10px;          /* sedikit lebih kecil dari sebelumnya */
   box-shadow: var(--shadow, 0 20px 50px rgba(0,0,0,.12));
   max-width: min(1100px, 95vw);
   width: 100%;
   transition: transform .25s ease, padding .25s ease, background .25s ease;
 }
 
+.brand{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--brand, #b7410e);
+  font-weight: 800;
+  padding: 4px 8px;           /* kecilkan padding supaya tinggi navbar tetap tipis */
+  border-radius: 999px;
+}
+
 /* efek kecil ketika scroll */
 .nav-pill.scrolling{ transform: scale(.96); }
 .nav-pill.idle-bounce{ transform: scale(1.02); }
 
-.brand{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: var(--brand, #b7410e);
-  font-weight: 800;
-  padding: 8px 12px;
-  border-radius: 999px;
-}
+
 .brand-icon{
   display: grid;
   place-items: center;
