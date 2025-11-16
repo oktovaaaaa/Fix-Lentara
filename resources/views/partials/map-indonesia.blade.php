@@ -1,5 +1,7 @@
 {{-- resources/views/partials/map-indonesia.blade.php --}}
-<section id="map-indonesia-section" class="mi-section">
+<section
+    id="map-indonesia-section"
+    class="mi-section py-12 px-4 sm:px-6 flex justify-center bg-[var(--bg-body)] text-[var(--txt-body)]">
 
     {{-- Leaflet CSS --}}
     <link rel="stylesheet"
@@ -8,24 +10,22 @@
           crossorigin=""/>
 
     <style>
-        /* ========= WRAPPER SECTION ========= */
+        /* ========= WRAPPER + GRID ========= */
         #map-indonesia-section.mi-section {
-            padding: 3rem 1.5rem;
-            display: flex;
-            justify-content: center;
-            /* ikut variable global supaya sinkron tema */
-            background: var(--bg-body, #030712);
-            color: var(--txt-body, #f9fafb);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .mi-shell {
+            width: 100%;
+            max-width: 1200px;
         }
 
         .mi-container {
             width: 100%;
-            max-width: 1200px;
             display: grid;
-            grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* 2 kolom SAMA BESAR */
             gap: 2rem;
-            align-items: stretch;
+            align-items: stretch; /* tinggi baris sama */
         }
 
         @media (max-width: 900px) {
@@ -35,45 +35,109 @@
         }
 
         /* ========= MAP COLUMN ========= */
-       .mi-map-wrapper {
-    position: relative;
-    border-radius: 24px;
-    overflow: hidden;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
-    background: #000;
-
-    /* >>> ini penting: tinggi wrapper fix / fleksibel */
-    /* height: min(70vh, 650px);  contoh: maksimal 650px, atau 70% tinggi layar */
-}
-
-#mi-map-indonesia {
-    width: 100%;
-    height: 100%;     /* >>> ganti min-height jadi height full*/
-}
-
-
-        /* ========= RIGHT INFO COLUMN (NEON CARD) ========= */
-        .mi-info-wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        .mi-map-wrapper {
+            position: relative;
+            border-radius: 26px;
+            padding: 8px;
+            background: transparent;
         }
 
+        .mi-map-neon {
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            z-index: 0;
+            background: conic-gradient(
+                from var(--mi-border-angle),
+                rgba(249, 115, 22, 0),
+                rgba(249, 115, 22, 0.1) 40deg,
+                #f97316 90deg,
+                #fdba74 140deg,
+                rgba(249, 115, 22, 0.18) 200deg,
+                rgba(249, 115, 22, 0) 260deg,
+                rgba(249, 115, 22, 0.2) 310deg,
+                #f97316 340deg,
+                rgba(249, 115, 22, 0) 360deg
+            );
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            padding: 6px;
+            filter: blur(4px);
+            opacity: 0.9;
+            animation: mi-neon-spin 8s linear infinite;
+        }
+
+        .mi-map-inner {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+
+            height: 100%;      /* tinggi ngikut baris grid */
+            min-height: 340px;
+        }
+
+        #mi-map-indonesia {
+            width: 100%;
+            height: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .mi-map-inner {
+                min-height: 320px;
+            }
+        }
+
+        /* ========= TITLE AREA (ATAS KEDUA KOLOM) ========= */
         .mi-title {
             font-size: clamp(2rem, 3vw, 2.6rem);
             font-weight: 700;
             margin-bottom: 0.5rem;
-            color: var(--txt-body, #f9fafb);
+            display: inline-block;
+
+            background-image: linear-gradient(90deg, #f97316, #fdba74, #f97316);
+            background-size: 200% auto;
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+
+            animation: mi-title-glow 4s ease-in-out infinite;
         }
 
         .mi-subtitle {
             font-size: 0.95rem;
             color: var(--muted, #9ca3af);
             margin-bottom: 1.75rem;
-            max-width: 480px;
+            max-width: 640px;
         }
 
-        /* ==== NEON BORDER ==== */
+        @keyframes mi-title-glow {
+            0%, 100% {
+                background-position: 0% 50%;
+                text-shadow: 0 0 18px rgba(249, 115, 22, 0.5);
+                transform: translateY(0);
+            }
+            50% {
+                background-position: 100% 50%;
+                text-shadow: 0 0 28px rgba(253, 186, 116, 0.7);
+                transform: translateY(-2px);
+            }
+        }
+
+        /* ========= RIGHT INFO COLUMN ========= */
+        .mi-info-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        /* ==== NEON BORDER CARD ==== */
         @property --mi-border-angle {
             syntax: "<angle>";
             inherits: false;
@@ -82,8 +146,10 @@
 
         .mi-card {
             position: relative;
-            max-width: 480px;
+            max-width: 680px;
             border-radius: 20px;
+            height: 100%;
+            display: flex;
         }
 
         .mi-card-glow {
@@ -93,7 +159,6 @@
             padding: 10px;
             z-index: 0;
             pointer-events: none;
-
             background: conic-gradient(
                 from var(--mi-border-angle),
                 rgba(249, 115, 22, 0),
@@ -106,16 +171,13 @@
                 #f97316 330deg,
                 rgba(249, 115, 22, 0) 360deg
             );
-
             -webkit-mask:
                 linear-gradient(#000 0 0) content-box,
                 linear-gradient(#000 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
-
             filter: blur(4px);
             opacity: 0.95;
-
             animation: mi-neon-spin 8s linear infinite;
         }
 
@@ -128,7 +190,6 @@
         .mi-card-inner {
             position: relative;
             border-radius: 18px;
-            /* ikut var(--card) supaya warnanya nyambung tema */
             background: var(--card, radial-gradient(circle at top left, #111827, #020617));
             padding: 1.75rem 1.9rem;
             box-shadow:
@@ -136,6 +197,9 @@
                 0 0 0 1px rgba(255, 255, 255, 0.06);
             z-index: 1;
             color: var(--txt-body, #f9fafb);
+
+            display: flex;
+            flex-direction: column;
         }
 
         .mi-card-badge {
@@ -193,7 +257,6 @@
                 0 0 0 2px rgba(248, 113, 113, 0.35);
         }
 
-        /* kalau tema light, biar popup nggak terlalu gelap */
         html:not(.dark):not(.theme-dark) .mi-leaflet-popup .leaflet-popup-content-wrapper {
             background: #ffffff;
             color: #111827;
@@ -259,36 +322,46 @@
         }
     </style>
 
-    <div class="mi-container">
-        {{-- LEFT: MAP --}}
-        <div class="mi-map-wrapper">
-            <div id="mi-map-indonesia"></div>
-        </div>
-
-        {{-- RIGHT: NEON CARD INFO --}}
-        <div class="mi-info-wrapper">
-            <h2 class="mi-title">Peta Interaktif Indonesia</h2>
-            <p class="mi-subtitle">
+    <div class="mi-shell">
+        {{-- TITLE DI ATAS KEDUA KOLOM --}}
+        <div class="text-center mb-8 sm:mb-10">
+            <h2 class="mi-title mx-auto tracking-tight">
+                Peta Interaktif Indonesia
+            </h2>
+            <p class="mi-subtitle mx-auto">
                 Klik area berwarna pada peta untuk melihat informasi yang diambil dari
                 <code>map-indonesia.geojson</code>. Tema peta akan ikut tombol tema di navbar
                 (light / dark).
             </p>
+        </div>
 
-            <div class="mi-card">
-                <div class="mi-card-glow"></div>
-                <div class="mi-card-inner">
-                    <div class="mi-card-badge">Panduan</div>
-                    <h3 class="mi-card-heading">Cara Menggunakan Peta</h3>
-                    <p class="mi-card-text">
-                        Gunakan scroll untuk zoom, drag untuk menggeser peta, lalu klik polygon
-                        berwarna untuk membuka popup detail wilayah. Tema peta otomatis sinkron
-                        dengan tombol ☀️ / 🌙 di navbar.
-                    </p>
-                    <ul class="mi-card-list">
-                        <li><span class="mi-dot"></span> GeoJSON: <code>public/data/map-indonesia.geojson</code></li>
-                        <li><span class="mi-dot"></span> Basemap: MapTiler Streets (light & dark)</li>
-                        <li><span class="mi-dot"></span> Neon border mengikuti desain timeline-mu</li>
-                    </ul>
+        <div class="mi-container">
+            {{-- LEFT: MAP --}}
+            <div class="mi-map-wrapper">
+                <div class="mi-map-neon"></div>
+                <div class="mi-map-inner">
+                    <div id="mi-map-indonesia"></div>
+                </div>
+            </div>
+
+            {{-- RIGHT: NEON CARD INFO --}}
+            <div class="mi-info-wrapper">
+                <div class="mi-card">
+                    <div class="mi-card-glow"></div>
+                    <div class="mi-card-inner">
+                        <div class="mi-card-badge">Panduan</div>
+                        <h3 class="mi-card-heading">Cara Menggunakan Peta</h3>
+                        <p class="mi-card-text">
+                            Gunakan scroll untuk zoom, drag untuk menggeser peta, lalu klik polygon
+                            berwarna untuk membuka popup detail wilayah. Tema peta otomatis sinkron
+                            dengan tombol ☀️ / 🌙 di navbar.
+                        </p>
+                        <ul class="mi-card-list">
+                            <li><span class="mi-dot"></span> GeoJSON: <code>public/data/map-indonesia.geojson</code></li>
+                            <li><span class="mi-dot"></span> Basemap: MapTiler Streets (light & dark)</li>
+                            <li><span class="mi-dot"></span> Neon border mengikuti desain timeline-mu</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -309,7 +382,13 @@
                 scrollWheelZoom: true
             }).setView([-2.5, 118], 5);
 
-            // ====== DEFINISI 2 BASEMAP (LIGHT & DARK) ======
+            // CUSTOM ATTRIBUTION: Lentara Nusantara | Leaflet
+            map.attributionControl.setPrefix(
+                '<a href="/" target="_blank" rel="noopener">Lentara Nusantara</a> | ' +
+                '© <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>'
+            );
+
+            // ====== BASEMAP (LIGHT & DARK) ======
             const lightTiles = L.tileLayer(
                 "https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key={{ config('services.maptiler.key') }}",
                 {
@@ -328,7 +407,7 @@
                     tileSize: 256,
                     attribution:
                         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
-                        '&copy; <a href=\"https://www.maptiler.com/copyright/\">MapTiler</a>'
+                        '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a>'
                 }
             );
 
@@ -342,7 +421,7 @@
                 baseLayer.addTo(map);
             }
 
-            // ====== DETEKSI TEMA AWAL (cocok dengan sistem kamu sebisa mungkin) ======
+            // ====== DETEKSI TEMA AWAL ======
             function detectIsDark() {
                 const html = document.documentElement;
                 const body = document.body;
@@ -356,13 +435,10 @@
                     return true;
                 }
 
-                // fallback: cek localStorage.theme kalau ada
                 try {
                     const stored = localStorage.getItem('theme');
                     if (stored === 'dark') return true;
-                } catch (e) {
-                    // abaikan error localStorage
-                }
+                } catch (e) {}
 
                 return false;
             }
@@ -372,22 +448,19 @@
                 setBaseMapTheme(dark);
             }
 
-            // pas pertama load
             syncThemeFromDOM();
 
-            // ====== HOOK KE TOMBOL NAVBAR & DRAWER ======
             function hookThemeButton(id) {
                 const btn = document.getElementById(id);
                 if (!btn) return;
 
                 btn.addEventListener('click', function () {
-                    // kasih sedikit delay supaya script utama navbar sempat update class / localStorage
                     setTimeout(syncThemeFromDOM, 30);
                 });
             }
 
-            hookThemeButton('themeToggle');  // tombol ☀️ / 🌙 di navbar
-            hookThemeButton('drawerTheme');  // tombol ganti tema di drawer mobile
+            hookThemeButton('themeToggle');
+            hookThemeButton('drawerTheme');
 
             // ====== LAYER GEOJSON ======
             let geojsonLayer = null;
@@ -467,6 +540,9 @@
 
                     try {
                         map.fitBounds(geojsonLayer.getBounds(), { padding: [20, 20] });
+
+                        const currentZoom = map.getZoom();
+                        map.setZoom(currentZoom - 1);
                     } catch (err) {
                         console.warn('Tidak bisa fitBounds, pakai view default.', err);
                     }
