@@ -60,32 +60,12 @@ Route::prefix('admin')
 
         Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
 
-        // ⬇️ CRUD history UNTUK SEMUA PULAU
-        Route::resource('histories', IslandHistoryController::class)
+        Route::resource('histories', \App\Http\Controllers\Admin\HistoryController::class)
+            ->names('histories')
             ->except(['show']);
-            
+
         Route::resource('stats', IslandStatController::class)
             ->names('stats');
-
-        Route::post('stats/population/{island}', [IslandStatController::class, 'updatePopulation'])
-            ->name('stats.population.update');
-
-        Route::post('stats/{island}/demographics', [IslandStatController::class, 'storeDemographic'])
-            ->name('stats.demographics.store');
-
-        Route::delete('stats/{island}/demographics/{demographic}', [IslandStatController::class, 'destroyDemographic'])
-            ->name('stats.demographics.destroy');
-
-
-               Route::resource('sumatera-histories', SumateraHistoryController::class)
-            ->except(['show']);
-        // URL contoh:
-        // - GET  /admin/sumatera-histories           -> index
-        // - GET  /admin/sumatera-histories/create    -> create
-        // - POST /admin/sumatera-histories           -> store
-        // - GET  /admin/sumatera-histories/{id}/edit -> edit
-        // - PUT  /admin/sumatera-histories/{id}      -> update
-        // - DELETE /admin/sumatera-histories/{id}    -> destroy
 
         Route::post('stats/population/{island}', [IslandStatController::class, 'updatePopulation'])
             ->name('stats.population.update');

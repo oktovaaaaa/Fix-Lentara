@@ -36,7 +36,7 @@
             <select name="tribe" id="tribeSelect"
                     class="w-full rounded-lg border border-slate-700 bg-slate-950/40 px-3 py-2 text-sm">
                 <option value="">Pilih suku...</option>
-                @foreach($sumateraTribes as $t)
+@foreach($tribes as $t)
                     <option value="{{ $t }}" @selected(old('tribe', $history->tribe) === $t)>{{ $t }}</option>
                 @endforeach
             </select>

@@ -19,7 +19,7 @@
                 @foreach($islands as $island)
                     <option value="{{ $island->id }}"
                             data-slug="{{ $island->slug }}"
-                            @selected(old('island_id') == $island->id)>
+                            @selected(old('island_id', $selectedIslandId ?? null) == $island->id)>
                         {{ $island->name }}
                     </option>
                 @endforeach
@@ -29,20 +29,19 @@
             @enderror
         </div>
 
-        {{-- Suku (aktif ketika pulau Sumatera) --}}
+        {{-- Suku (mengikuti pulau yang dipilih) --}}
         <div>
-            <label class="block text-xs font-medium mb-1">Suku (untuk Sumatera: Aceh / Batak / Minangkabau)</label>
+            <label class="block text-xs font-medium mb-1">Suku</label>
             <select name="tribe" id="tribeSelect"
-                    class="w-full rounded-lg border border-slate-700 bg-slate-950/40 px-3 py-2 text-sm"
-                    disabled>
+                    class="w-full rounded-lg border border-slate-700 bg-slate-950/40 px-3 py-2 text-sm">
                 <option value="">Pilih suku...</option>
-                @foreach($sumateraTribes as $t)
+                @foreach($tribes as $t)
                     <option value="{{ $t }}" @selected(old('tribe') === $t)>{{ $t }}</option>
                 @endforeach
             </select>
             <p class="text-[11px] text-slate-500 mt-1">
-                Dropdown ini aktif jika pulau yang dipilih adalah <strong>Pulau Sumatera</strong>.
-                Untuk pulau lain kamu bisa nanti pakai field suku bebas (bisa dikembangkan lagi).
+                Daftar suku akan menyesuaikan <strong>pulau</strong> yang dipilih
+                (Jawa, Sumatera, Kalimantan, Sulawesi, Sunda Kecil, Papua &amp; Maluku).
             </p>
             @error('tribe')
                 <p class="text-xs text-red-400 mt-1">{{ $message }}</p>
@@ -119,26 +118,46 @@
     </form>
 </div>
 
-{{-- SCRIPT: aktifkan dropdown suku hanya jika pulau Sumatera --}}
+{{-- SCRIPT: update daftar suku setiap kali pulau diganti --}}
 <script>
-    (function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        // mapping pulau -> daftar suku dari config/tribes.php
+        const tribesConfig = @json($tribesConfig ?? []);
+
         const islandSelect = document.getElementById('islandSelect');
         const tribeSelect  = document.getElementById('tribeSelect');
+        const oldTribe     = @json(old('tribe'));
 
-        function updateTribeSelect() {
-            const selected = islandSelect.options[islandSelect.selectedIndex];
-            const slug = selected ? selected.getAttribute('data-slug') : null;
+        function fillTribes(selectedTribe) {
+            const opt  = islandSelect.options[islandSelect.selectedIndex];
+            const slug = opt ? opt.dataset.slug : null;
+            const tribes = slug && tribesConfig[slug] ? tribesConfig[slug] : [];
 
-            if (slug === 'sumatera') {
-                tribeSelect.disabled = false;
-            } else {
-                tribeSelect.disabled = true;
-                tribeSelect.value = '';
-            }
+            // kosongkan option
+            tribeSelect.innerHTML = '<option value=\"\">Pilih suku...</option>';
+
+            tribes.forEach(function (t) {
+                const o = document.createElement('option');
+                o.value = t;
+                o.textContent = t;
+
+                if (selectedTribe && selectedTribe === t) {
+                    o.selected = true;
+                }
+
+                tribeSelect.appendChild(o);
+            });
+
+            tribeSelect.disabled = tribes.length === 0;
         }
 
-        islandSelect.addEventListener('change', updateTribeSelect);
-        updateTribeSelect();
-    })();
+        // pertama kali load (pakai old('tribe') kalau ada)
+        fillTribes(oldTribe || '');
+
+        // ketika pulau diganti, reset pilihan suku
+        islandSelect.addEventListener('change', function () {
+            fillTribes('');
+        });
+    });
 </script>
 @endsection

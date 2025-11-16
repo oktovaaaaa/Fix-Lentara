@@ -37,11 +37,11 @@
         </div>
 
         <div>
-            <label class="text-xs font-medium block mb-1">Suku (khusus Sumatera)</label>
+            <label class="text-xs font-medium block mb-1">Suku</label>
             <select name="tribe"
                     class="rounded-lg border border-slate-700 bg-slate-900/60 text-sm px-3 py-2">
                 <option value="">Semua</option>
-                @foreach($sumateraTribes as $t)
+@foreach($tribes as $t)
                     <option value="{{ $t }}" @selected($tribe === $t)>{{ $t }}</option>
                 @endforeach
             </select>

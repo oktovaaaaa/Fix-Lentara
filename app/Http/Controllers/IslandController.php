@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 
 class IslandController extends Controller
 {
-    /**
-     * (Opsional) index untuk admin statistik
-     */
     public function index()
     {
         $islands = Island::orderBy('order')->get();
@@ -18,9 +15,6 @@ class IslandController extends Controller
         return view('admin.stats.index', compact('islands'));
     }
 
-    /**
-     * Halaman landing (home) dengan carousel pulau
-     */
     public function landing()
     {
         $islands = Island::query()
@@ -57,10 +51,10 @@ class IslandController extends Controller
      */
     public function show(Island $island)
     {
-        // pastikan pulau aktif
+        // pastikan hanya pulau aktif yang bisa diakses
         abort_unless($island->is_active, 404);
 
-        // ====== DATA UNTUK CAROUSEL DI HERO ======
+        // ====== CAROUSEL DATA UNTUK SEMUA PULAU ======
         $islands = Island::query()
             ->where('is_active', true)
             ->orderBy('order')
@@ -78,7 +72,7 @@ class IslandController extends Controller
             ];
         });
 
-        // ====== RELASI FEATURES & DEMOGRAPHICS ======
+        // ====== FEATURES & DEMOGRAPHICS UNTUK PULAU TERPILIH ======
         $island->load(['features', 'demographics']);
 
         $featuresByType = [
@@ -95,34 +89,36 @@ class IslandController extends Controller
             'language'  => $island->demographics->where('type', 'language')->sortBy('order')->values(),
         ];
 
-        // ====== HISTORY PULAU & SUKU (untuk Sumatera) ======
-        $historiesByTribe = collect();
+        // ====== HISTORY PER SUKU UNTUK PULAU INI ======
+        $histories = IslandHistory::where('island_id', $island->id)
+            ->orderBy('order')
+            ->orderBy('year_label')
+            ->get();
 
-        if ($island->slug === 'sumatera') {
-            // ambil semua history untuk pulau Sumatera (island_id = id Sumatera)
-            $histories = IslandHistory::where('island_id', $island->id)
-                ->orderBy('order')
-                ->orderBy('id')
-                ->get();
+        $historiesByTribe = $histories->groupBy('tribe');
 
-            // group by kolom `tribe` -> 'Aceh', 'Batak', 'Minangkabau'
-            $historiesByTribe = $histories->groupBy('tribe');
+        // ambil daftar suku dari config, fallback ke data di DB
+        $availableTribes = config("tribes.{$island->slug}") ?? [];
+
+        if (empty($availableTribes)) {
+            $availableTribes = $histories->pluck('tribe')->unique()->values()->all();
         }
 
-        // ====== PILIH VIEW BERDASARKAN SLUG ======
+        // ====== TENTUKAN NAMA VIEW BERDASARKAN SLUG ======
         $viewName = 'islands.' . $island->slug;
 
-        // kalau file khusus belum ada, pakai view default
+        // kalau view khusus tidak ada, pakai default
         if (!view()->exists($viewName)) {
             $viewName = 'islands.default';
         }
 
         return view($viewName, [
-            'carouselData'   => $carouselData,
-            'selectedIsland' => $island,
-            'featuresByType' => $featuresByType,
-            'demographics'   => $demographics,
-            'historiesByTribe' => $historiesByTribe, // ⬅️ DIKIRIM KE VIEW
+            'carouselData'     => $carouselData,
+            'selectedIsland'   => $island,
+            'featuresByType'   => $featuresByType,
+            'demographics'     => $demographics,
+            'historiesByTribe' => $historiesByTribe,
+            'availableTribes'  => $availableTribes,
         ]);
     }
 }

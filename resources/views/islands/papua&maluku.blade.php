@@ -1,7 +1,7 @@
-{{-- resources/views/islands/kalimantan.blade.php --}}
+{{-- resources/views/islands/papua-maluku.blade.php --}}
 @extends('layouts.app')
 
-@section('title', 'Pulau Kalimantan – Lentara')
+@section('title', 'Pulau Papua & Maluku – Lentara')
 
 @section('content')
     {{-- HERO shared --}}
@@ -9,13 +9,13 @@
 
     @php
         // dikirim dari controller, tapi jaga-jaga kalau belum ada
-        $historiesByTribe  = $historiesByTribe ?? collect();
-        $dayakHistories    = $historiesByTribe['Dayak'] ?? collect();
-        $banjarHistories   = $historiesByTribe['Banjar'] ?? collect();
-        $kutaiHistories    = $historiesByTribe['Kutai'] ?? collect();
+        $historiesByTribe = $historiesByTribe ?? collect();
+        $asmatHistories   = $historiesByTribe['Asmat'] ?? collect();
+        $amungmeHistories = $historiesByTribe['Amungme'] ?? collect();
+        $ambonHistories   = $historiesByTribe['Ambon'] ?? collect();
     @endphp
 
-    {{-- WRAPPER KALIMANTAN --}}
+    {{-- WRAPPER PAPUA & MALUKU --}}
     <section
         class="relative z-[10] py-12 sm:py-16 px-4 sm:px-6 bg-[var(--bg-body)] text-[var(--txt-body)]">
 
@@ -28,7 +28,7 @@
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div>
                     <p class="text-xs uppercase tracking-[0.18em] text-[var(--muted)] mb-1">
-                        Pilih Suku di Pulau Kalimantan
+                        Pilih Suku di Papua & Maluku
                     </p>
                     <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
                         Eksplorasi Budaya per Suku
@@ -38,18 +38,18 @@
                 <div class="inline-flex gap-2 bg-[color-mix(in_srgb,var(--bg-body)_80%,#e5e7eb_20%)] p-1.5 rounded-full">
                     <button type="button"
                             class="tribe-tab is-active"
-                            data-tribe-tab="dayak">
-                        Dayak
+                            data-tribe-tab="asmat">
+                        Asmat
                     </button>
                     <button type="button"
                             class="tribe-tab"
-                            data-tribe-tab="banjar">
-                        Banjar
+                            data-tribe-tab="amungme">
+                        Amungme
                     </button>
                     <button type="button"
                             class="tribe-tab"
-                            data-tribe-tab="kutai">
-                        Kutai
+                            data-tribe-tab="ambon">
+                        Ambon
                     </button>
                 </div>
             </div>
@@ -60,32 +60,32 @@
                 {{-- ABOUT + HISTORY DINAMIS (PENTING) --}}
                 <section id="about" class="space-y-3">
                     <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
-                        Tentang Suku di Pulau Kalimantan
+                        Tentang Suku di Papua & Maluku
                     </h2>
 
-                    {{-- Dayak --}}
-                    <div data-tribe-panel="dayak">
+                    {{-- Asmat --}}
+                    <div data-tribe-panel="asmat">
                         <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Suku Dayak adalah kelompok etnis asli Kalimantan yang mendiami wilayah pedalaman
-                            dan tepi sungai. Mereka terdiri dari banyak sub-suku dengan bahasa, adat, dan
-                            kepercayaan yang beragam, namun sama-sama dekat dengan hutan dan sungai.
+                            Suku Asmat mendiami wilayah pesisir selatan Papua. Mereka dikenal dengan seni ukir kayu
+                            yang sangat khas, dengan bentuk-bentuk manusia, leluhur, dan simbol-simbol alam yang penuh makna.
                         </p>
                         <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Budaya Dayak tercermin pada rumah panjang, seni ukir, tato tradisional, hingga
-                            upacara adat yang menghormati leluhur dan alam sebagai sumber kehidupan.
+                            Kehidupan masyarakat Asmat sangat dekat dengan hutan rawa, sungai, dan laut. Upacara adat,
+                            rumah-rumah laki-laki (<span class="italic">jeu</span>), dan ritual penghormatan leluhur
+                            menjadi pusat dari identitas budaya mereka.
                         </p>
 
-                        {{-- TIMELINE HISTORY: DAYAK --}}
-                        @if($dayakHistories->count())
+                        {{-- TIMELINE HISTORY: ASMAT --}}
+                        @if($asmatHistories->count())
                             <section class="history-section">
                                 <div class="history-container">
-                                    <h3 class="history-title">Sejarah Suku Dayak</h3>
+                                    <h3 class="history-title">Sejarah Suku Asmat</h3>
                                     <p class="history-subtitle">
-                                        Rangkaian peristiwa penting yang menggambarkan perjalanan masyarakat Dayak di Kalimantan.
+                                        Jejak seni ukir, hubungan dengan alam, dan ritual leluhur di tanah Asmat.
                                     </p>
 
                                     <div class="timeline">
-                                        @foreach($dayakHistories as $item)
+                                        @foreach($asmatHistories as $item)
                                             <div class="timeline-item">
                                                 <div class="timeline-card">
                                                     <div class="timeline-card-glow"></div>
@@ -120,34 +120,33 @@
                             </section>
                         @else
                             <p class="history-empty">
-                                Belum ada data sejarah Dayak yang diinput dari admin.
+                                Belum ada data sejarah Asmat yang diinput dari admin.
                             </p>
                         @endif
                     </div>
 
-                    {{-- Banjar --}}
-                    <div class="hidden" data-tribe-panel="banjar">
+                    {{-- Amungme --}}
+                    <div class="hidden" data-tribe-panel="amungme">
                         <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Suku Banjar banyak mendiami wilayah Kalimantan Selatan dan kawasan sekitarnya.
-                            Mereka dikenal sebagai masyarakat sungai dan pesisir dengan tradisi perdagangan
-                            yang kuat di pasar-pasar terapung.
+                            Suku Amungme tinggal di wilayah pegunungan tengah Papua. Bagi mereka, gunung-gunung
+                            tinggi dan lembah adalah ruang sakral yang menghubungkan manusia, alam, dan leluhur.
                         </p>
                         <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Identitas Banjar tampak dalam bahasa, rumah panggung di tepi sungai, dan
-                            adat istiadat yang dipengaruhi nilai-nilai Islam serta budaya Melayu.
+                            Sistem nilai dan adat Amungme menekankan penghormatan terhadap tanah dan ruang hidup,
+                            yang tercermin dalam cerita-cerita lisan, pembagian wilayah adat, dan ritual keagamaan.
                         </p>
 
-                        {{-- TIMELINE HISTORY: BANJAR --}}
-                        @if($banjarHistories->count())
+                        {{-- TIMELINE HISTORY: AMUNGME --}}
+                        @if($amungmeHistories->count())
                             <section class="history-section">
                                 <div class="history-container">
-                                    <h3 class="history-title">Sejarah Suku Banjar</h3>
+                                    <h3 class="history-title">Sejarah Suku Amungme</h3>
                                     <p class="history-subtitle">
-                                        Jejak kerajaan Banjar, jaringan perdagangan, dan perkembangan budaya sungai Kalimantan.
+                                        Kisah masyarakat pegunungan Papua dalam menjaga tanah dan identitas budaya mereka.
                                     </p>
 
                                     <div class="timeline">
-                                        @foreach($banjarHistories as $item)
+                                        @foreach($amungmeHistories as $item)
                                             <div class="timeline-item">
                                                 <div class="timeline-card">
                                                     <div class="timeline-card-glow"></div>
@@ -182,33 +181,33 @@
                             </section>
                         @else
                             <p class="history-empty">
-                                Belum ada data sejarah Banjar yang diinput dari admin.
+                                Belum ada data sejarah Amungme yang diinput dari admin.
                             </p>
                         @endif
                     </div>
 
-                    {{-- Kutai --}}
-                    <div class="hidden" data-tribe-panel="kutai">
+                    {{-- Ambon --}}
+                    <div class="hidden" data-tribe-panel="ambon">
                         <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Suku Kutai mendiami wilayah Kalimantan Timur dan sekitarnya. Di daerah ini pernah
-                            berdiri salah satu kerajaan tertua di Nusantara yang dikenal melalui prasasti Yupa.
+                            Masyarakat Ambon berada di wilayah Maluku, yang sejak lama dikenal sebagai daerah
+                            penghasil rempah-rempah dan persilangan berbagai budaya: lokal, Eropa, Arab, hingga Nusantara.
                         </p>
                         <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Warisan sejarah dan budaya Kutai dapat dijumpai pada situs-situs arkeologi, tradisi
-                            lisan, dan upacara adat yang masih dijalankan masyarakat setempat.
+                            Musik tradisional, tari-tarian, tradisi pela gandong, dan kehidupan maritim menjadi
+                            bagian penting dari identitas budaya Ambon di kepulauan rempah.
                         </p>
 
-                        {{-- TIMELINE HISTORY: KUTAI --}}
-                        @if($kutaiHistories->count())
+                        {{-- TIMELINE HISTORY: AMBON --}}
+                        @if($ambonHistories->count())
                             <section class="history-section">
                                 <div class="history-container">
-                                    <h3 class="history-title">Sejarah Suku Kutai</h3>
+                                    <h3 class="history-title">Sejarah Masyarakat Ambon</h3>
                                     <p class="history-subtitle">
-                                        Catatan awal kerajaan di Nusantara dan perkembangan masyarakat Kutai dari masa ke masa.
+                                        Jejak panjang Ambon sebagai simpul perdagangan rempah dan pertemuan budaya.
                                     </p>
 
                                     <div class="timeline">
-                                        @foreach($kutaiHistories as $item)
+                                        @foreach($ambonHistories as $item)
                                             <div class="timeline-item">
                                                 <div class="timeline-card">
                                                     <div class="timeline-card-glow"></div>
@@ -243,7 +242,7 @@
                             </section>
                         @else
                             <p class="history-empty">
-                                Belum ada data sejarah Kutai yang diinput dari admin.
+                                Belum ada data sejarah Ambon yang diinput dari admin.
                             </p>
                         @endif
                     </div>
@@ -251,29 +250,29 @@
 
                 {{-- ====== SECTION LAIN: HANYA KERANGKA / KOLOM KOSONG ====== --}}
 
-                {{-- STATISTIK (kosong) --}}
+                {{-- STATISTIK (kosong, siap diisi nanti) --}}
                 <section id="stats" class="space-y-4">
                     <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
                         Statistik Singkat
                     </h2>
 
-                    <div data-tribe-panel="dayak"
+                    <div data-tribe-panel="asmat"
                          class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                        {{-- Kolom statistik Dayak (belum diisi) --}}
+                        {{-- Kolom statistik Asmat (belum diisi) --}}
                     </div>
 
-                    <div data-tribe-panel="banjar"
+                    <div data-tribe-panel="amungme"
                          class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm hidden">
-                        {{-- Kolom statistik Banjar (belum diisi) --}}
+                        {{-- Kolom statistik Amungme (belum diisi) --}}
                     </div>
 
-                    <div data-tribe-panel="kutai"
+                    <div data-tribe-panel="ambon"
                          class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm hidden">
-                        {{-- Kolom statistik Kutai (belum diisi) --}}
+                        {{-- Kolom statistik Ambon (belum diisi) --}}
                     </div>
 
                     <p class="text-xs sm:text-sm text-[var(--muted)]">
-                        Data statistik Kalimantan akan ditambahkan kemudian.
+                        Data statistik Papua & Maluku akan ditambahkan kemudian.
                     </p>
                 </section>
 
@@ -283,19 +282,19 @@
                         Destinasi Budaya
                     </h2>
 
-                    <div data-tribe-panel="dayak"
+                    <div data-tribe-panel="asmat"
                          class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {{-- Destinasi Dayak (belum diisi) --}}
+                        {{-- Destinasi Asmat (belum diisi) --}}
                     </div>
 
-                    <div data-tribe-panel="banjar"
+                    <div data-tribe-panel="amungme"
                          class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
-                        {{-- Destinasi Banjar (belum diisi) --}}
+                        {{-- Destinasi Amungme (belum diisi) --}}
                     </div>
 
-                    <div data-tribe-panel="kutai"
+                    <div data-tribe-panel="ambon"
                          class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
-                        {{-- Destinasi Kutai (belum diisi) --}}
+                        {{-- Destinasi Ambon (belum diisi) --}}
                     </div>
                 </section>
 
@@ -305,19 +304,19 @@
                         Kuliner Khas
                     </h2>
 
-                    <div data-tribe-panel="dayak"
+                    <div data-tribe-panel="asmat"
                          class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {{-- Kuliner Dayak (belum diisi) --}}
+                        {{-- Kuliner Asmat (belum diisi) --}}
                     </div>
 
-                    <div data-tribe-panel="banjar"
+                    <div data-tribe-panel="amungme"
                          class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
-                        {{-- Kuliner Banjar (belum diisi) --}}
+                        {{-- Kuliner Amungme (belum diisi) --}}
                     </div>
 
-                    <div data-tribe-panel="kutai"
+                    <div data-tribe-panel="ambon"
                          class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
-                        {{-- Kuliner Kutai (belum diisi) --}}
+                        {{-- Kuliner Ambon (belum diisi) --}}
                     </div>
                 </section>
 
@@ -327,16 +326,16 @@
                         Warisan & Sejarah
                     </h2>
 
-                    <div data-tribe-panel="dayak" class="space-y-2">
-                        {{-- Warisan Dayak (belum diisi) --}}
+                    <div data-tribe-panel="asmat" class="space-y-2">
+                        {{-- Warisan Asmat (belum diisi) --}}
                     </div>
 
-                    <div data-tribe-panel="banjar" class="space-y-2 hidden">
-                        {{-- Warisan Banjar (belum diisi) --}}
+                    <div data-tribe-panel="amungme" class="space-y-2 hidden">
+                        {{-- Warisan Amungme (belum diisi) --}}
                     </div>
 
-                    <div data-tribe-panel="kutai" class="space-y-2 hidden">
-                        {{-- Warisan Kutai (belum diisi) --}}
+                    <div data-tribe-panel="ambon" class="space-y-2 hidden">
+                        {{-- Warisan Ambon (belum diisi) --}}
                     </div>
                 </section>
 
@@ -346,16 +345,16 @@
                         Kuis Mini
                     </h2>
 
-                    <div data-tribe-panel="dayak" class="space-y-4">
-                        {{-- Kuis Dayak (belum diisi) --}}
+                    <div data-tribe-panel="asmat" class="space-y-4">
+                        {{-- Kuis Asmat (belum diisi) --}}
                     </div>
 
-                    <div data-tribe-panel="banjar" class="space-y-4 hidden">
-                        {{-- Kuis Banjar (belum diisi) --}}
+                    <div data-tribe-panel="amungme" class="space-y-4 hidden">
+                        {{-- Kuis Amungme (belum diisi) --}}
                     </div>
 
-                    <div data-tribe-panel="kutai" class="space-y-4 hidden">
-                        {{-- Kuis Kutai (belum diisi) --}}
+                    <div data-tribe-panel="ambon" class="space-y-4 hidden">
+                        {{-- Kuis Ambon (belum diisi) --}}
                     </div>
                 </section>
             </div>
