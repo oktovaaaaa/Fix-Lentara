@@ -13,11 +13,19 @@
         $sundaHistories   = $historiesByTribe['Sunda'] ?? collect();
         $jawaHistories    = $historiesByTribe['Jawa'] ?? collect();
         $betawiHistories  = $historiesByTribe['Betawi'] ?? collect();
+
+        // ===== QUIZ PER SUKU (sama seperti HOME) =====
+        // dari controller: $quizzesByTribe (map tribe => Quiz) dan $generalIslandQuiz (fallback)
+        $quizzesByTribe = $quizzesByTribe ?? collect();
+        $generalIslandQuiz = $generalIslandQuiz ?? null;
+
+        $sundaQuiz  = $quizzesByTribe['Sunda'] ?? null;
+        $jawaQuiz   = $quizzesByTribe['Jawa'] ?? null;
+        $betawiQuiz = $quizzesByTribe['Betawi'] ?? null;
     @endphp
 
     {{-- WRAPPER JAWA --}}
-    <section
-        class="relative z-[10] py-12 sm:py-16 px-4 sm:px-6 bg-[var(--bg-body)] text-[var(--txt-body)]">
+    <section class="relative z-[10] py-12 sm:py-16 px-4 sm:px-6 bg-[var(--bg-body)] text-[var(--txt-body)]">
 
         {{-- CSS kecil khusus tab suku + timeline history --}}
         @include('islands.partials.tribe-styles')
@@ -36,21 +44,9 @@
                 </div>
 
                 <div class="inline-flex gap-2 bg-[color-mix(in_srgb,var(--bg-body)_80%,#e5e7eb_20%)] p-1.5 rounded-full">
-                    <button type="button"
-                            class="tribe-tab is-active"
-                            data-tribe-tab="sunda">
-                        Sunda
-                    </button>
-                    <button type="button"
-                            class="tribe-tab"
-                            data-tribe-tab="jawa">
-                        Jawa
-                    </button>
-                    <button type="button"
-                            class="tribe-tab"
-                            data-tribe-tab="betawi">
-                        Betawi
-                    </button>
+                    <button type="button" class="tribe-tab is-active" data-tribe-tab="sunda">Sunda</button>
+                    <button type="button" class="tribe-tab" data-tribe-tab="jawa">Jawa</button>
+                    <button type="button" class="tribe-tab" data-tribe-tab="betawi">Betawi</button>
                 </div>
             </div>
 
@@ -90,24 +86,15 @@
                                                 <div class="timeline-card">
                                                     <div class="timeline-card-glow"></div>
                                                     <div class="timeline-card-inner">
-                                                        @if(!empty($item->year_label))
-                                                            <div class="timeline-badge">
-                                                                {{ $item->year_label }}
-                                                            </div>
-                                                        @else
-                                                            <div class="timeline-badge">
-                                                                Jejak Sejarah
-                                                            </div>
-                                                        @endif
+                                                        <div class="timeline-badge">
+                                                            {{ !empty($item->year_label) ? $item->year_label : 'Jejak Sejarah' }}
+                                                        </div>
 
                                                         <h3 class="timeline-heading">{{ $item->title }}</h3>
-                                                        <p class="timeline-text">
-                                                            {{ $item->content }}
-                                                        </p>
+                                                        <p class="timeline-text">{{ $item->content }}</p>
 
                                                         @if($item->more_link)
-                                                            <a href="{{ $item->more_link }}" target="_blank" rel="noopener"
-                                                               class="timeline-link">
+                                                            <a href="{{ $item->more_link }}" target="_blank" rel="noopener" class="timeline-link">
                                                                 Lihat selengkapnya →
                                                             </a>
                                                         @endif
@@ -119,9 +106,7 @@
                                 </div>
                             </section>
                         @else
-                            <p class="history-empty">
-                                Belum ada data sejarah Sunda yang diinput dari admin.
-                            </p>
+                            <p class="history-empty">Belum ada data sejarah Sunda yang diinput dari admin.</p>
                         @endif
                     </div>
 
@@ -153,24 +138,15 @@
                                                 <div class="timeline-card">
                                                     <div class="timeline-card-glow"></div>
                                                     <div class="timeline-card-inner">
-                                                        @if(!empty($item->year_label))
-                                                            <div class="timeline-badge">
-                                                                {{ $item->year_label }}
-                                                            </div>
-                                                        @else
-                                                            <div class="timeline-badge">
-                                                                Jejak Sejarah
-                                                            </div>
-                                                        @endif
+                                                        <div class="timeline-badge">
+                                                            {{ !empty($item->year_label) ? $item->year_label : 'Jejak Sejarah' }}
+                                                        </div>
 
                                                         <h3 class="timeline-heading">{{ $item->title }}</h3>
-                                                        <p class="timeline-text">
-                                                            {{ $item->content }}
-                                                        </p>
+                                                        <p class="timeline-text">{{ $item->content }}</p>
 
                                                         @if($item->more_link)
-                                                            <a href="{{ $item->more_link }}" target="_blank" rel="noopener"
-                                                               class="timeline-link">
+                                                            <a href="{{ $item->more_link }}" target="_blank" rel="noopener" class="timeline-link">
                                                                 Lihat selengkapnya →
                                                             </a>
                                                         @endif
@@ -182,9 +158,7 @@
                                 </div>
                             </section>
                         @else
-                            <p class="history-empty">
-                                Belum ada data sejarah Jawa yang diinput dari admin.
-                            </p>
+                            <p class="history-empty">Belum ada data sejarah Jawa yang diinput dari admin.</p>
                         @endif
                     </div>
 
@@ -215,24 +189,15 @@
                                                 <div class="timeline-card">
                                                     <div class="timeline-card-glow"></div>
                                                     <div class="timeline-card-inner">
-                                                        @if(!empty($item->year_label))
-                                                            <div class="timeline-badge">
-                                                                {{ $item->year_label }}
-                                                            </div>
-                                                        @else
-                                                            <div class="timeline-badge">
-                                                                Jejak Sejarah
-                                                            </div>
-                                                        @endif
+                                                        <div class="timeline-badge">
+                                                            {{ !empty($item->year_label) ? $item->year_label : 'Jejak Sejarah' }}
+                                                        </div>
 
                                                         <h3 class="timeline-heading">{{ $item->title }}</h3>
-                                                        <p class="timeline-text">
-                                                            {{ $item->content }}
-                                                        </p>
+                                                        <p class="timeline-text">{{ $item->content }}</p>
 
                                                         @if($item->more_link)
-                                                            <a href="{{ $item->more_link }}" target="_blank" rel="noopener"
-                                                               class="timeline-link">
+                                                            <a href="{{ $item->more_link }}" target="_blank" rel="noopener" class="timeline-link">
                                                                 Lihat selengkapnya →
                                                             </a>
                                                         @endif
@@ -244,22 +209,18 @@
                                 </div>
                             </section>
                         @else
-                            <p class="history-empty">
-                                Belum ada data sejarah Betawi yang diinput dari admin.
-                            </p>
+                            <p class="history-empty">Belum ada data sejarah Betawi yang diinput dari admin.</p>
                         @endif
                     </div>
                 </section>
 
                 {{-- STATISTIK --}}
                 <section id="stats" class="space-y-4">
-                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
-                        Statistik Singkat
-                    </h2>
+                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">Statistik Singkat</h2>
 
+                    {{-- (bagian statistik kamu biarkan seperti semula) --}}
                     {{-- Sunda --}}
-                    <div data-tribe-panel="sunda"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div data-tribe-panel="sunda" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <p class="text-xs uppercase tracking-wide text-[var(--muted)]">Wilayah Utama</p>
                             <p class="text-lg font-semibold mt-1">Jawa Barat & Banten</p>
@@ -279,8 +240,7 @@
                     </div>
 
                     {{-- Jawa --}}
-                    <div data-tribe-panel="jawa"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm hidden">
+                    <div data-tribe-panel="jawa" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm hidden">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <p class="text-xs uppercase tracking-wide text-[var(--muted)]">Wilayah Utama</p>
                             <p class="text-lg font-semibold mt-1">Jawa Tengah, DIY, Jawa Timur</p>
@@ -300,8 +260,7 @@
                     </div>
 
                     {{-- Betawi --}}
-                    <div data-tribe-panel="betawi"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm hidden">
+                    <div data-tribe-panel="betawi" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm hidden">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <p class="text-xs uppercase tracking-wide text-[var(--muted)]">Wilayah Utama</p>
                             <p class="text-lg font-semibold mt-1">Jakarta & sekitarnya</p>
@@ -327,13 +286,11 @@
 
                 {{-- DESTINASI --}}
                 <section id="destinations" class="space-y-4">
-                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
-                        Destinasi Budaya
-                    </h2>
+                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">Destinasi Budaya</h2>
 
+                    {{-- (destinasi kamu biarkan seperti semula) --}}
                     {{-- Sunda --}}
-                    <div data-tribe-panel="sunda"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div data-tribe-panel="sunda" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Kampung Naga</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -351,8 +308,7 @@
                     </div>
 
                     {{-- Jawa --}}
-                    <div data-tribe-panel="jawa"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                    <div data-tribe-panel="jawa" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Keraton Yogyakarta</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -370,8 +326,7 @@
                     </div>
 
                     {{-- Betawi --}}
-                    <div data-tribe-panel="betawi"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                    <div data-tribe-panel="betawi" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Setu Babakan</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -391,13 +346,11 @@
 
                 {{-- KULINER --}}
                 <section id="foods" class="space-y-4">
-                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
-                        Kuliner Khas
-                    </h2>
+                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">Kuliner Khas</h2>
 
+                    {{-- (kuliner kamu biarkan seperti semula) --}}
                     {{-- Sunda --}}
-                    <div data-tribe-panel="sunda"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div data-tribe-panel="sunda" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Nasi Timbel</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -415,8 +368,7 @@
                     </div>
 
                     {{-- Jawa --}}
-                    <div data-tribe-panel="jawa"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                    <div data-tribe-panel="jawa" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Gudeg</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -434,8 +386,7 @@
                     </div>
 
                     {{-- Betawi --}}
-                    <div data-tribe-panel="betawi"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                    <div data-tribe-panel="betawi" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Soto Betawi</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -455,10 +406,9 @@
 
                 {{-- WARISAN --}}
                 <section id="warisan" class="space-y-4">
-                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
-                        Warisan & Sejarah
-                    </h2>
+                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">Warisan & Sejarah</h2>
 
+                    {{-- (warisan kamu biarkan seperti semula) --}}
                     {{-- Sunda --}}
                     <div data-tribe-panel="sunda" class="space-y-2">
                         <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
@@ -499,95 +449,33 @@
                     </div>
                 </section>
 
-                {{-- KUIS --}}
+                {{-- KUIS (DIUBAH: SAMA SEPERTI HOME, DINAMIS) --}}
                 <section id="quiz" class="space-y-4">
-                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
-                        Kuis Mini
-                    </h2>
+                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">Kuis Mini</h2>
 
-                    {{-- Sunda --}}
                     <div data-tribe-panel="sunda" class="space-y-4">
-                        <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm text-sm">
-                            <p class="font-semibold mb-2">
-                                1. Ibukota provinsi yang menjadi pusat budaya Sunda adalah...
-                            </p>
-                            <ul class="space-y-1 text-xs sm:text-sm text-[var(--muted)]">
-                                <li>A. Semarang</li>
-                                <li>B. Bandung</li>
-                                <li>C. Surabaya</li>
-                                <li>D. Denpasar</li>
-                            </ul>
-                        </div>
-                        <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm text-sm">
-                            <p class="font-semibold mb-2">
-                                2. Alat musik bambu yang identik dengan Sunda adalah...
-                            </p>
-                            <ul class="space-y-1 text-xs sm:text-sm text-[var(--muted)]">
-                                <li>A. Sasando</li>
-                                <li>B. Angklung</li>
-                                <li>C. Tifa</li>
-                                <li>D. Kolintang</li>
-                            </ul>
-                        </div>
+                        @include('partials.quiz-section', [
+                            'quiz' => $sundaQuiz ?: $generalIslandQuiz
+                        ])
                     </div>
 
-                    {{-- Jawa --}}
                     <div data-tribe-panel="jawa" class="space-y-4 hidden">
-                        <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm text-sm">
-                            <p class="font-semibold mb-2">
-                                1. Seni pertunjukan yang menggunakan boneka kulit dan dimainkan dengan gamelan adalah...
-                            </p>
-                            <ul class="space-y-1 text-xs sm:text-sm text-[var(--muted)]">
-                                <li>A. Wayang Golek</li>
-                                <li>B. Wayang Orang</li>
-                                <li>C. Wayang Kulit</li>
-                                <li>D. Wayang Beber</li>
-                            </ul>
-                        </div>
-                        <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm text-sm">
-                            <p class="font-semibold mb-2">
-                                2. Kota yang dikenal sebagai kota pelajar sekaligus pusat budaya Jawa adalah...
-                            </p>
-                            <ul class="space-y-1 text-xs sm:text-sm text-[var(--muted)]">
-                                <li>A. Medan</li>
-                                <li>B. Yogyakarta</li>
-                                <li>C. Palembang</li>
-                                <li>D. Makassar</li>
-                            </ul>
-                        </div>
+                        @include('partials.quiz-section', [
+                            'quiz' => $jawaQuiz ?: $generalIslandQuiz
+                        ])
                     </div>
 
-                    {{-- Betawi --}}
                     <div data-tribe-panel="betawi" class="space-y-4 hidden">
-                        <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm text-sm">
-                            <p class="font-semibold mb-2">
-                                1. Boneka raksasa khas Betawi yang sering tampil di pawai disebut...
-                            </p>
-                            <ul class="space-y-1 text-xs sm:text-sm text-[var(--muted)]">
-                                <li>A. Barongsai</li>
-                                <li>B. Ondel-ondel</li>
-                                <li>C. Reog</li>
-                                <li>D. Kuda Lumping</li>
-                            </ul>
-                        </div>
-                        <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm text-sm">
-                            <p class="font-semibold mb-2">
-                                2. Makanan khas Betawi yang terbuat dari telur, beras ketan, dan serundeng adalah...
-                            </p>
-                            <ul class="space-y-1 text-xs sm:text-sm text-[var(--muted)]">
-                                <li>A. Rendang</li>
-                                <li>B. Kerak Telor</li>
-                                <li>C. Pempek</li>
-                                <li>D. Nasi Liwet</li>
-                            </ul>
-                        </div>
+                        @include('partials.quiz-section', [
+                            'quiz' => $betawiQuiz ?: $generalIslandQuiz
+                        ])
                     </div>
                 </section>
+
             </div>
         </div>
 
         {{-- SCRIPT KECIL UNTUK GANTI TAB SUKU --}}
         @include('islands.partials.tribe-tabs-script')
-
     </section>
 @endsection

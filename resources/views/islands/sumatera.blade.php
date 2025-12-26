@@ -463,38 +463,38 @@
                     </div>
                 </section>
 
-<section id="quiz" class="space-y-4">
-  <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold"> Kuis Mini </h2>
+                {{-- ===================== QUIZ (SAMA SEPERTI HOME) ===================== --}}
+                <section id="quiz" class="space-y-4">
+                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">Kuis Mini</h2>
 
-  <div data-tribe-panel="aceh" class="space-y-4">
-    @include('islands.partials.quiz-by-tribe', [
-      'tribeName' => 'Aceh',
-      'quiz' => $acehQuiz,
-      'fallback' => $generalIslandQuiz,
-    ])
-  </div>
+                    {{-- Aceh --}}
+                    <div data-tribe-panel="aceh" class="space-y-4">
+                        @include('partials.quiz-section', [
+                            'quiz' => $acehQuiz ?: $generalIslandQuiz
+                        ])
+                    </div>
 
-  <div data-tribe-panel="batak" class="space-y-4 hidden">
-    @include('islands.partials.quiz-by-tribe', [
-      'tribeName' => 'Batak',
-      'quiz' => $batakQuiz,
-      'fallback' => $generalIslandQuiz,
-    ])
-  </div>
+                    {{-- Batak --}}
+                    <div data-tribe-panel="batak" class="space-y-4 hidden">
+                        @include('partials.quiz-section', [
+                            'quiz' => $batakQuiz ?: $generalIslandQuiz
+                        ])
+                    </div>
 
-  <div data-tribe-panel="minang" class="space-y-4 hidden">
-    @include('islands.partials.quiz-by-tribe', [
-      'tribeName' => 'Minangkabau',
-      'quiz' => $minangQuiz,
-      'fallback' => $generalIslandQuiz,
-    ])
-  </div>
-</section>
+                    {{-- Minangkabau --}}
+                    <div data-tribe-panel="minang" class="space-y-4 hidden">
+                        @include('partials.quiz-section', [
+                            'quiz' => $minangQuiz ?: $generalIslandQuiz
+                        ])
+                    </div>
+                </section>
+                {{-- ===================== END QUIZ ===================== --}}
 
+            </div> {{-- end #suku-wrapper --}}
 
+            {{-- SCRIPT KECIL UNTUK GANTI TAB SUKU --}}
+            @include('islands.partials.tribe-tabs-script')
 
-        {{-- SCRIPT KECIL UNTUK GANTI TAB SUKU --}}
-        @include('islands.partials.tribe-tabs-script')
-
+        </div>
     </section>
 @endsection
