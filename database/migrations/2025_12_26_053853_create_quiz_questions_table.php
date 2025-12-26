@@ -9,18 +9,19 @@ return new class extends Migration {
     {
         Schema::create('quiz_questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('quiz_id')->constrained()->cascadeOnDelete();
 
-            // text | image
-            $table->string('prompt_type')->default('text');
+            $table->foreignId('quiz_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->string('prompt_type')->default('text'); // text|image
             $table->text('prompt_text')->nullable();
-            $table->string('prompt_image')->nullable(); // path storage/public
+            $table->string('prompt_image')->nullable();
 
-            $table->unsignedInteger('order')->default(0);
+            $table->unsignedInteger('order')->default(0)->index();
             $table->text('explanation')->nullable();
 
             $table->timestamps();
-
             $table->index(['quiz_id', 'order']);
         });
     }

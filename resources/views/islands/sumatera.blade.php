@@ -13,14 +13,23 @@
         $acehHistories = $historiesByTribe['Aceh'] ?? collect();
         $batakHistories = $historiesByTribe['Batak'] ?? collect();
         $minangHistories = $historiesByTribe['Minangkabau'] ?? collect();
+
+        // ===== QUIZ PER SUKU (dari controller) =====
+        // $quizzesByTribe: Collection map [ 'Aceh' => Quiz, 'Batak' => Quiz, 'Minangkabau' => Quiz, '__general__' => Quiz ]
+        // $generalIslandQuiz: Quiz fallback utk pulau jika tribe spesifik belum ada
+        $quizzesByTribe = $quizzesByTribe ?? collect();
+        $generalIslandQuiz = $generalIslandQuiz ?? null;
+
+        $acehQuiz  = $quizzesByTribe['Aceh'] ?? null;
+        $batakQuiz = $quizzesByTribe['Batak'] ?? null;
+        $minangQuiz = $quizzesByTribe['Minangkabau'] ?? null;
     @endphp
 
     {{-- WRAPPER SUMATERA --}}
-    <section
-        class="relative z-[10] py-12 sm:py-16 px-4 sm:px-6 bg-[var(--bg-body)] text-[var(--txt-body)]">
+    <section class="relative z-[10] py-12 sm:py-16 px-4 sm:px-6 bg-[var(--bg-body)] text-[var(--txt-body)]">
 
-{{-- CSS kecil khusus tab suku + timeline history --}}
-@include('islands.partials.tribe-styles')
+        {{-- CSS kecil khusus tab suku + timeline history --}}
+        @include('islands.partials.tribe-styles')
 
         <div class="max-w-5xl mx-auto space-y-10">
 
@@ -36,19 +45,13 @@
                 </div>
 
                 <div class="inline-flex gap-2 bg-[color-mix(in_srgb,var(--bg-body)_80%,#e5e7eb_20%)] p-1.5 rounded-full">
-                    <button type="button"
-                            class="tribe-tab is-active"
-                            data-tribe-tab="aceh">
+                    <button type="button" class="tribe-tab is-active" data-tribe-tab="aceh">
                         Aceh
                     </button>
-                    <button type="button"
-                            class="tribe-tab"
-                            data-tribe-tab="batak">
+                    <button type="button" class="tribe-tab" data-tribe-tab="batak">
                         Batak
                     </button>
-                    <button type="button"
-                            class="tribe-tab"
-                            data-tribe-tab="minang">
+                    <button type="button" class="tribe-tab" data-tribe-tab="minang">
                         Minangkabau
                     </button>
                 </div>
@@ -90,24 +93,15 @@
                                                 <div class="timeline-card">
                                                     <div class="timeline-card-glow"></div>
                                                     <div class="timeline-card-inner">
-                                                        @if(!empty($item->year_label))
-                                                            <div class="timeline-badge">
-                                                                {{ $item->year_label }}
-                                                            </div>
-                                                        @else
-                                                            <div class="timeline-badge">
-                                                                Jejak Sejarah
-                                                            </div>
-                                                        @endif
+                                                        <div class="timeline-badge">
+                                                            {{ !empty($item->year_label) ? $item->year_label : 'Jejak Sejarah' }}
+                                                        </div>
 
                                                         <h3 class="timeline-heading">{{ $item->title }}</h3>
-                                                        <p class="timeline-text">
-                                                            {{ $item->content }}
-                                                        </p>
+                                                        <p class="timeline-text">{{ $item->content }}</p>
 
                                                         @if($item->more_link)
-                                                            <a href="{{ $item->more_link }}" target="_blank" rel="noopener"
-                                                               class="timeline-link">
+                                                            <a href="{{ $item->more_link }}" target="_blank" rel="noopener" class="timeline-link">
                                                                 Lihat selengkapnya →
                                                             </a>
                                                         @endif
@@ -151,24 +145,15 @@
                                                 <div class="timeline-card">
                                                     <div class="timeline-card-glow"></div>
                                                     <div class="timeline-card-inner">
-                                                        @if(!empty($item->year_label))
-                                                            <div class="timeline-badge">
-                                                                {{ $item->year_label }}
-                                                            </div>
-                                                        @else
-                                                            <div class="timeline-badge">
-                                                                Jejak Sejarah
-                                                            </div>
-                                                        @endif
+                                                        <div class="timeline-badge">
+                                                            {{ !empty($item->year_label) ? $item->year_label : 'Jejak Sejarah' }}
+                                                        </div>
 
                                                         <h3 class="timeline-heading">{{ $item->title }}</h3>
-                                                        <p class="timeline-text">
-                                                            {{ $item->content }}
-                                                        </p>
+                                                        <p class="timeline-text">{{ $item->content }}</p>
 
                                                         @if($item->more_link)
-                                                            <a href="{{ $item->more_link }}" target="_blank" rel="noopener"
-                                                               class="timeline-link">
+                                                            <a href="{{ $item->more_link }}" target="_blank" rel="noopener" class="timeline-link">
                                                                 Lihat selengkapnya →
                                                             </a>
                                                         @endif
@@ -212,24 +197,15 @@
                                                 <div class="timeline-card">
                                                     <div class="timeline-card-glow"></div>
                                                     <div class="timeline-card-inner">
-                                                        @if(!empty($item->year_label))
-                                                            <div class="timeline-badge">
-                                                                {{ $item->year_label }}
-                                                            </div>
-                                                        @else
-                                                            <div class="timeline-badge">
-                                                                Jejak Sejarah
-                                                            </div>
-                                                        @endif
+                                                        <div class="timeline-badge">
+                                                            {{ !empty($item->year_label) ? $item->year_label : 'Jejak Sejarah' }}
+                                                        </div>
 
                                                         <h3 class="timeline-heading">{{ $item->title }}</h3>
-                                                        <p class="timeline-text">
-                                                            {{ $item->content }}
-                                                        </p>
+                                                        <p class="timeline-text">{{ $item->content }}</p>
 
                                                         @if($item->more_link)
-                                                            <a href="{{ $item->more_link }}" target="_blank" rel="noopener"
-                                                               class="timeline-link">
+                                                            <a href="{{ $item->more_link }}" target="_blank" rel="noopener" class="timeline-link">
                                                                 Lihat selengkapnya →
                                                             </a>
                                                         @endif
@@ -255,8 +231,7 @@
                     </h2>
 
                     {{-- Aceh --}}
-                    <div data-tribe-panel="aceh"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div data-tribe-panel="aceh" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <p class="text-xs uppercase tracking-wide text-[var(--muted)]">Wilayah Utama</p>
                             <p class="text-lg font-semibold mt-1">Provinsi Aceh</p>
@@ -276,8 +251,7 @@
                     </div>
 
                     {{-- Batak --}}
-                    <div data-tribe-panel="batak"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm hidden">
+                    <div data-tribe-panel="batak" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm hidden">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <p class="text-xs uppercase tracking-wide text-[var(--muted)]">Wilayah Utama</p>
                             <p class="text-lg font-semibold mt-1">Sekitar Danau Toba</p>
@@ -297,8 +271,7 @@
                     </div>
 
                     {{-- Minangkabau --}}
-                    <div data-tribe-panel="minang"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm hidden">
+                    <div data-tribe-panel="minang" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm hidden">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <p class="text-xs uppercase tracking-wide text-[var(--muted)]">Wilayah Utama</p>
                             <p class="text-lg font-semibold mt-1">Sumatera Barat</p>
@@ -329,8 +302,7 @@
                     </h2>
 
                     {{-- Aceh --}}
-                    <div data-tribe-panel="aceh"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div data-tribe-panel="aceh" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Banda Aceh & Masjid Raya Baiturrahman</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -348,8 +320,7 @@
                     </div>
 
                     {{-- Batak --}}
-                    <div data-tribe-panel="batak"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                    <div data-tribe-panel="batak" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Danau Toba & Pulau Samosir</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -367,8 +338,7 @@
                     </div>
 
                     {{-- Minangkabau --}}
-                    <div data-tribe-panel="minang"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                    <div data-tribe-panel="minang" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Bukittinggi & Jam Gadang</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -393,8 +363,7 @@
                     </h2>
 
                     {{-- Aceh --}}
-                    <div data-tribe-panel="aceh"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div data-tribe-panel="aceh" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Mie Aceh</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -412,8 +381,7 @@
                     </div>
 
                     {{-- Batak --}}
-                    <div data-tribe-panel="batak"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                    <div data-tribe-panel="batak" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Arsik</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -431,8 +399,7 @@
                     </div>
 
                     {{-- Minangkabau --}}
-                    <div data-tribe-panel="minang"
-                         class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                    <div data-tribe-panel="minang" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Rendang</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -496,95 +463,38 @@
                     </div>
                 </section>
 
-                {{-- KUIS --}}
-                <section id="quiz" class="space-y-4">
-                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
-                        Kuis Mini
-                    </h2>
+<section id="quiz" class="space-y-4">
+  <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold"> Kuis Mini </h2>
 
-                    {{-- Aceh --}}
-                    <div data-tribe-panel="aceh" class="space-y-4">
-                        <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm text-sm">
-                            <p class="font-semibold mb-2">
-                                1. Julukan yang sering diberikan kepada Aceh adalah...
-                            </p>
-                            <ul class="space-y-1 text-xs sm:text-sm text-[var(--muted)]">
-                                <li>A. Kota Kembang</li>
-                                <li>B. Serambi Mekkah</li>
-                                <li>C. Kota Hujan</li>
-                                <li>D. Kota Pelajar</li>
-                            </ul>
-                        </div>
-                        <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm text-sm">
-                            <p class="font-semibold mb-2">
-                                2. Tari tradisional Aceh yang terkenal secara internasional adalah...
-                            </p>
-                            <ul class="space-y-1 text-xs sm:text-sm text-[var(--muted)]">
-                                <li>A. Tari Piring</li>
-                                <li>B. Tari Saman</li>
-                                <li>C. Tari Jaipong</li>
-                                <li>D. Tari Kecak</li>
-                            </ul>
-                        </div>
-                    </div>
+  <div data-tribe-panel="aceh" class="space-y-4">
+    @include('islands.partials.quiz-by-tribe', [
+      'tribeName' => 'Aceh',
+      'quiz' => $acehQuiz,
+      'fallback' => $generalIslandQuiz,
+    ])
+  </div>
 
-                    {{-- Batak --}}
-                    <div data-tribe-panel="batak" class="space-y-4 hidden">
-                        <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm text-sm">
-                            <p class="font-semibold mb-2">
-                                1. Danau besar yang menjadi pusat budaya Batak adalah...
-                            </p>
-                            <ul class="space-y-1 text-xs sm:text-sm text-[var(--muted)]">
-                                <li>A. Danau Maninjau</li>
-                                <li>B. Danau Ranau</li>
-                                <li>C. Danau Toba</li>
-                                <li>D. Danau Singkarak</li>
-                            </ul>
-                        </div>
-                        <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm text-sm">
-                            <p class="font-semibold mb-2">
-                                2. Nama kain tenun khas Batak yang sering digunakan dalam upacara adat adalah...
-                            </p>
-                            <ul class="space-y-1 text-xs sm:text-sm text-[var(--muted)]">
-                                <li>A. Ulos</li>
-                                <li>B. Songket</li>
-                                <li>C. Lurik</li>
-                                <li>D. Kain Gringsing</li>
-                            </ul>
-                        </div>
-                    </div>
+  <div data-tribe-panel="batak" class="space-y-4 hidden">
+    @include('islands.partials.quiz-by-tribe', [
+      'tribeName' => 'Batak',
+      'quiz' => $batakQuiz,
+      'fallback' => $generalIslandQuiz,
+    ])
+  </div>
 
-                    {{-- Minangkabau --}}
-                    <div data-tribe-panel="minang" class="space-y-4 hidden">
-                        <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm text-sm">
-                            <p class="font-semibold mb-2">
-                                1. Sistem kekerabatan Minangkabau diturunkan melalui garis...
-                            </p>
-                            <ul class="space-y-1 text-xs sm:text-sm text-[var(--muted)]">
-                                <li>A. Ayah (patrilineal)</li>
-                                <li>B. Ibu (matrilineal)</li>
-                                <li>C. Kakek</li>
-                                <li>D. Nenek dari ayah</li>
-                            </ul>
-                        </div>
-                        <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm text-sm">
-                            <p class="font-semibold mb-2">
-                                2. Masakan Minang yang pernah dinobatkan sebagai salah satu makanan terenak di dunia adalah...
-                            </p>
-                            <ul class="space-y-1 text-xs sm:text-sm text-[var(--muted)]">
-                                <li>A. Soto Padang</li>
-                                <li>B. Rendang</li>
-                                <li>C. Gulai Ikan</li>
-                                <li>D. Nasi Uduk</li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
+  <div data-tribe-panel="minang" class="space-y-4 hidden">
+    @include('islands.partials.quiz-by-tribe', [
+      'tribeName' => 'Minangkabau',
+      'quiz' => $minangQuiz,
+      'fallback' => $generalIslandQuiz,
+    ])
+  </div>
+</section>
 
-{{-- SCRIPT KECIL UNTUK GANTI TAB SUKU --}}
-@include('islands.partials.tribe-tabs-script')
+
+
+        {{-- SCRIPT KECIL UNTUK GANTI TAB SUKU --}}
+        @include('islands.partials.tribe-tabs-script')
 
     </section>
 @endsection

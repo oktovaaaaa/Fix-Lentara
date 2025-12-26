@@ -11,10 +11,31 @@
         </div>
     @endif
 
+    @php
+        $scopeLabel = 'Global';
+        if ($quiz->scope === 'tribe') $scopeLabel = 'Suku';
+        elseif ($quiz->scope === 'island') $scopeLabel = 'Pulau';
+    @endphp
+
     <div class="grid gap-4 lg:grid-cols-3">
         <div class="bg-white rounded-xl shadow border p-5 lg:col-span-1">
             <h2 class="text-xl font-bold mb-1">Pengaturan Quiz</h2>
-            <p class="text-sm text-slate-500 mb-4">Update judul & status.</p>
+            <p class="text-sm text-slate-500 mb-4">Scope dikunci agar tidak membingungkan. Ubah judul & status saja.</p>
+
+            <div class="mb-4 p-3 rounded-lg bg-slate-50 border">
+                <div class="text-xs text-slate-500">Cakupan</div>
+                <div class="font-extrabold">{{ $scopeLabel }}</div>
+                @if($quiz->island)
+                    <div class="text-xs text-slate-500 mt-1">
+                        Pulau: <span class="font-bold">{{ $quiz->island->subtitle ?: $quiz->island->name }}</span>
+                    </div>
+                @endif
+                @if($quiz->tribe)
+                    <div class="text-xs text-slate-500">
+                        Suku: <span class="font-bold">{{ $quiz->tribe }}</span>
+                    </div>
+                @endif
+            </div>
 
             @if($errors->any())
                 <div class="mb-4 p-3 rounded-lg bg-red-50 text-red-700">
@@ -25,13 +46,13 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('admin.quizzes.update', $quiz) }}" class="space-y-3">
-                @csrf @method('PUT')
+            <form method="POST" action="{{ route('admin.quizzes.update', $quiz) }}" class="space-y-4">
+                @csrf
+                @method('PUT')
 
                 <div>
                     <label class="text-sm font-bold">Judul</label>
-                    <input class="w-full border rounded-lg px-3 py-2" name="title"
-                           value="{{ old('title', $quiz->title) }}" />
+                    <input class="w-full border rounded-lg px-3 py-2" name="title" value="{{ old('title', $quiz->title) }}" />
                 </div>
 
                 <label class="inline-flex items-center gap-2">
@@ -39,7 +60,7 @@
                     <span class="font-semibold">Aktif</span>
                 </label>
 
-                <button class="px-4 py-2 rounded-lg bg-slate-900 text-white font-bold hover:opacity-90">
+                <button class="w-full px-4 py-2 rounded-lg bg-slate-900 text-white font-bold hover:opacity-90">
                     Update
                 </button>
             </form>
@@ -64,13 +85,13 @@
                         <div class="flex items-start justify-between gap-3">
                             <div class="flex-1">
                                 <div class="text-xs text-slate-500 mb-1">Order: {{ $q->order }}</div>
+
                                 <div class="font-extrabold">
                                     @if($q->prompt_type === 'text')
                                         {{ $q->prompt_text }}
                                     @else
                                         <div class="font-bold mb-2">[Soal Gambar]</div>
-                                        <img class="w-full max-w-sm rounded-lg border"
-                                             src="{{ asset('storage/'.$q->prompt_image) }}" alt="prompt">
+                                        <img class="w-full max-w-sm rounded-lg border" src="{{ asset('storage/'.$q->prompt_image) }}" alt="prompt">
                                     @endif
                                 </div>
 
@@ -84,18 +105,22 @@
                                             @if($opt->content_type === 'text')
                                                 <div>{{ $opt->content_text }}</div>
                                             @else
-                                                <img class="w-full rounded-lg border"
-                                                     src="{{ asset('storage/'.$opt->content_image) }}" alt="option">
+                                                <img class="w-full rounded-lg border" src="{{ asset('storage/'.$opt->content_image) }}" alt="option">
                                             @endif
                                         </div>
                                     @endforeach
                                 </div>
+
+                                @if(!empty($q->explanation))
+                                    <div class="mt-3 text-xs text-slate-600">
+                                        <span class="font-bold">Penjelasan:</span> {{ $q->explanation }}
+                                    </div>
+                                @endif
                             </div>
 
-                            <form method="POST"
-                                  action="{{ route('admin.quiz-questions.destroy', [$quiz, $q]) }}"
-                                  onsubmit="return confirm('Hapus pertanyaan ini?')">
-                                @csrf @method('DELETE')
+                            <form method="POST" action="{{ route('admin.quiz-questions.destroy', [$quiz, $q]) }}" onsubmit="return confirm('Hapus pertanyaan ini?')">
+                                @csrf
+                                @method('DELETE')
                                 <button class="px-3 py-2 rounded-lg bg-red-100 text-red-700 font-bold">
                                     Hapus
                                 </button>

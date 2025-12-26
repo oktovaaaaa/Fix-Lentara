@@ -8,7 +8,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class QuizOption extends Model
 {
     protected $fillable = [
-        'quiz_question_id','content_type','content_text','content_image','is_correct','order'
+        'quiz_question_id',
+        'content_type',
+        'content_text',
+        'content_image',
+        'is_correct',
+        'order',
+    ];
+
+    protected $casts = [
+        'is_correct' => 'boolean',
     ];
 
     public function question(): BelongsTo

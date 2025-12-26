@@ -1268,15 +1268,16 @@
 
 {{-- QUIZ INDONESIA --}}
 <section id="quiz" class="py-10">
-    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-3 text-[var(--txt-body)]">
-        Kuis Budaya Indonesia
-    </h2>
-    <p class="text-sm sm:text-base text-[var(--muted)] mb-4">
-        Jawab pertanyaan seputar Nusantara. Soal & opsi bisa berupa teks atau gambar.
-    </p>
+  <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-3 text-[var(--txt-body)]">
+    Kuis Budaya Indonesia
+  </h2>
+  <p class="text-sm sm:text-base text-[var(--muted)] mb-4">
+    Jawab pertanyaan seputar Nusantara. Soal & opsi bisa berupa teks atau gambar.
+  </p>
 
-    @include('partials.quiz-section', ['quiz' => $quiz ?? null])
+  @include('partials.quiz-section', ['quiz' => $quiz ?? null])
 </section>
+
 
 
 

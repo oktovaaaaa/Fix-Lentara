@@ -7,7 +7,27 @@
 <div class="max-w-4xl mx-auto">
     <div class="bg-white rounded-xl shadow border p-5">
         <h2 class="text-xl font-bold mb-1">Tambah Pertanyaan</h2>
-        <p class="text-sm text-slate-500 mb-4">Soal & opsi bisa teks atau gambar. Pilih 1 jawaban benar.</p>
+
+        <div class="text-sm text-slate-600 mb-4">
+            <div class="font-bold">{{ $quiz->title }}</div>
+            @php
+                $scopeLabel = 'Global';
+                if ($quiz->island_id && $quiz->tribe) $scopeLabel = 'Suku';
+                elseif ($quiz->island_id) $scopeLabel = 'Pulau';
+            @endphp
+            <div class="text-xs text-slate-500 mt-1">
+                Cakupan: <span class="font-bold">{{ $scopeLabel }}</span>
+                @if($quiz->island)
+                    • Pulau: <span class="font-bold">{{ $quiz->island->subtitle ?: $quiz->island->name }}</span>
+                @endif
+                @if($quiz->tribe)
+                    • Suku: <span class="font-bold">{{ $quiz->tribe }}</span>
+                @endif
+            </div>
+            <div class="text-xs text-slate-500 mt-1">
+                Soal & opsi bisa teks atau gambar. Pilih <span class="font-bold">1 jawaban benar</span>.
+            </div>
+        </div>
 
         @if($errors->any())
             <div class="mb-4 p-3 rounded-lg bg-red-50 text-red-700">
@@ -18,7 +38,8 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('admin.quiz-questions.store', $quiz) }}" enctype="multipart/form-data" class="space-y-4" id="questionForm">
+        <form method="POST" action="{{ route('admin.quiz-questions.store', $quiz) }}"
+              enctype="multipart/form-data" class="space-y-4" id="questionForm">
             @csrf
 
             <div class="grid sm:grid-cols-2 gap-3">
@@ -82,7 +103,7 @@
                             <input class="w-full border rounded-lg px-3 py-2" name="options[{{ $i }}][order]" value="{{ old("options.$i.order",$i) }}">
                         </div>
                         <div class="text-xs text-slate-500 flex items-end">
-                            (opsional) kalau mau urutan custom
+                            (opsional) urutan custom
                         </div>
                     </div>
 

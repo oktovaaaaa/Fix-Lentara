@@ -9,7 +9,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class QuizQuestion extends Model
 {
     protected $fillable = [
-        'quiz_id','prompt_type','prompt_text','prompt_image','order','explanation'
+        'quiz_id',
+        'prompt_type',   // text|image
+        'prompt_text',
+        'prompt_image',
+        'order',
+        'explanation',
+    ];
+
+    protected $casts = [
+        'order' => 'integer',
     ];
 
     public function quiz(): BelongsTo
@@ -19,6 +28,6 @@ class QuizQuestion extends Model
 
     public function options(): HasMany
     {
-        return $this->hasMany(QuizOption::class)->orderBy('order');
+        return $this->hasMany(QuizOption::class, 'quiz_question_id')->orderBy('order');
     }
 }
