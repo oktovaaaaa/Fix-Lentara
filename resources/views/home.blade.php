@@ -29,138 +29,138 @@
 
                     {{-- @section('content') --}}
 
-                {{-- Leaflet CSS & JS (CDN) --}}
-                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                    {{-- Leaflet CSS & JS (CDN) --}}
+                    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-                <style>
-                    #indo-map {
-                        height: 500px;
-                        border-radius: 1.5rem;
-                        overflow: hidden;
-                    }
-
-                    /* Styling popup biar mirip card */
-                    .island-popup {
-                        font-family: "Inter", system-ui, sans-serif;
-                        min-width: 220px;
-                    }
-
-                    .island-popup h3 {
-                        margin: 0 0 0.25rem;
-                        font-size: 1.1rem;
-                        font-weight: 700;
-                    }
-
-                    .island-popup .subtitle {
-                        display: inline-block;
-                        width: 60px;
-                        font-weight: 600;
-                    }
-
-                    .island-popup hr {
-                        border: none;
-                        border-top: 3px solid #f97373;
-                        /* garis merah */
-                        width: 40px;
-                        margin: .4rem 0 .8rem;
-                    }
-                </style>
-
-                <script>
-                    document.addEventListener("DOMContentLoaded", function() {
-                        // 1. Inisialisasi map (posisi Indonesia)
-                        const map = L.map('indo-map').setView([-2, 118], 4.7);
-
-                        // 2. Tambah tile layer (background peta)
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            maxZoom: 18,
-                            attribution: '&copy; OpenStreetMap'
-                        }).addTo(map);
-
-                        // 3. Data pulau dalam bentuk GeoJSON (CONTOH SEDERHANA)
-                        // Koordinat di sini hanya kira-kira supaya ada yang muncul.
-                        const islandsGeoJson = {
-                            "type": "FeatureCollection",
-                            "features": [{
-                                    "type": "Feature",
-                                    "properties": {
-                                        "name": "Sumatera",
-                                        "aksara": "—",
-                                        "kata_khas": "Contoh kata",
-                                        "makna": "Deskripsi singkat tentang Sumatera.",
-                                        "digunakan_di": "Provinsi-provinsi di Sumatera."
-                                    },
-                                    "geometry": {
-                                        "type": "Polygon",
-                                        "coordinates": [
-                                            [
-                                                [95, 6], // barat laut
-                                                [105, 6], // timur laut
-                                                [105, -6], // tenggara
-                                                [95, -6], // barat daya
-                                                [95, 6] // tutup polygon
-                                            ]
-                                        ]
-                                    }
-                                },
-                                {
-                                    "type": "Feature",
-                                    "properties": {
-                                        "name": "Jawa",
-                                        "aksara": "—",
-                                        "kata_khas": "Contoh kata",
-                                        "makna": "Deskripsi singkat tentang Jawa.",
-                                        "digunakan_di": "Provinsi-provinsi di Jawa."
-                                    },
-                                    "geometry": {
-                                        "type": "Polygon",
-                                        "coordinates": [
-                                            [
-                                                [105, -5], // barat
-                                                [115, -5], // timur
-                                                [115, -9], // tenggara
-                                                [105, -9], // barat daya
-                                                [105, -5] // tutup polygon
-                                            ]
-                                        ]
-                                    }
-                                }
-                                // TODO: Tambahkan Kalimantan, Sulawesi, Sunda Kecil, Maluku, Papua
-                            ]
-                        };
-
-                        // 4. Style default dan style highlight
-                        function style(feature) {
-                            return {
-                                color: '#ffffff',
-                                weight: 2,
-                                fillColor: '#f97316', // oranye
-                                fillOpacity: 0.6
-                            };
+                    <style>
+                        #indo-map {
+                            height: 500px;
+                            border-radius: 1.5rem;
+                            overflow: hidden;
                         }
 
-                        function highlightStyle(feature) {
-                            return {
-                                color: '#ffffff',
-                                weight: 3,
-                                fillColor: '#fb923c',
-                                fillOpacity: 0.8
-                            };
+                        /* Styling popup biar mirip card */
+                        .island-popup {
+                            font-family: "Inter", system-ui, sans-serif;
+                            min-width: 220px;
                         }
 
-                        // 5. Event untuk tiap feature
-                        function onEachFeature(feature, layer) {
-                            const props = feature.properties;
+                        .island-popup h3 {
+                            margin: 0 0 0.25rem;
+                            font-size: 1.1rem;
+                            font-weight: 700;
+                        }
 
-                            // Tooltip saat hover (nama pulau)
-                            layer.bindTooltip(props.name, {
-                                sticky: true,
-                                direction: 'top'
-                            });
+                        .island-popup .subtitle {
+                            display: inline-block;
+                            width: 60px;
+                            font-weight: 600;
+                        }
 
-                            // Popup/kartu saat diklik
-                            const popupHtml = `
+                        .island-popup hr {
+                            border: none;
+                            border-top: 3px solid #f97373;
+                            /* garis merah */
+                            width: 40px;
+                            margin: .4rem 0 .8rem;
+                        }
+                    </style>
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            // 1. Inisialisasi map (posisi Indonesia)
+                            const map = L.map('indo-map').setView([-2, 118], 4.7);
+
+                            // 2. Tambah tile layer (background peta)
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                maxZoom: 18,
+                                attribution: '&copy; OpenStreetMap'
+                            }).addTo(map);
+
+                            // 3. Data pulau dalam bentuk GeoJSON (CONTOH SEDERHANA)
+                            // Koordinat di sini hanya kira-kira supaya ada yang muncul.
+                            const islandsGeoJson = {
+                                "type": "FeatureCollection",
+                                "features": [{
+                                        "type": "Feature",
+                                        "properties": {
+                                            "name": "Sumatera",
+                                            "aksara": "—",
+                                            "kata_khas": "Contoh kata",
+                                            "makna": "Deskripsi singkat tentang Sumatera.",
+                                            "digunakan_di": "Provinsi-provinsi di Sumatera."
+                                        },
+                                        "geometry": {
+                                            "type": "Polygon",
+                                            "coordinates": [
+                                                [
+                                                    [95, 6], // barat laut
+                                                    [105, 6], // timur laut
+                                                    [105, -6], // tenggara
+                                                    [95, -6], // barat daya
+                                                    [95, 6] // tutup polygon
+                                                ]
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "Feature",
+                                        "properties": {
+                                            "name": "Jawa",
+                                            "aksara": "—",
+                                            "kata_khas": "Contoh kata",
+                                            "makna": "Deskripsi singkat tentang Jawa.",
+                                            "digunakan_di": "Provinsi-provinsi di Jawa."
+                                        },
+                                        "geometry": {
+                                            "type": "Polygon",
+                                            "coordinates": [
+                                                [
+                                                    [105, -5], // barat
+                                                    [115, -5], // timur
+                                                    [115, -9], // tenggara
+                                                    [105, -9], // barat daya
+                                                    [105, -5] // tutup polygon
+                                                ]
+                                            ]
+                                        }
+                                    }
+                                    // TODO: Tambahkan Kalimantan, Sulawesi, Sunda Kecil, Maluku, Papua
+                                ]
+                            };
+
+                            // 4. Style default dan style highlight
+                            function style(feature) {
+                                return {
+                                    color: '#ffffff',
+                                    weight: 2,
+                                    fillColor: '#f97316', // oranye
+                                    fillOpacity: 0.6
+                                };
+                            }
+
+                            function highlightStyle(feature) {
+                                return {
+                                    color: '#ffffff',
+                                    weight: 3,
+                                    fillColor: '#fb923c',
+                                    fillOpacity: 0.8
+                                };
+                            }
+
+                            // 5. Event untuk tiap feature
+                            function onEachFeature(feature, layer) {
+                                const props = feature.properties;
+
+                                // Tooltip saat hover (nama pulau)
+                                layer.bindTooltip(props.name, {
+                                    sticky: true,
+                                    direction: 'top'
+                                });
+
+                                // Popup/kartu saat diklik
+                                const popupHtml = `
                 <div class="island-popup">
                     <h3>${props.name}</h3>
                     <hr />
@@ -170,34 +170,34 @@
                     <p><span class="subtitle">Wilayah:</span> ${props.digunakan_di}</p>
                 </div>
             `;
-                            layer.bindPopup(popupHtml);
+                                layer.bindPopup(popupHtml);
 
-                            // Efek hover
-                            layer.on({
-                                mouseover: function(e) {
-                                    e.target.setStyle(highlightStyle());
-                                    // optional: bawa ke depan
-                                    e.target.bringToFront();
-                                },
-                                mouseout: function(e) {
-                                    geojson.resetStyle(e.target);
-                                },
-                                click: function(e) {
-                                    map.fitBounds(e.target.getBounds(), {
-                                        padding: [20, 20]
-                                    });
-                                }
-                            });
-                        }
+                                // Efek hover
+                                layer.on({
+                                    mouseover: function(e) {
+                                        e.target.setStyle(highlightStyle());
+                                        // optional: bawa ke depan
+                                        e.target.bringToFront();
+                                    },
+                                    mouseout: function(e) {
+                                        geojson.resetStyle(e.target);
+                                    },
+                                    click: function(e) {
+                                        map.fitBounds(e.target.getBounds(), {
+                                            padding: [20, 20]
+                                        });
+                                    }
+                                });
+                            }
 
-                        // 6. Tambahkan layer GeoJSON ke map
-                        const geojson = L.geoJSON(islandsGeoJson, {
-                            style: style,
-                            onEachFeature: onEachFeature
-                        }).addTo(map);
-                    });
-                </script>
-                {{-- @endsection --}}
+                            // 6. Tambahkan layer GeoJSON ke map
+                            const geojson = L.geoJSON(islandsGeoJson, {
+                                style: style,
+                                onEachFeature: onEachFeature
+                            }).addTo(map);
+                        });
+                    </script>
+                    {{-- @endsection --}}
 
                 </p>
 
@@ -235,7 +235,7 @@
                     Indonesia adalah negara kepulauan dengan ratusan suku, bahasa, dan tradisi. Halaman ini
                     mengajakmu menjelajahi keragaman budaya dari Sabang sampai Merauke melalui pulau-pulau utama.
                 </p>
-                    @include('partials.map-indonesia')
+                @include('partials.map-indonesia')
             </section>
 
             {{-- HISTORY SECTION: Sejarah Nama Pulau di Indonesia --}}
@@ -627,380 +627,381 @@
                 </div>
             </section>
 
-{{-- STATISTIK INDONESIA --}}
-<section id="stats" class="mt-10">
-    {{-- CSS khusus section ini --}}
-    <style>
-        /* ================= THEME VAR UNTUK SECTION STATS ================= */
-        :root[data-theme='light'] {
-            --stats-card-red: linear-gradient(135deg, #fecaca, #f97373);
-            --stats-card-purple: linear-gradient(135deg, #ede9fe, #a855f7);
-            --stats-card-green: linear-gradient(135deg, #bbf7d0, #22c55e);
+            {{-- STATISTIK INDONESIA --}}
+            <section id="stats" class="mt-10">
+                {{-- CSS khusus section ini --}}
+                <style>
+                    /* ================= THEME VAR UNTUK SECTION STATS ================= */
+                    :root[data-theme='light'] {
+                        --stats-card-red: linear-gradient(135deg, #fecaca, #f97373);
+                        --stats-card-purple: linear-gradient(135deg, #ede9fe, #a855f7);
+                        --stats-card-green: linear-gradient(135deg, #bbf7d0, #22c55e);
 
-            --stats-card-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+                        --stats-card-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
 
-            --stats-chart-bg: radial-gradient(circle at top left, #f9fafb, #e5e7eb);
-            --stats-chart-border: rgba(15, 23, 42, 0.08);
-        }
+                        --stats-chart-bg: radial-gradient(circle at top left, #f9fafb, #e5e7eb);
+                        --stats-chart-border: rgba(15, 23, 42, 0.08);
+                    }
 
-        :root[data-theme='dark'] {
-            --stats-card-red: linear-gradient(135deg, #dc2626, #7f1d1d);
-            --stats-card-purple: linear-gradient(135deg, #7c3aed, #4c1d95);
-            --stats-card-green: linear-gradient(135deg, #059669, #065f46);
+                    :root[data-theme='dark'] {
+                        --stats-card-red: linear-gradient(135deg, #dc2626, #7f1d1d);
+                        --stats-card-purple: linear-gradient(135deg, #7c3aed, #4c1d95);
+                        --stats-card-green: linear-gradient(135deg, #059669, #065f46);
 
-            --stats-card-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+                        --stats-card-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
 
-            --stats-chart-bg: radial-gradient(circle at top left, #111827, #020617);
-            --stats-chart-border: rgba(255, 255, 255, 0.08);
-        }
+                        --stats-chart-bg: radial-gradient(circle at top left, #111827, #020617);
+                        --stats-chart-border: rgba(255, 255, 255, 0.08);
+                    }
 
-        #stats .stat-card {
-            position: relative;
-            border-radius: 18px;
-            padding: 18px 18px 16px 18px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: var(--stats-card-shadow);
-            cursor: pointer;
-            overflow: hidden;
+                    #stats .stat-card {
+                        position: relative;
+                        border-radius: 18px;
+                        padding: 18px 18px 16px 18px;
+                        border: 1px solid rgba(255, 255, 255, 0.08);
+                        box-shadow: var(--stats-card-shadow);
+                        cursor: pointer;
+                        overflow: hidden;
 
-            opacity: 0;
-            transform: translateY(16px);
-            animation: statsFadeUp 0.7s ease-out forwards;
-        }
+                        opacity: 0;
+                        transform: translateY(16px);
+                        animation: statsFadeUp 0.7s ease-out forwards;
+                    }
 
-        /* varian warna kartu – diambil dari CSS variable di atas */
-        #stats .stat-card--red {
-            background: var(--stats-card-red);
-        }
+                    /* varian warna kartu – diambil dari CSS variable di atas */
+                    #stats .stat-card--red {
+                        background: var(--stats-card-red);
+                    }
 
-        #stats .stat-card--purple {
-            background: var(--stats-card-purple);
-        }
+                    #stats .stat-card--purple {
+                        background: var(--stats-card-purple);
+                    }
 
-        #stats .stat-card--green {
-            background: var(--stats-card-green);
-        }
+                    #stats .stat-card--green {
+                        background: var(--stats-card-green);
+                    }
 
-        #stats .stat-card::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 55%);
-            opacity: 0;
-            transition: opacity 0.25s ease-out;
-        }
+                    #stats .stat-card::after {
+                        content: "";
+                        position: absolute;
+                        inset: 0;
+                        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 55%);
+                        opacity: 0;
+                        transition: opacity 0.25s ease-out;
+                    }
 
-        #stats .stat-card:hover::after {
-            opacity: 1;
-        }
+                    #stats .stat-card:hover::after {
+                        opacity: 1;
+                    }
 
-        #stats .stat-number {
-            font-size: 2.5rem;
-            line-height: 1;
-            font-weight: 800;
-        }
+                    #stats .stat-number {
+                        font-size: 2.5rem;
+                        line-height: 1;
+                        font-weight: 800;
+                    }
 
-        #stats .stat-label {
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
+                    #stats .stat-label {
+                        font-size: 0.95rem;
+                        font-weight: 500;
+                    }
 
-        #stats .stat-more {
-            margin-top: 10px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
+                    #stats .stat-more {
+                        margin-top: 10px;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        font-size: 0.8rem;
+                        font-weight: 500;
+                        text-transform: uppercase;
+                        letter-spacing: 0.08em;
+                    }
 
-        #stats .stat-more-icon {
-            transition: transform 0.2s ease-out;
-        }
+                    #stats .stat-more-icon {
+                        transition: transform 0.2s ease-out;
+                    }
 
-        #stats .stat-card:hover .stat-more-icon {
-            transform: translateX(4px);
-        }
+                    #stats .stat-card:hover .stat-more-icon {
+                        transform: translateX(4px);
+                    }
 
-        /* kartu chart: pakai var theme supaya cocok di light & dark */
-        #stats .chart-card {
-            position: relative;
-            border-radius: 18px;
-            padding: 16px 16px 12px 16px;
-            background: var(--stats-chart-bg);
-            border: 1px solid var(--stats-chart-border);
-            box-shadow: var(--stats-card-shadow);
-            overflow: hidden;
+                    /* kartu chart: pakai var theme supaya cocok di light & dark */
+                    #stats .chart-card {
+                        position: relative;
+                        border-radius: 18px;
+                        padding: 16px 16px 12px 16px;
+                        background: var(--stats-chart-bg);
+                        border: 1px solid var(--stats-chart-border);
+                        box-shadow: var(--stats-card-shadow);
+                        overflow: hidden;
 
-            opacity: 0;
-            transform: translateY(16px);
-            animation: statsFadeUp 0.7s ease-out forwards;
-            color: var(--txt-body);
-        }
+                        opacity: 0;
+                        transform: translateY(16px);
+                        animation: statsFadeUp 0.7s ease-out forwards;
+                        color: var(--txt-body);
+                    }
 
-        #stats .chart-title {
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
+                    #stats .chart-title {
+                        font-size: 0.95rem;
+                        font-weight: 600;
+                    }
 
-        #stats .chart-subtitle {
-            font-size: 0.75rem;
-            color: var(--muted);
-        }
+                    #stats .chart-subtitle {
+                        font-size: 0.75rem;
+                        color: var(--muted);
+                    }
 
-        #stats .chart-wrapper {
-            position: relative;
-            width: 100%;
-            height: 220px;
-        }
+                    #stats .chart-wrapper {
+                        position: relative;
+                        width: 100%;
+                        height: 220px;
+                    }
 
-        /* stagger animasi */
-        #stats .stat-card[data-stat="islands"] {
-            animation-delay: 0.05s;
-        }
+                    /* stagger animasi */
+                    #stats .stat-card[data-stat="islands"] {
+                        animation-delay: 0.05s;
+                    }
 
-        #stats .stat-card[data-stat="unesco"] {
-            animation-delay: 0.12s;
-        }
+                    #stats .stat-card[data-stat="unesco"] {
+                        animation-delay: 0.12s;
+                    }
 
-        #stats .stat-card[data-stat="population"] {
-            animation-delay: 0.19s;
-        }
+                    #stats .stat-card[data-stat="population"] {
+                        animation-delay: 0.19s;
+                    }
 
-        #stats .chart-card:nth-child(1) {
-            animation-delay: 0.26s;
-        }
+                    #stats .chart-card:nth-child(1) {
+                        animation-delay: 0.26s;
+                    }
 
-        #stats .chart-card:nth-child(2) {
-            animation-delay: 0.33s;
-        }
+                    #stats .chart-card:nth-child(2) {
+                        animation-delay: 0.33s;
+                    }
 
-        #stats .chart-card:nth-child(3) {
-            animation-delay: 0.40s;
-        }
+                    #stats .chart-card:nth-child(3) {
+                        animation-delay: 0.40s;
+                    }
 
-        @keyframes statsFadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(18px) scale(0.98);
-            }
+                    @keyframes statsFadeUp {
+                        from {
+                            opacity: 0;
+                            transform: translateY(18px) scale(0.98);
+                        }
 
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0) scale(1);
+                        }
+                    }
 
-        /* ===== Modal (popup) ===== */
-        #stats-modal-backdrop {
-            display: none;
-        }
+                    /* ===== Modal (popup) ===== */
+                    #stats-modal-backdrop {
+                        display: none;
+                    }
 
-        #stats-modal-backdrop.is-open {
-            display: flex;
-        }
+                    #stats-modal-backdrop.is-open {
+                        display: flex;
+                    }
 
-        #stats-modal {
-            transform: translateY(12px) scale(0.96);
-            opacity: 0;
-            transition: all 0.22s ease-out;
-            background: var(--card);
-            color: var(--txt-body);
-            border-color: var(--line);
-        }
+                    #stats-modal {
+                        transform: translateY(12px) scale(0.96);
+                        opacity: 0;
+                        transition: all 0.22s ease-out;
+                        background: var(--card);
+                        color: var(--txt-body);
+                        border-color: var(--line);
+                    }
 
-        #stats-modal-title {
-            color: var(--txt-body);
-        }
+                    #stats-modal-title {
+                        color: var(--txt-body);
+                    }
 
-        #stats-modal-body {
-            color: var(--muted);
-        }
+                    #stats-modal-body {
+                        color: var(--muted);
+                    }
 
-        @media (max-width: 640px) {
-            #stats .stat-number {
-                font-size: 2.1rem;
-            }
+                    @media (max-width: 640px) {
+                        #stats .stat-number {
+                            font-size: 2.1rem;
+                        }
 
-            #stats .chart-wrapper {
-                height: 210px;
-            }
-        }
-    </style>
+                        #stats .chart-wrapper {
+                            height: 210px;
+                        }
+                    }
+                </style>
 
-    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-3 text-[var(--txt-body)]">
-        Statistik Budaya Indonesia
-    </h2>
-    <p class="text-sm sm:text-base text-[var(--muted)] mb-4 max-w-3xl">
-        Ringkasan keragaman Indonesia: jumlah pulau, warisan budaya takbenda yang diakui
-        UNESCO, serta dinamika jumlah penduduk.
-    </p>
+                <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-3 text-[var(--txt-body)]">
+                    Statistik Budaya Indonesia
+                </h2>
+                <p class="text-sm sm:text-base text-[var(--muted)] mb-4 max-w-3xl">
+                    Ringkasan keragaman Indonesia: jumlah pulau, warisan budaya takbenda yang diakui
+                    UNESCO, serta dinamika jumlah penduduk.
+                </p>
 
-    {{-- TIGA CARD UTAMA --}}
-    <div class="grid gap-4 lg:grid-cols-3 mb-6">
-        {{-- Pulau di Indonesia --}}
-        <button type="button" class="stat-card stat-card--red text-left text-white" data-stat="islands">
-            <div class="flex items-start justify-between gap-3">
-                <div>
-                    <div class="stat-number">17.380</div>
-                    <div class="stat-label mt-1">Pulau di Indonesia (2024)</div>
-                    <p class="mt-2 text-xs text-white/80 max-w-[260px]">
-                        Jumlah pulau bernama dan berkoordinat menurut BIG. Angka ini
-                        terus diperbarui karena dinamika geografis dan verifikasi lapangan.
-                    </p>
+                {{-- TIGA CARD UTAMA --}}
+                <div class="grid gap-4 lg:grid-cols-3 mb-6">
+                    {{-- Pulau di Indonesia --}}
+                    <button type="button" class="stat-card stat-card--red text-left text-white" data-stat="islands">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <div class="stat-number">17.380</div>
+                                <div class="stat-label mt-1">Pulau di Indonesia (2024)</div>
+                                <p class="mt-2 text-xs text-white/80 max-w-[260px]">
+                                    Jumlah pulau bernama dan berkoordinat menurut BIG. Angka ini
+                                    terus diperbarui karena dinamika geografis dan verifikasi lapangan.
+                                </p>
+                            </div>
+                            <div class="opacity-80">
+                                <svg viewBox="0 0 24 24" class="w-10 h-10">
+                                    <path fill="#fecaca" d="M11 3a9 9 0 1 0 9 9h-9z" />
+                                    <path fill="#fee2e2" d="M13 3.055V11h7.945A9.002 9.002 0 0 0 13 3.055z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-more text-white/90">
+                            More info
+                            <span class="stat-more-icon">➜</span>
+                        </div>
+                    </button>
+
+                    {{-- Warisan Budaya Takbenda UNESCO --}}
+                    <button type="button" class="stat-card stat-card--purple text-left text-white" data-stat="unesco">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <div class="stat-number">16</div>
+                                <div class="stat-label mt-1">WBTb Indonesia diakui UNESCO</div>
+                                <p class="mt-2 text-xs text-white/80 max-w-[260px]">
+                                    Termasuk Keris, Batik, Angklung, Tari Saman, Gamelan, Reog
+                                    Ponorogo, Kebaya, dan lainnya yang tercatat hingga 2024.
+                                </p>
+                            </div>
+                            <div class="opacity-80">
+                                <svg viewBox="0 0 24 24" class="w-10 h-10">
+                                    <circle cx="12" cy="12" r="9" fill="#ddd6fe" />
+                                    <path fill="#a855f7" d="M12 3v9l7.8 4.5A9 9 0 0 0 12 3z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-more text-white/90">
+                            More info
+                            <span class="stat-more-icon">➜</span>
+                        </div>
+                    </button>
+
+                    {{-- Jumlah Penduduk Indonesia --}}
+                    <button type="button" class="stat-card stat-card--green text-left text-white"
+                        data-stat="population">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <div class="stat-number">287,6 Jt</div>
+                                <div class="stat-label mt-1">Perkiraan penduduk (Nov 2025)</div>
+                                <p class="mt-2 text-xs text-white/80 max-w-[260px]">
+                                    Berbasis data Kemendagri dan BPS, penduduk Indonesia terus
+                                    bertambah sejak Sensus 2020 yang mencatat 270,20 juta jiwa.
+                                </p>
+                            </div>
+                            <div class="opacity-80">
+                                <svg viewBox="0 0 24 24" class="w-10 h-10">
+                                    <rect x="3" y="10" width="4" height="9" rx="1" fill="#bbf7d0" />
+                                    <rect x="10" y="7" width="4" height="12" rx="1" fill="#6ee7b7" />
+                                    <rect x="17" y="4" width="4" height="15" rx="1" fill="#22c55e" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="stat-more text-white/90">
+                            More info
+                            <span class="stat-more-icon">➜</span>
+                        </div>
+                    </button>
                 </div>
-                <div class="opacity-80">
-                    <svg viewBox="0 0 24 24" class="w-10 h-10">
-                        <path fill="#fecaca" d="M11 3a9 9 0 1 0 9 9h-9z" />
-                        <path fill="#fee2e2" d="M13 3.055V11h7.945A9.002 9.002 0 0 0 13 3.055z" />
-                    </svg>
+
+                {{-- TIGA CHART: SUKU (BAR), BAHASA (DONUT), AGAMA (PIE) --}}
+                <div class="grid gap-4 lg:grid-cols-3">
+                    {{-- 1. SUKU BANGSA – BAR CHART --}}
+                    <div class="chart-card">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="chart-title">14 Suku Terbesar (persentase penduduk)</p>
+                            <span class="chart-subtitle">Bar chart</span>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="ethnicChart"></canvas>
+                        </div>
+                        <p class="mt-2 text-[11px] text-[var(--muted)]">
+                            Data diadaptasi dari sensus: Jawa &gt;40%, diikuti Sunda, Melayu, Batak,
+                            dan suku-suku besar lainnya. Slice terakhir = <em>Lainnya</em>.
+                        </p>
+                    </div>
+
+                    {{-- 2. BAHASA SEHARI-HARI – DONUT CHART --}}
+                    <div class="chart-card">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="chart-title">Bahasa yang Paling Banyak Digunakan</p>
+                            <span class="chart-subtitle">Donut chart</span>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="languageChart"></canvas>
+                        </div>
+                        <p class="mt-2 text-[11px] text-[var(--muted)]">
+                            14 bahasa dengan penutur terbanyak, berdasarkan persentase penggunaan
+                            sehari-hari. Sisanya digabung sebagai <em>Lainnya</em>.
+                        </p>
+                    </div>
+
+                    {{-- 3. AGAMA – PIE CHART --}}
+                    <div class="chart-card">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="chart-title">Komposisi Agama di Indonesia (±2021)</p>
+                            <span class="chart-subtitle">Pie chart</span>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="religionChart"></canvas>
+                        </div>
+                        <p class="mt-2 text-[11px] text-[var(--muted)]">
+                            Islam mendominasi populasi, diikuti Protestan, Katolik, Hindu, Buddha,
+                            Konghucu, dan agama lainnya.
+                        </p>
+                    </div>
                 </div>
-            </div>
-            <div class="stat-more text-white/90">
-                More info
-                <span class="stat-more-icon">➜</span>
-            </div>
-        </button>
 
-        {{-- Warisan Budaya Takbenda UNESCO --}}
-        <button type="button" class="stat-card stat-card--purple text-left text-white" data-stat="unesco">
-            <div class="flex items-start justify-between gap-3">
-                <div>
-                    <div class="stat-number">16</div>
-                    <div class="stat-label mt-1">WBTb Indonesia diakui UNESCO</div>
-                    <p class="mt-2 text-xs text-white/80 max-w-[260px]">
-                        Termasuk Keris, Batik, Angklung, Tari Saman, Gamelan, Reog
-                        Ponorogo, Kebaya, dan lainnya yang tercatat hingga 2024.
-                    </p>
+                <p class="mt-3 text-[11px] text-[var(--muted)] opacity-80">
+                    *Angka dibulatkan. Persentase dan jumlah bisa sedikit berbeda antar sumber resmi,
+                    tetapi kisaran nilainya tetap sama.
+                </p>
+
+                {{-- POPUP DETAIL UNTUK SEMUA CARD --}}
+                <div id="stats-modal-backdrop" class="fixed inset-0 z-40 bg-black/60 items-center justify-center px-4"
+                    aria-hidden="true">
+                    <div id="stats-modal" class="max-w-lg w-full rounded-2xl border p-5 sm:p-6 relative">
+                        <button type="button" id="stats-modal-close"
+                            class="absolute right-4 top-3 text-[var(--muted)] hover:opacity-100 text-xl leading-none"
+                            aria-label="Tutup">
+                            ×
+                        </button>
+
+                        <h3 id="stats-modal-title" class="text-lg sm:text-xl font-semibold mb-2">
+                            Detail Statistik
+                        </h3>
+
+                        <div id="stats-modal-body" class="text-sm space-y-2 leading-relaxed">
+                            {{-- konten diisi via JS --}}
+                        </div>
+
+                        <p class="mt-4 text-[11px] text-[var(--muted)] opacity-70">
+                            Ringkasan berdasarkan data lembaga resmi Indonesia, UNESCO, dan publikasi terkait.
+                        </p>
+                    </div>
                 </div>
-                <div class="opacity-80">
-                    <svg viewBox="0 0 24 24" class="w-10 h-10">
-                        <circle cx="12" cy="12" r="9" fill="#ddd6fe" />
-                        <path fill="#a855f7" d="M12 3v9l7.8 4.5A9 9 0 0 0 12 3z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="stat-more text-white/90">
-                More info
-                <span class="stat-more-icon">➜</span>
-            </div>
-        </button>
 
-        {{-- Jumlah Penduduk Indonesia --}}
-        <button type="button" class="stat-card stat-card--green text-left text-white" data-stat="population">
-            <div class="flex items-start justify-between gap-3">
-                <div>
-                    <div class="stat-number">287,6 Jt</div>
-                    <div class="stat-label mt-1">Perkiraan penduduk (Nov 2025)</div>
-                    <p class="mt-2 text-xs text-white/80 max-w-[260px]">
-                        Berbasis data Kemendagri dan BPS, penduduk Indonesia terus
-                        bertambah sejak Sensus 2020 yang mencatat 270,20 juta jiwa.
-                    </p>
-                </div>
-                <div class="opacity-80">
-                    <svg viewBox="0 0 24 24" class="w-10 h-10">
-                        <rect x="3" y="10" width="4" height="9" rx="1" fill="#bbf7d0" />
-                        <rect x="10" y="7" width="4" height="12" rx="1" fill="#6ee7b7" />
-                        <rect x="17" y="4" width="4" height="15" rx="1" fill="#22c55e" />
-                    </svg>
-                </div>
-            </div>
-            <div class="stat-more text-white/90">
-                More info
-                <span class="stat-more-icon">➜</span>
-            </div>
-        </button>
-    </div>
+                {{-- SCRIPT POPUP + CHART.JS --}}
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    {{-- TIGA CHART: SUKU (BAR), BAHASA (DONUT), AGAMA (PIE) --}}
-    <div class="grid gap-4 lg:grid-cols-3">
-        {{-- 1. SUKU BANGSA – BAR CHART --}}
-        <div class="chart-card">
-            <div class="flex items-center justify-between mb-2">
-                <p class="chart-title">14 Suku Terbesar (persentase penduduk)</p>
-                <span class="chart-subtitle">Bar chart</span>
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="ethnicChart"></canvas>
-            </div>
-            <p class="mt-2 text-[11px] text-[var(--muted)]">
-                Data diadaptasi dari sensus: Jawa &gt;40%, diikuti Sunda, Melayu, Batak,
-                dan suku-suku besar lainnya. Slice terakhir = <em>Lainnya</em>.
-            </p>
-        </div>
-
-        {{-- 2. BAHASA SEHARI-HARI – DONUT CHART --}}
-        <div class="chart-card">
-            <div class="flex items-center justify-between mb-2">
-                <p class="chart-title">Bahasa yang Paling Banyak Digunakan</p>
-                <span class="chart-subtitle">Donut chart</span>
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="languageChart"></canvas>
-            </div>
-            <p class="mt-2 text-[11px] text-[var(--muted)]">
-                14 bahasa dengan penutur terbanyak, berdasarkan persentase penggunaan
-                sehari-hari. Sisanya digabung sebagai <em>Lainnya</em>.
-            </p>
-        </div>
-
-        {{-- 3. AGAMA – PIE CHART --}}
-        <div class="chart-card">
-            <div class="flex items-center justify-between mb-2">
-                <p class="chart-title">Komposisi Agama di Indonesia (±2021)</p>
-                <span class="chart-subtitle">Pie chart</span>
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="religionChart"></canvas>
-            </div>
-            <p class="mt-2 text-[11px] text-[var(--muted)]">
-                Islam mendominasi populasi, diikuti Protestan, Katolik, Hindu, Buddha,
-                Konghucu, dan agama lainnya.
-            </p>
-        </div>
-    </div>
-
-    <p class="mt-3 text-[11px] text-[var(--muted)] opacity-80">
-        *Angka dibulatkan. Persentase dan jumlah bisa sedikit berbeda antar sumber resmi,
-        tetapi kisaran nilainya tetap sama.
-    </p>
-
-    {{-- POPUP DETAIL UNTUK SEMUA CARD --}}
-    <div id="stats-modal-backdrop" class="fixed inset-0 z-40 bg-black/60 items-center justify-center px-4"
-        aria-hidden="true">
-        <div id="stats-modal" class="max-w-lg w-full rounded-2xl border p-5 sm:p-6 relative">
-            <button type="button" id="stats-modal-close"
-                class="absolute right-4 top-3 text-[var(--muted)] hover:opacity-100 text-xl leading-none"
-                aria-label="Tutup">
-                ×
-            </button>
-
-            <h3 id="stats-modal-title" class="text-lg sm:text-xl font-semibold mb-2">
-                Detail Statistik
-            </h3>
-
-            <div id="stats-modal-body" class="text-sm space-y-2 leading-relaxed">
-                {{-- konten diisi via JS --}}
-            </div>
-
-            <p class="mt-4 text-[11px] text-[var(--muted)] opacity-70">
-                Ringkasan berdasarkan data lembaga resmi Indonesia, UNESCO, dan publikasi terkait.
-            </p>
-        </div>
-    </div>
-
-    {{-- SCRIPT POPUP + CHART.JS --}}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script>
-        (function() {
-            /* ================= DETAIL MODAL UNTUK 3 CARD ================= */
-            const detailMap = {
-                islands: {
-                    title: 'Jumlah Pulau di Indonesia',
-                    body: `
+                <script>
+                    (function() {
+                        /* ================= DETAIL MODAL UNTUK 3 CARD ================= */
+                        const detailMap = {
+                            islands: {
+                                title: 'Jumlah Pulau di Indonesia',
+                                body: `
                         <p>Menurut penelahaan <strong>Badan Informasi Geospasial (BIG)</strong>,
                         jumlah pulau di Indonesia pada tahun 2024 mencapai
                         <strong>17.380 pulau</strong>. Angka ini mencakup pulau yang memiliki
@@ -1020,10 +1021,10 @@
                         melalui platform resmi BIG seperti <em>sipulau.big.go.id</em> dan
                         <em>Gazeter Republik Indonesia</em>.</p>
                     `
-                },
-                unesco: {
-                    title: 'Warisan Budaya Takbenda Indonesia',
-                    body: `
+                            },
+                            unesco: {
+                                title: 'Warisan Budaya Takbenda Indonesia',
+                                body: `
                         <p>Hingga Desember 2024, terdapat <strong>16 Warisan Budaya Takbenda
                         (WBTb) Indonesia</strong> yang telah diakui UNESCO, antara lain:</p>
                         <ul class="mt-2 list-disc list-inside space-y-1">
@@ -1058,10 +1059,10 @@
                         perlindungan warisan budaya, baik yang bersifat <em>takbenda</em> maupun
                         yang berupa <em>warisan benda</em> seperti situs budaya dan alam.</p>
                     `
-                },
-                population: {
-                    title: 'Jumlah Penduduk Indonesia',
-                    body: `
+                            },
+                            population: {
+                                title: 'Jumlah Penduduk Indonesia',
+                                body: `
                         <p>Jumlah penduduk Indonesia terus meningkat setiap tahun:</p>
                         <ul class="mt-2 list-disc list-inside space-y-1">
                             <li><strong>Sensus Penduduk 2020</strong>:
@@ -1078,204 +1079,628 @@
                         pendidikan, kesehatan, hingga pembangunan infrastruktur di seluruh
                         wilayah Indonesia.</p>
                     `
-                }
-            };
+                            }
+                        };
 
-            const backdrop = document.getElementById('stats-modal-backdrop');
-            const modalTitle = document.getElementById('stats-modal-title');
-            const modalBody = document.getElementById('stats-modal-body');
-            const closeBtn = document.getElementById('stats-modal-close');
+                        const backdrop = document.getElementById('stats-modal-backdrop');
+                        const modalTitle = document.getElementById('stats-modal-title');
+                        const modalBody = document.getElementById('stats-modal-body');
+                        const closeBtn = document.getElementById('stats-modal-close');
 
-            function openModal(statKey) {
-                const data = detailMap[statKey];
-                if (!data) return;
+                        function openModal(statKey) {
+                            const data = detailMap[statKey];
+                            if (!data) return;
 
-                modalTitle.textContent = data.title;
-                modalBody.innerHTML = data.body;
+                            modalTitle.textContent = data.title;
+                            modalBody.innerHTML = data.body;
 
-                backdrop.classList.add('is-open');
-                document.body.classList.add('overflow-hidden');
+                            backdrop.classList.add('is-open');
+                            document.body.classList.add('overflow-hidden');
+                        }
+
+                        function closeModal() {
+                            backdrop.classList.remove('is-open');
+                            document.body.classList.remove('overflow-hidden');
+                        }
+
+                        document.querySelectorAll('#stats .stat-card[data-stat]').forEach(function(card) {
+                            card.addEventListener('click', function() {
+                                const key = card.getAttribute('data-stat');
+                                openModal(key);
+                            });
+                        });
+
+                        closeBtn.addEventListener('click', closeModal);
+                        backdrop.addEventListener('click', function(e) {
+                            if (e.target === backdrop) closeModal();
+                        });
+                        document.addEventListener('keydown', function(e) {
+                            if (e.key === 'Escape') closeModal();
+                        });
+
+                        /* ================= CHART: DATA ================= */
+                        const ethnicLabels = [
+                            'Jawa', 'Sunda', 'Melayu', 'Batak', 'Madura',
+                            'Betawi', 'Minangkabau', 'Bugis', 'Banten', 'Banjar',
+                            'Bali', 'Makassar', 'Aceh', 'Sasak', 'Lainnya'
+                        ];
+                        const ethnicData = [
+                            40.06, 15.51, 3.70, 3.58, 3.03,
+                            2.88, 2.73, 2.71, 1.96, 1.74,
+                            1.50, 1.40, 1.30, 1.10, 17.50
+                        ];
+
+                        const languageLabels = [
+                            'Jawa', 'Indonesia', 'Sunda', 'Melayu', 'Madura',
+                            'Minangkabau', 'Banjar', 'Bugis', 'Bali',
+                            'Bahasa Batak', 'Cirebon', 'NTT lainnya',
+                            'Sasak', 'Aceh', 'Lainnya'
+                        ];
+                        const languageData = [
+                            31.79, 19.94, 15.14, 3.69, 3.62,
+                            1.98, 1.71, 1.64, 1.57,
+                            1.55, 1.44, 1.40,
+                            1.26, 12.08
+                        ];
+
+                        const religionLabels = [
+                            'Islam', 'Protestan', 'Katolik',
+                            'Hindu', 'Buddha', 'Konghucu', 'Agama lainnya'
+                        ];
+                        const religionData = [86.93, 7.47, 3.08, 1.71, 0.74, 0.05, 0.03];
+
+                        const palette = [
+                            '#60a5fa', '#f97316', '#a855f7', '#22c55e', '#eab308',
+                            '#f97373', '#0ea5e9', '#6366f1', '#ec4899', '#14b8a6',
+                            '#f59e0b', '#84cc16', '#fb7185', '#2dd4bf', '#9ca3af'
+                        ];
+
+                        const commonOptions = {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: {
+                                duration: 900,
+                                easing: 'easeOutQuart'
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(ctx) {
+                                            const label = ctx.label || '';
+                                            const value = ctx.parsed;
+                                            return label + ': ' + value.toFixed(2) + '%';
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    labels: {
+
+                                        font: {
+                                            size: 11
+                                        }
+                                    }
+                                }
+                            }
+                        };
+
+                        const ethnicCtx = document.getElementById('ethnicChart').getContext('2d');
+                        new Chart(ethnicCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: ethnicLabels,
+                                datasets: [{
+                                    data: ethnicData,
+                                    backgroundColor: palette,
+                                    borderRadius: 8
+                                }]
+                            },
+                            options: {
+                                ...commonOptions,
+                                plugins: {
+                                    ...commonOptions.plugins,
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        ticks: {
+                                            color: '#9ca3af',
+                                            font: {
+                                                size: 10
+                                            }
+                                        },
+                                        grid: {
+                                            display: false
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            color: '#9ca3af',
+                                            callback: value => value + '%'
+                                        },
+                                        grid: {
+                                            color: 'rgba(148, 163, 184, 0.15)'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        const languageCtx = document.getElementById('languageChart').getContext('2d');
+                        new Chart(languageCtx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: languageLabels,
+                                datasets: [{
+                                    data: languageData,
+                                    backgroundColor: palette,
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                ...commonOptions,
+                                cutout: '55%'
+                            }
+                        });
+
+                        const religionCtx = document.getElementById('religionChart').getContext('2d');
+                        new Chart(religionCtx, {
+                            type: 'pie',
+                            data: {
+                                labels: religionLabels,
+                                datasets: [{
+                                    data: religionData,
+                                    backgroundColor: [
+                                        '#22c55e', '#60a5fa', '#4b5563',
+                                        '#eab308', '#f97316', '#f97373', '#a855f7'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: commonOptions
+                        });
+                    })();
+                </script>
+            </section>
+
+
+{{-- QUIZ INDONESIA --}}
+<section id="quiz" class="py-10">
+    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-3 text-[var(--txt-body)]">
+        Kuis Budaya Indonesia
+    </h2>
+    <p class="text-sm sm:text-base text-[var(--muted)] mb-4">
+        Jawab pertanyaan seputar Nusantara. Soal & opsi bisa berupa teks atau gambar.
+    </p>
+
+    @include('partials.quiz-section', ['quiz' => $quiz ?? null])
+</section>
+
+
+
+            <section id="testimoni" class="mt-12">
+    @php
+        $testimonials = $testimonials ?? collect();
+        $testimonialStats = $testimonialStats ?? ['counts'=>[1=>0,2=>0,3=>0,4=>0,5=>0],'total'=>0,'avg'=>0];
+
+        $counts = $testimonialStats['counts'];
+        $total  = (int) $testimonialStats['total'];
+        $avg    = (float) $testimonialStats['avg'];
+
+        // helper % bar
+        $pct = function($n) use ($total) {
+            return $total > 0 ? round(($n / $total) * 100) : 0;
+        };
+    @endphp
+
+    <style>
+        /* ===== TESTIMONI THEME SAFE (LIGHT/DARK) ===== */
+        .t-wrap { color: var(--txt-body); }
+        .t-card {
+            background: color-mix(in oklab, var(--card) 88%, transparent);
+            border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+            box-shadow: var(--shadow);
+            border-radius: 18px;
+        }
+        .t-soft {
+            background: color-mix(in oklab, var(--bg-body) 75%, var(--card) 25%);
+            border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+            border-radius: 16px;
+        }
+        .t-muted { color: var(--muted); }
+
+        .t-input, .t-textarea {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+            background: color-mix(in oklab, var(--card) 92%, transparent);
+            color: var(--txt-body);
+            padding: 10px 12px;
+            outline: none;
+            transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+        }
+        .t-input::placeholder, .t-textarea::placeholder { color: color-mix(in oklab, var(--muted) 75%, transparent); }
+        .t-input:focus, .t-textarea:focus {
+            border-color: color-mix(in oklab, var(--brand) 70%, transparent);
+            box-shadow: 0 0 0 4px color-mix(in oklab, var(--brand) 18%, transparent);
+        }
+
+        /* Rating Stars (click) */
+        .star-row { display: inline-flex; gap: 6px; align-items: center; }
+        .star-btn {
+            width: 30px; height: 30px;
+            display: grid; place-items: center;
+            border-radius: 999px;
+            border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+            background: color-mix(in oklab, var(--card) 92%, transparent);
+            cursor: pointer;
+            transition: transform .12s ease, box-shadow .18s ease, border-color .18s ease;
+            user-select: none;
+        }
+        .star-btn:hover { transform: translateY(-1px) scale(1.03); box-shadow: 0 8px 18px rgba(0,0,0,.12); }
+        .star {
+            font-size: 18px;
+            line-height: 1;
+            color: color-mix(in oklab, var(--muted) 40%, transparent);
+            transition: transform .12s ease, color .18s ease;
+        }
+        .star.is-on { color: #f59e0b; transform: scale(1.05); } /* amber */
+
+        /* Progress bars */
+        .t-bar {
+            height: 10px;
+            border-radius: 999px;
+            background: color-mix(in oklab, var(--line) 55%, transparent);
+            overflow: hidden;
+        }
+        .t-bar > span {
+            display: block;
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #f59e0b, #f97316);
+            transition: width .5s ease;
+        }
+
+        /* Scroll area */
+        .t-scroll {
+            max-height: 460px;
+            overflow: auto;
+            padding-right: 6px;
+        }
+        .t-scroll::-webkit-scrollbar { width: 10px; }
+        .t-scroll::-webkit-scrollbar-thumb {
+            background: color-mix(in oklab, var(--line) 70%, transparent);
+            border-radius: 999px;
+        }
+
+        /* File input nicer */
+        .t-file {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px dashed color-mix(in oklab, var(--line) 85%, transparent);
+            background: color-mix(in oklab, var(--card) 92%, transparent);
+            color: var(--txt-body);
+            padding: 10px 12px;
+        }
+
+        .t-btn {
+            border-radius: 14px;
+            padding: 12px 16px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--brand), #f59e0b);
+            color: #fff;
+            border: 0;
+            box-shadow: 0 18px 30px rgba(249,115,22,.18);
+            transition: transform .18s ease, filter .18s ease;
+        }
+        .t-btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+        .t-btn:active { transform: translateY(0px); }
+
+        /* small meta in card */
+        .t-chip {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+            background: color-mix(in oklab, var(--card) 92%, transparent);
+            color: var(--muted);
+        }
+    </style>
+
+    <div class="t-wrap max-w-6xl mx-auto px-4 sm:px-6">
+        <h2 class="text-2xl sm:text-3xl font-extrabold mb-2">Testimoni Pengunjung</h2>
+        <p class="t-muted text-sm mb-6">Bagikan pengalamanmu, bantu kami jadi lebih baik.</p>
+
+        {{-- ===== SUMMARY (TOP) ===== --}}
+        <div class="grid gap-4 lg:grid-cols-3 mb-6">
+            {{-- Left: distribution --}}
+            <div class="t-card p-5 lg:col-span-2">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="font-bold">Ringkasan Rating</div>
+                    <div class="t-chip">{{ $total }} Rating</div>
+                </div>
+
+                @for($r = 5; $r >= 1; $r--)
+                    @php $p = $pct($counts[$r]); @endphp
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-16 text-xs font-bold tracking-wide uppercase t-muted">
+                            {{ $r }} ★
+                        </div>
+                        <div class="flex-1 t-bar">
+                            <span style="width: {{ $p }}%"></span>
+                        </div>
+                        <div class="w-14 text-right text-xs t-muted">
+                            {{ $counts[$r] }}
+                        </div>
+                    </div>
+                @endfor
+            </div>
+
+            {{-- Right: average --}}
+            <div class="t-card p-5 flex flex-col items-center justify-center text-center">
+                <div class="text-4xl font-extrabold" style="color: color-mix(in oklab, var(--brand) 70%, #f59e0b 30%);">
+                    {{ number_format($avg, 1) }}
+                </div>
+
+                <div class="mt-2 flex items-center justify-center gap-1">
+                    @php
+                        $rounded = (int) round($avg);
+                    @endphp
+                    @for($i=1; $i<=5; $i++)
+                        <span class="text-2xl" style="color: {{ $i <= $rounded ? '#f59e0b' : 'color-mix(in oklab, var(--line) 85%, transparent)' }};">★</span>
+                    @endfor
+                </div>
+
+                <div class="mt-2 t-muted text-sm">
+                    Dari {{ $total }} rating
+                </div>
+            </div>
+        </div>
+
+        {{-- ===== MAIN (BOTTOM): left list + right form ===== --}}
+        <div class="grid gap-4 lg:grid-cols-2">
+            {{-- LEFT: recent feedbacks --}}
+            <div class="t-card p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="font-bold text-lg">Recent Feedbacks</div>
+                    <div class="t-chip">Terbaru</div>
+                </div>
+
+                <div class="t-scroll space-y-3">
+                    @forelse($testimonials as $t)
+                        <div class="t-soft p-4">
+                            <div class="flex items-start gap-3">
+                                <img
+                                    class="w-14 h-14 rounded-full object-cover border border-[var(--line)]"
+                                    src="{{ $t->photo ? asset('storage/'.$t->photo) : asset('images/avatar.png') }}"
+                                    alt="Avatar {{ $t->name }}"
+                                />
+
+                                <div class="flex-1">
+                                    <div class="flex items-start justify-between gap-2">
+                                        <div>
+                                            <div class="font-extrabold">{{ $t->name }}</div>
+                                            <div class="t-muted text-xs">
+                                                {{ $t->created_at->translatedFormat('d F Y') }}
+                                            </div>
+                                        </div>
+
+                                        <div class="text-right">
+                                            <div class="flex justify-end gap-0.5">
+                                                @for($i=1; $i<=5; $i++)
+                                                    <span style="color: {{ $i <= $t->rating ? '#f59e0b' : 'color-mix(in oklab, var(--line) 85%, transparent)' }};">★</span>
+                                                @endfor
+                                            </div>
+                                            <div class="t-muted text-[11px] mt-1">
+                                                {{ $t->created_at->format('d/m/Y') }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <p class="mt-2 text-sm leading-relaxed">
+                                        {{ $t->message }}
+                                    </p>
+
+                                    <div class="mt-3 flex justify-end">
+                                        <button
+                                            type="button"
+                                            onclick="openReportModal('{{ route('testimonials.report', $t) }}')"
+                                            class="text-xs font-bold text-red-500 hover:underline">
+                                            Laporkan
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="t-muted text-sm">Belum ada testimoni. Jadilah yang pertama 😊</div>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- RIGHT: add a review --}}
+            <div class="t-card p-5">
+                <div class="font-bold text-lg mb-3">Add a Review</div>
+
+                {{-- flash message --}}
+                @if(session('success'))
+                    <div class="mb-3 t-soft p-3 text-sm" style="border-color: color-mix(in oklab, var(--brand) 45%, var(--line) 55%);">
+                        ✅ {{ session('success') }}
+                    </div>
+                @endif
+
+                {{-- error bag --}}
+                @if($errors->any())
+                    <div class="mb-3 t-soft p-3 text-sm" style="border-color: rgba(239,68,68,.5);">
+                        <div class="font-bold mb-1">Gagal mengirim:</div>
+                        <ul class="list-disc list-inside t-muted">
+                            @foreach($errors->all() as $e)
+                                <li>{{ $e }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST"
+                      action="{{ route('testimonials.store') }}"
+                      enctype="multipart/form-data"
+                      class="space-y-3"
+                      id="testimonialForm">
+                    @csrf
+
+                    {{-- Honeypot --}}
+                    <input type="text" name="website" value="" autocomplete="off" tabindex="-1"
+                           style="position:absolute;left:-9999px;top:-9999px;height:1px;width:1px;opacity:0;">
+
+                    {{-- Rating --}}
+                    <div>
+                        <label class="text-sm font-bold">Rating <span class="text-red-500">*</span></label>
+                        <input type="hidden" name="rating" id="ratingValue" value="{{ old('rating', 0) }}">
+
+                        <div class="mt-2 star-row" id="starRow">
+                            @for($i=1; $i<=5; $i++)
+                                <button type="button" class="star-btn" data-star="{{ $i }}" aria-label="Pilih {{ $i }} bintang">
+                                    <span class="star">★</span>
+                                </button>
+                            @endfor
+                        </div>
+                        <div class="t-muted text-xs mt-1">Klik bintang untuk memilih rating.</div>
+                    </div>
+
+                    {{-- Nama --}}
+                    <div>
+                        <label class="text-sm font-bold">Nama <span class="text-red-500">*</span></label>
+                        <input class="t-input" name="name" value="{{ old('name') }}" placeholder="Nama kamu">
+                    </div>
+
+                    {{-- Pesan --}}
+                    <div>
+                        <label class="text-sm font-bold">Pesan <span class="text-red-500">*</span></label>
+                        <textarea class="t-textarea" name="message" rows="5" placeholder="Tulis pengalamanmu...">{{ old('message') }}</textarea>
+                    </div>
+
+                    {{-- Foto (opsional) --}}
+                    <div>
+                        <label class="text-sm font-bold">Foto Profil <span class="t-muted text-xs">(opsional, max 5MB)</span></label>
+                        <input class="t-file" type="file" name="photo" accept="image/png,image/jpeg,image/jpg">
+                        <div class="t-muted text-xs mt-1">Format: JPG / JPEG / PNG.</div>
+                    </div>
+
+                    <button class="t-btn w-full mt-2">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{-- ================= MODAL REPORT (tetap) ================= --}}
+    <div id="reportModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 px-4">
+        <div class="t-card w-full max-w-md p-6"
+             style="animation: scaleIn .18s ease-out;">
+            <h3 class="text-lg font-extrabold mb-1">Laporkan Testimoni</h3>
+            <p class="t-muted text-xs mb-4">Pilih alasan laporan. Admin akan meninjau laporan ini.</p>
+
+            <form id="reportForm" method="POST">
+                @csrf
+
+                <label class="text-sm font-bold">Alasan</label>
+                <select name="reason" required class="t-input mt-1 mb-3">
+                    <option value="Spam">Spam</option>
+                    <option value="Ujaran kebencian">Ujaran kebencian</option>
+                    <option value="Tidak pantas">Tidak pantas</option>
+                    <option value="Penipuan">Penipuan</option>
+                    <option value="Lainnya">Lainnya</option>
+                </select>
+
+                <label class="text-sm font-bold">
+                    Catatan tambahan <span class="t-muted text-xs">(opsional)</span>
+                </label>
+                <textarea name="note" rows="3" class="t-textarea mt-1"
+                          placeholder="Tulis catatan tambahan bila perlu..."></textarea>
+
+                <div class="mt-4 flex justify-end gap-2">
+                    <button type="button" onclick="closeReportModal()"
+                            class="t-input !w-auto !px-4 !py-2 font-bold">
+                        Batal
+                    </button>
+
+                    <button class="t-btn !w-auto !px-4 !py-2">
+                        Kirim Laporan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ===== modal report =====
+        function openReportModal(actionUrl) {
+            const modal = document.getElementById('reportModal');
+            const form  = document.getElementById('reportForm');
+            form.action = actionUrl;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        function closeReportModal() {
+            const modal = document.getElementById('reportModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        document.getElementById('reportModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'reportModal') closeReportModal();
+        });
+
+        // ===== rating stars =====
+        (function () {
+            const row = document.getElementById('starRow');
+            const input = document.getElementById('ratingValue');
+            if (!row || !input) return;
+
+            function paint(v) {
+                const stars = row.querySelectorAll('.star-btn .star');
+                stars.forEach((el, idx) => {
+                    const n = idx + 1;
+                    el.classList.toggle('is-on', n <= v);
+                });
             }
 
-            function closeModal() {
-                backdrop.classList.remove('is-open');
-                document.body.classList.remove('overflow-hidden');
-            }
+            // init (old value)
+            const initial = parseInt(input.value || '0', 10);
+            paint(initial);
 
-            document.querySelectorAll('#stats .stat-card[data-stat]').forEach(function(card) {
-                card.addEventListener('click', function() {
-                    const key = card.getAttribute('data-stat');
-                    openModal(key);
+            row.querySelectorAll('.star-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const v = parseInt(btn.dataset.star, 10);
+                    input.value = v;
+                    paint(v);
                 });
             });
 
-            closeBtn.addEventListener('click', closeModal);
-            backdrop.addEventListener('click', function(e) {
-                if (e.target === backdrop) closeModal();
-            });
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') closeModal();
-            });
-
-            /* ================= CHART: DATA ================= */
-            const ethnicLabels = [
-                'Jawa', 'Sunda', 'Melayu', 'Batak', 'Madura',
-                'Betawi', 'Minangkabau', 'Bugis', 'Banten', 'Banjar',
-                'Bali', 'Makassar', 'Aceh', 'Sasak', 'Lainnya'
-            ];
-            const ethnicData = [
-                40.06, 15.51, 3.70, 3.58, 3.03,
-                2.88, 2.73, 2.71, 1.96, 1.74,
-                1.50, 1.40, 1.30, 1.10, 17.50
-            ];
-
-            const languageLabels = [
-                'Jawa', 'Indonesia', 'Sunda', 'Melayu', 'Madura',
-                'Minangkabau', 'Banjar', 'Bugis', 'Bali',
-                'Bahasa Batak', 'Cirebon', 'NTT lainnya',
-                'Sasak', 'Aceh', 'Lainnya'
-            ];
-            const languageData = [
-                31.79, 19.94, 15.14, 3.69, 3.62,
-                1.98, 1.71, 1.64, 1.57,
-                1.55, 1.44, 1.40,
-                1.26, 12.08
-            ];
-
-            const religionLabels = [
-                'Islam', 'Protestan', 'Katolik',
-                'Hindu', 'Buddha', 'Konghucu', 'Agama lainnya'
-            ];
-            const religionData = [86.93, 7.47, 3.08, 1.71, 0.74, 0.05, 0.03];
-
-            const palette = [
-                '#60a5fa', '#f97316', '#a855f7', '#22c55e', '#eab308',
-                '#f97373', '#0ea5e9', '#6366f1', '#ec4899', '#14b8a6',
-                '#f59e0b', '#84cc16', '#fb7185', '#2dd4bf', '#9ca3af'
-            ];
-
-            const commonOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: {
-                    duration: 900,
-                    easing: 'easeOutQuart'
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(ctx) {
-                                const label = ctx.label || '';
-                                const value = ctx.parsed;
-                                return label + ': ' + value.toFixed(2) + '%';
-                            }
-                        }
-                    },
-                    legend: {
-                        labels: {
-
-                            font: {
-                                size: 11
-                            }
-                        }
-                    }
+            // prevent submit rating=0
+            document.getElementById('testimonialForm')?.addEventListener('submit', (e) => {
+                const v = parseInt(input.value || '0', 10);
+                if (!v || v < 1) {
+                    e.preventDefault();
+                    alert('Silakan pilih rating bintang dulu.');
                 }
-            };
-
-            const ethnicCtx = document.getElementById('ethnicChart').getContext('2d');
-            new Chart(ethnicCtx, {
-                type: 'bar',
-                data: {
-                    labels: ethnicLabels,
-                    datasets: [{
-                        data: ethnicData,
-                        backgroundColor: palette,
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    ...commonOptions,
-                    plugins: {
-                        ...commonOptions.plugins,
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        x: {
-                            ticks: {
-                                color: '#9ca3af',
-                                font: {
-                                    size: 10
-                                }
-                            },
-                            grid: {
-                                display: false
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: '#9ca3af',
-                                callback: value => value + '%'
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.15)'
-                            }
-                        }
-                    }
-                }
-            });
-
-            const languageCtx = document.getElementById('languageChart').getContext('2d');
-            new Chart(languageCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: languageLabels,
-                    datasets: [{
-                        data: languageData,
-                        backgroundColor: palette,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    ...commonOptions,
-                    cutout: '55%'
-                }
-            });
-
-            const religionCtx = document.getElementById('religionChart').getContext('2d');
-            new Chart(religionCtx, {
-                type: 'pie',
-                data: {
-                    labels: religionLabels,
-                    datasets: [{
-                        data: religionData,
-                        backgroundColor: [
-                            '#22c55e', '#60a5fa', '#4b5563',
-                            '#eab308', '#f97316', '#f97373', '#a855f7'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: commonOptions
             });
         })();
+
+        // ===== anim keyframes =====
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes scaleIn {
+                from { opacity:0; transform: scale(.94); }
+                to   { opacity:1; transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </section>
 
 
-            {{-- QUIZ INDONESIA --}}
-            <section id="quiz">
-                <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-3">
-                    Kuis Budaya Indonesia
-                </h2>
-                <p class="text-sm sm:text-base text-[var(--muted)]">
-                    Di sini nanti bisa jadi area kuis umum tentang Nusantara — misalnya pilihan ganda tentang
-                    pulau, suku, atau rumah adat.
-                    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-                </p>
-            </section>
         </div>
     </section>
 @endsection

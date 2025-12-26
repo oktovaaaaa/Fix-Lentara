@@ -82,6 +82,29 @@
                 <span class="tooltip">Makanan</span>
             </li>
 
+            <li>
+                <a href="{{ route('admin.testimonials.index') }}">
+                    <i class='bx bx-message-rounded-dots'></i>
+                    <span class="links_name">Testimoni</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('admin.testimonial-reports.index') }}">
+                    <i class='bx bx-flag'></i>
+                    <span class="links_name">Report Testimoni</span>
+                </a>
+            </li>
+
+            {{-- ===== QUIZ (BARU) ===== --}}
+            <li>
+                <a href="{{ route('admin.quizzes.index') }}">
+                    <i class='bx bx-joystick'></i>
+                    <span class="links_name">Quiz</span>
+                </a>
+                <span class="tooltip">Quiz</span>
+            </li>
+
             {{-- Pengaturan --}}
             <li>
                 <a href="#">

@@ -18,8 +18,12 @@
 <header class="site-header" id="top">
     {{-- ===== NAVBAR UTAMA (desktop + trigger mobile) ===== --}}
     <nav class="nav-pill" role="navigation" aria-label="Navigasi utama">
+
         {{-- Tombol hamburger (mobile) --}}
-        <button class="hamburger" id="hamburger" aria-label="Buka menu" aria-controls="drawer" aria-expanded="false">
+        <button class="hamburger" id="hamburger"
+                aria-label="Buka menu"
+                aria-controls="drawer"
+                aria-expanded="false">
             <span></span><span></span><span></span>
         </button>
 
@@ -30,19 +34,23 @@
                  class="brand-logo">
         </a>
 
-        {{-- Link navbar (desktop) --}}
+        {{-- ================= DESKTOP NAV ================= --}}
         <div class="nav-links" id="navLinks">
+
             @if (!$isIslandMode)
-                {{-- MODE HOME: Budaya Indonesia --}}
+                {{-- ================= MODE HOME ================= --}}
+
                 <button class="nav-btn is-active" data-target="#home">
                     <span class="icon">🏠</span><span>Home</span>
                 </button>
 
                 {{-- Pulau + dropdown daftar pulau --}}
-                <div class="nav-dropdown" data-dropdown="islands"
-                    @if ($currentIslandName) data-current-island="{{ $currentIslandName }}" @endif>
-                    <button class="nav-btn nav-dropdown-toggle" type="button" data-target="#islands"
-                        aria-haspopup="true" aria-expanded="false">
+                <div class="nav-dropdown" data-dropdown="islands">
+                    <button class="nav-btn nav-dropdown-toggle"
+                            type="button"
+                            data-target="#islands"
+                            aria-haspopup="true"
+                            aria-expanded="false">
                         <span class="icon">🗺️</span>
                         <span class="dropdown-label">Pulau</span>
                         <span class="chevron">▾</span>
@@ -54,8 +62,11 @@
                                 $url = route('islands.show', $island->slug);
                                 $label = $island->subtitle ?: $island->name;
                             @endphp
-                            <a href="{{ $url }}" class="dropdown-item" role="menuitem"
-                               data-island="{{ $label }}" data-url="{{ $url }}">
+                            <a href="{{ $url }}"
+                               class="dropdown-item"
+                               role="menuitem"
+                               data-island="{{ $label }}"
+                               data-url="{{ $url }}">
                                 {{ $label }}
                             </a>
                         @endforeach
@@ -73,19 +84,30 @@
                 <button class="nav-btn" data-target="#quiz">
                     <span class="icon">❓</span><span>Kuis</span>
                 </button>
+
+                {{-- ================= TESTIMONI (HOME ONLY) ================= --}}
+                <button class="nav-btn" data-target="#testimoni">
+                    <span class="icon">💬</span><span>Testimoni</span>
+                </button>
+
             @else
-                {{-- MODE ISLAND: Halaman Pulau (Sumatera, Jawa, dll) --}}
+                {{-- ================= MODE ISLAND ================= --}}
 
                 {{-- Home: balik ke Budaya Indonesia (landing) --}}
                 <button class="nav-btn" data-url="{{ route('home') }}">
                     <span class="icon">🏠</span><span>Home</span>
                 </button>
 
-                {{-- DROPDOWN PULAU JUGA TAMPIL DI MODE ISLAND --}}
-                <div class="nav-dropdown" data-dropdown="islands"
-                    @if ($currentIslandName) data-current-island="{{ $currentIslandName }}" @endif>
-                    <button class="nav-btn nav-dropdown-toggle" type="button" aria-haspopup="true"
-                        aria-expanded="false">
+                {{-- Dropdown Pulau --}}
+                <div class="nav-dropdown"
+                     data-dropdown="islands"
+                     @if ($currentIslandName)
+                         data-current-island="{{ $currentIslandName }}"
+                     @endif>
+                    <button class="nav-btn nav-dropdown-toggle"
+                            type="button"
+                            aria-haspopup="true"
+                            aria-expanded="false">
                         <span class="icon">🗺️</span>
                         <span class="dropdown-label">
                             {{ $currentIslandName ?? 'Pulau' }}
@@ -99,8 +121,11 @@
                                 $url = route('islands.show', $island->slug);
                                 $label = $island->subtitle ?: $island->name;
                             @endphp
-                            <a href="{{ $url }}" class="dropdown-item" role="menuitem"
-                               data-island="{{ $label }}" data-url="{{ $url }}">
+                            <a href="{{ $url }}"
+                               class="dropdown-item"
+                               role="menuitem"
+                               data-island="{{ $label }}"
+                               data-url="{{ $url }}">
                                 {{ $label }}
                             </a>
                         @endforeach
@@ -137,15 +162,20 @@
             <span class="active-indicator" aria-hidden="true"></span>
         </div>
 
-        {{-- Kanan: tombol Admin + toggle tema --}}
+        {{-- ================= KANAN: ADMIN + THEME ================= --}}
         <div class="flex items-center gap-2 ml-auto">
+
             {{-- Link Admin (desktop) --}}
             <a href="{{ route('login') }}"
-                class="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold rounded-full border border-amber-300/60 bg-amber-400/90 text-slate-900 shadow-sm hover:bg-amber-300 transition">
+               class="hidden sm:inline-flex items-center gap-2 px-3 py-2
+                      text-sm font-semibold rounded-full
+                      border border-amber-300/60
+                      bg-amber-400/90 text-slate-900
+                      shadow-sm hover:bg-amber-300 transition">
                 <span>🛠️</span><span>Admin</span>
             </a>
 
-            {{-- Tombol ganti tema (light/dark) --}}
+            {{-- Toggle Tema --}}
             <button class="theme-toggle" id="themeToggle" aria-label="Ubah tema">
                 <span class="sun">☀️</span>
                 <span class="moon">🌙</span>
@@ -153,27 +183,29 @@
         </div>
     </nav>
 
-    {{-- ===== DRAWER / SIDEBAR MOBILE ===== --}}
+    {{-- ================= MOBILE DRAWER ================= --}}
     <aside class="drawer" id="drawer" aria-hidden="true">
+
         <div class="drawer-header">
             <div class="drawer-brand">
                 <img src="{{ asset('images/icon/icon_lentara.png') }}"
                      alt="Lentara"
                      class="drawer-logo">
             </div>
-            {{-- Tombol X untuk menutup drawer --}}
-            <button id="closeDrawer" class="close-drawer" aria-label="Tutup menu">✕</button>
+            <button id="closeDrawer"
+                    class="close-drawer"
+                    aria-label="Tutup menu">✕</button>
         </div>
 
         <div class="drawer-links">
             @if (!$isIslandMode)
-                {{-- MODE HOME: Budaya Indonesia --}}
+                {{-- MODE HOME --}}
                 <a href="#home" data-target="#home" class="drawer-link">🏠 Home</a>
                 <a href="#about" data-target="#about" class="drawer-link">ℹ️ Tentang</a>
                 <a href="#history" data-target="#history" class="drawer-link">📜 Sejarah</a>
                 <a href="#stats" data-target="#stats" class="drawer-link">📊 Statistik</a>
 
-                {{-- Pulau + sub menu pulau-pulau (mobile) --}}
+                {{-- Pulau + sub menu --}}
                 <a href="#islands" data-target="#islands" class="drawer-link">🗺️ Pulau</a>
                 <div class="drawer-subgroup">
                     @foreach ($navbarIslands as $island)
@@ -181,16 +213,23 @@
                             $url = route('islands.show', $island->slug);
                             $label = $island->subtitle ?: $island->name;
                         @endphp
-                        <a href="{{ $url }}" class="drawer-link drawer-sublink"
-                           data-url="{{ $url }}" data-island="{{ $label }}">
+                        <a href="{{ $url }}"
+                           class="drawer-link drawer-sublink"
+                           data-url="{{ $url }}"
+                           data-island="{{ $label }}">
                             • {{ $label }}
                         </a>
                     @endforeach
                 </div>
 
                 <a href="#quiz" data-target="#quiz" class="drawer-link">❓ Kuis</a>
+
+                {{-- TESTIMONI (MOBILE HOME) --}}
+                <a href="#testimoni" data-target="#testimoni" class="drawer-link">
+                    💬 Testimoni
+                </a>
             @else
-                {{-- MODE ISLAND: Pulau --}}
+                {{-- MODE ISLAND --}}
                 <a href="{{ route('home') }}" class="drawer-link">🏠 Home</a>
                 <a href="#about" data-target="#about" class="drawer-link">ℹ️ Tentang</a>
                 <a href="#history" data-target="#history" class="drawer-link">📜 Warisan</a>
@@ -205,8 +244,10 @@
                             $url = route('islands.show', $island->slug);
                             $label = $island->subtitle ?: $island->name;
                         @endphp
-                        <a href="{{ $url }}" class="drawer-link drawer-sublink"
-                           data-url="{{ $url }}" data-island="{{ $label }}">
+                        <a href="{{ $url }}"
+                           class="drawer-link drawer-sublink"
+                           data-url="{{ $url }}"
+                           data-island="{{ $label }}">
                             • {{ $label }}
                         </a>
                     @endforeach
