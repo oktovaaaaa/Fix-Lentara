@@ -35,10 +35,25 @@
             @yield('hero')
             @yield('content')
         </main>
+<footer class="w-screen border-t border-slate-800/40 bg-[var(--bg-body)]">
+    <div class="w-full flex flex-col items-center gap-3 py-4">
 
-        <footer class="border-t border-slate-800/40 py-4 text-center text-xs text-slate-500">
-            &copy; {{ date('Y') }} Lentara.
-        </footer>
+        {{-- Teks di ATAS --}}
+        <div class="text-xs text-slate-500">
+            © {{ date('Y') }} Piforrr G6 Lentara Nusantara.
+        </div>
+
+        {{-- Gambar FULL kiri-kanan --}}
+        <img
+            src="{{ asset('images/icon/footer.PNG') }}"
+            alt="Lentara Footer"
+            class="w-full h-24 object-cover block opacity-90"
+            loading="lazy"
+        />
+    </div>
+</footer>
+
+
     </div>
 
     {{-- === CHATBOT FLOATING NUSANTARA AI (di luar container utama) === --}}

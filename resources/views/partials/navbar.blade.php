@@ -81,6 +81,11 @@
                     <span class="icon">📊</span><span>Statistik</span>
                 </button>
 
+                {{-- ✅ FITUR BARU: Kamera AR (HOME / GENERAL SAJA) --}}
+                <button class="nav-btn" data-target="#camera-ar">
+                    <span class="icon">📷</span><span>Kamera AR</span>
+                </button>
+
                 <button class="nav-btn" data-target="#quiz">
                     <span class="icon">❓</span><span>Kuis</span>
                 </button>
@@ -222,6 +227,9 @@
                     @endforeach
                 </div>
 
+                {{-- ✅ FITUR BARU: Kamera AR (HOME / GENERAL SAJA) --}}
+                <a href="#camera-ar" data-target="#camera-ar" class="drawer-link">📷 Kamera AR</a>
+
                 <a href="#quiz" data-target="#quiz" class="drawer-link">❓ Kuis</a>
 
                 {{-- TESTIMONI (MOBILE HOME) --}}
@@ -236,8 +244,9 @@
                 <a href="#stats" data-target="#stats" class="drawer-link">📊 Statistik</a>
                 <a href="#destinations" data-target="#destinations" class="drawer-link">🗺️ Destinasi</a>
                 <a href="#foods" data-target="#foods" class="drawer-link">🍽️ Kuliner</a>
-                <a href="#quiz" data-target="#quiz" class="drawer-link">❓ Kuis</a>
 
+                {{-- ✅ FIX: kasih parent "Pulau" dulu, biar list pulau tidak kelihatan nempel ke Kuis --}}
+                <a href="#islands" data-target="#islands" class="drawer-link">🗺️ Pulau</a>
                 <div class="drawer-subgroup">
                     @foreach ($navbarIslands as $island)
                         @php
@@ -252,6 +261,8 @@
                         </a>
                     @endforeach
                 </div>
+
+                <a href="#quiz" data-target="#quiz" class="drawer-link">❓ Kuis</a>
             @endif
         </div>
 
