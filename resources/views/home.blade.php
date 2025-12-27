@@ -18,225 +18,349 @@
     <section class="relative z-[10] py-12 sm:py-16 px-4 sm:px-6 bg-[var(--bg-body)] text-[var(--txt-body)]">
         <div class="max-w-5xl mx-auto space-y-12">
 
-            {{-- ISLANDS LIST / JELAJAH PULAU (anchor #islands untuk navbar "Pulau") --}}
-            <section id="islands">
-                <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-3">
-                    Jelajahi Pulau-Pulau Indonesia
-                </h2>
-                <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed mb-4">
-                    Pilih salah satu pulau dari menu di atas atau dari daftar berikut untuk menjelajahi budaya,
-                    destinasi, kuliner, dan warisan khas masing-masing pulau.
+{{-- ISLANDS LIST / JELAJAH PULAU (anchor #islands untuk navbar "Pulau") --}}
+<section id="islands" class="mt-10">
+    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-3 text-[var(--txt-body)]">
+        Jelajahi Pulau-Pulau Indonesia
+    </h2>
 
-                    {{-- @section('content') --}}
+    <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed mb-6">
+        Pilih salah satu pulau untuk melihat budaya, suku, tradisi, destinasi, dan kuliner khasnya.
+        Konten tiap pulau bisa kamu kembangkan dari 3 suku utama yang kamu pilih.
+    </p>
 
-                    {{-- Leaflet CSS & JS (CDN) --}}
-                    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    {{-- CARD + MODAL STYLE (theme-safe: light/dark) --}}
+    <style>
+        /* ===== Card Look (mirip screenshot) ===== */
+        #islands .nus-card {
+            border-radius: 1.25rem;
+            padding: 1.1rem 1.2rem;
+            background:
+                radial-gradient(1200px circle at 10% 0%, rgba(255,255,255,.06), transparent 45%),
+                linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.05));
+            box-shadow: 0 20px 55px rgba(0,0,0,.35);
+            border: 1px solid rgba(255,255,255,.06);
+            overflow: hidden;
+        }
 
-                    <style>
-                        #indo-map {
-                            height: 500px;
-                            border-radius: 1.5rem;
-                            overflow: hidden;
-                        }
+        #islands .nus-card-title {
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--txt-body);
+        }
 
-                        /* Styling popup biar mirip card */
-                        .island-popup {
-                            font-family: "Inter", system-ui, sans-serif;
-                            min-width: 220px;
-                        }
+        #islands .nus-card-link {
+            color: #ef4444;
+            font-weight: 800;
+        }
+        #islands .nus-card-link:hover { text-decoration: underline; }
 
-                        .island-popup h3 {
-                            margin: 0 0 0.25rem;
-                            font-size: 1.1rem;
-                            font-weight: 700;
-                        }
+        /* ===== Island image ===== */
+        #islands .island-thumb {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+            background: color-mix(in oklab, var(--card) 80%, transparent);
+            cursor: zoom-in;
+            position: relative;
+        }
 
-                        .island-popup .subtitle {
-                            display: inline-block;
-                            width: 60px;
-                            font-weight: 600;
-                        }
+        #islands .island-thumb::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(255,255,255,.12), transparent 55%);
+            opacity: 0;
+            transition: opacity .2s ease;
+            pointer-events: none;
+        }
+        #islands .island-thumb:hover::after { opacity: 1; }
 
-                        .island-popup hr {
-                            border: none;
-                            border-top: 3px solid #f97373;
-                            /* garis merah */
-                            width: 40px;
-                            margin: .4rem 0 .8rem;
-                        }
-                    </style>
+        #islands .island-thumb img {
+            width: 100%;
+            height: 160px;
+            object-fit: contain; /* aman untuk PNG pulau */
+            display: block;
+            transform: scale(1);
+            transition: transform .22s ease;
+            padding: 10px;
+        }
+        #islands .island-thumb:hover img { transform: scale(1.02); }
 
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            // 1. Inisialisasi map (posisi Indonesia)
-                            const map = L.map('indo-map').setView([-2, 118], 4.7);
+        #islands .thumb-hint {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            font-size: 11px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+            background: color-mix(in oklab, var(--card) 85%, transparent);
+            color: var(--muted);
+            backdrop-filter: blur(6px);
+        }
 
-                            // 2. Tambah tile layer (background peta)
-                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                maxZoom: 18,
-                                attribution: '&copy; OpenStreetMap'
-                            }).addTo(map);
+        /* ===== Modal (popup) ===== */
+        #island-modal-backdrop { display: none; }
+        #island-modal-backdrop.is-open { display: flex; }
 
-                            // 3. Data pulau dalam bentuk GeoJSON (CONTOH SEDERHANA)
-                            // Koordinat di sini hanya kira-kira supaya ada yang muncul.
-                            const islandsGeoJson = {
-                                "type": "FeatureCollection",
-                                "features": [{
-                                        "type": "Feature",
-                                        "properties": {
-                                            "name": "Sumatera",
-                                            "aksara": "—",
-                                            "kata_khas": "Contoh kata",
-                                            "makna": "Deskripsi singkat tentang Sumatera.",
-                                            "digunakan_di": "Provinsi-provinsi di Sumatera."
-                                        },
-                                        "geometry": {
-                                            "type": "Polygon",
-                                            "coordinates": [
-                                                [
-                                                    [95, 6], // barat laut
-                                                    [105, 6], // timur laut
-                                                    [105, -6], // tenggara
-                                                    [95, -6], // barat daya
-                                                    [95, 6] // tutup polygon
-                                                ]
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "type": "Feature",
-                                        "properties": {
-                                            "name": "Jawa",
-                                            "aksara": "—",
-                                            "kata_khas": "Contoh kata",
-                                            "makna": "Deskripsi singkat tentang Jawa.",
-                                            "digunakan_di": "Provinsi-provinsi di Jawa."
-                                        },
-                                        "geometry": {
-                                            "type": "Polygon",
-                                            "coordinates": [
-                                                [
-                                                    [105, -5], // barat
-                                                    [115, -5], // timur
-                                                    [115, -9], // tenggara
-                                                    [105, -9], // barat daya
-                                                    [105, -5] // tutup polygon
-                                                ]
-                                            ]
-                                        }
-                                    }
-                                    // TODO: Tambahkan Kalimantan, Sulawesi, Sunda Kecil, Maluku, Papua
-                                ]
-                            };
+        #island-modal {
+            background: var(--card);
+            color: var(--txt-body);
+            border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+            box-shadow: 0 25px 70px rgba(0,0,0,.55);
+            border-radius: 20px;
+            transform: translateY(12px) scale(.97);
+            opacity: 0;
+            transition: all .22s ease-out;
+            overflow: hidden;
+        }
+        #island-modal-backdrop.is-open #island-modal {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
 
-                            // 4. Style default dan style highlight
-                            function style(feature) {
-                                return {
-                                    color: '#ffffff',
-                                    weight: 2,
-                                    fillColor: '#f97316', // oranye
-                                    fillOpacity: 0.6
-                                };
-                            }
+        #island-modal-title { color: var(--txt-body); }
+        #island-modal-subtitle { color: var(--muted); }
 
-                            function highlightStyle(feature) {
-                                return {
-                                    color: '#ffffff',
-                                    weight: 3,
-                                    fillColor: '#fb923c',
-                                    fillOpacity: 0.8
-                                };
-                            }
+        #island-modal-image {
+            width: 100%;
+            height: min(62vh, 520px);
+            object-fit: contain;
+            background:
+                radial-gradient(800px circle at 10% 0%, rgba(255,255,255,.05), transparent 50%),
+                color-mix(in oklab, var(--bg-body) 70%, var(--card) 30%);
+            display: block;
+            padding: 18px;
+        }
 
-                            // 5. Event untuk tiap feature
-                            function onEachFeature(feature, layer) {
-                                const props = feature.properties;
+        .island-modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+            background: color-mix(in oklab, var(--card) 92%, transparent);
+            color: var(--txt-body);
+            transition: transform .15s ease, filter .15s ease;
+        }
+        .island-modal-close:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    </style>
 
-                                // Tooltip saat hover (nama pulau)
-                                layer.bindTooltip(props.name, {
-                                    sticky: true,
-                                    direction: 'top'
-                                });
+    @php
+        $islandCards = [
+            [
+                'key'  => 'sumatera',
+                'name' => 'Sumatera',
+                'desc' => 'Jejak kerajaan maritim, ragam adat, dan kuliner rempah yang kuat—dari pesisir hingga dataran tinggi.',
+                'href' => url('/islands/sumatera'),
+                'img'  => asset('images/islands/sumatera.png'),
+            ],
+            [
+                'key'  => 'jawa',
+                'name' => 'Jawa',
+                'desc' => 'Pusat sejarah & kebudayaan: keraton, batik, seni pertunjukan, serta ragam bahasa daerah yang hidup.',
+                'href' => url('/islands/jawa'),
+                'img'  => asset('images/islands/jawa.png'),
+            ],
+            [
+                'key'  => 'kalimantan',
+                'name' => 'Kalimantan',
+                'desc' => 'Bentang hutan tropis dan sungai besar, dengan tradisi Dayak yang beragam dan kaya simbol.',
+                'href' => url('/islands/kalimantan'),
+                'img'  => asset('images/islands/kalimantan.png'),
+            ],
+            [
+                'key'  => 'sulawesi',
+                'name' => 'Sulawesi',
+                'desc' => 'Persimpangan budaya maritim & pegunungan—ritual, rumah adat, dan tradisi pelayaran yang kuat.',
+                'href' => url('/islands/sulawesi'),
+                'img'  => asset('images/islands/sulawesi.png'),
+            ],
+            [
+                'key'  => 'bali-nusa-tenggara',
+                'name' => 'Bali & Nusa Tenggara',
+                'desc' => 'Ritual dan seni yang kuat, lanskap vulkanik, pesisir, hingga savana—ragam budaya pulau-pulau kecil.',
+                'href' => url('/islands/bali-nusa-tenggara'),
+                'img'  => asset('images/islands/bali-nusa-tenggara.png'),
+            ],
+            [
+                'key'  => 'papua-maluku',
+                'name' => 'Papua & Maluku',
+                'desc' => 'Kawasan timur dengan kekayaan bahasa, tradisi, dan bentang alam ikonik—dari kepulauan rempah hingga pegunungan.',
+                'href' => url('/islands/papua-maluku'),
+                'img'  => asset('images/islands/papua-maluku.png'),
+            ],
+        ];
+    @endphp
 
-                                // Popup/kartu saat diklik
-                                const popupHtml = `
-                <div class="island-popup">
-                    <h3>${props.name}</h3>
-                    <hr />
-                    <p><span class="subtitle">Aksara:</span> ${props.aksara}</p>
-                    <p><span class="subtitle">Kata:</span> ${props.kata_khas}</p>
-                    <p><span class="subtitle">Makna:</span> ${props.makna}</p>
-                    <p><span class="subtitle">Wilayah:</span> ${props.digunakan_di}</p>
-                </div>
-            `;
-                                layer.bindPopup(popupHtml);
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        @foreach ($islandCards as $c)
+            <div class="nus-card text-[var(--txt-body)]">
+                {{-- THUMB (klik -> modal) --}}
+                <button type="button"
+                        class="island-thumb w-full mb-4"
+                        data-island-modal="1"
+                        data-title="{{ $c['name'] }}"
+                        data-desc="{{ $c['desc'] }}"
+                        data-img="{{ $c['img'] }}"
+                        aria-label="Lihat gambar {{ $c['name'] }}">
+                    <img src="{{ $c['img'] }}"
+                         alt="Peta 3D {{ $c['name'] }}"
+                         loading="lazy">
+                    <span class="thumb-hint">Klik untuk zoom</span>
+                </button>
 
-                                // Efek hover
-                                layer.on({
-                                    mouseover: function(e) {
-                                        e.target.setStyle(highlightStyle());
-                                        // optional: bawa ke depan
-                                        e.target.bringToFront();
-                                    },
-                                    mouseout: function(e) {
-                                        geojson.resetStyle(e.target);
-                                    },
-                                    click: function(e) {
-                                        map.fitBounds(e.target.getBounds(), {
-                                            padding: [20, 20]
-                                        });
-                                    }
-                                });
-                            }
+                <h3 class="nus-card-title text-lg sm:text-xl mb-2">
+                    {{ $c['name'] }}
+                </h3>
 
-                            // 6. Tambahkan layer GeoJSON ke map
-                            const geojson = L.geoJSON(islandsGeoJson, {
-                                style: style,
-                                onEachFeature: onEachFeature
-                            }).addTo(map);
-                        });
-                    </script>
-                    {{-- @endsection --}}
-
+                <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed mb-3">
+                    {{ $c['desc'] }}
                 </p>
 
-                {{-- Di sini nanti bisa diisi daftar kartu pulau dari database --}}
-                {{-- Contoh placeholder sederhana --}}
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="border border-[var(--line)] rounded-xl p-4 bg-[var(--card)] shadow-sm">
-                        <h3 class="font-semibold text-base mb-1">Sumatera</h3>
-                        <p class="text-xs text-[var(--muted)]">
-                            Pulau dengan beragam budaya dan kuliner khas seperti rendang.
-                        </p>
-                    </div>
-                    <div class="border border-[var(--line)] rounded-xl p-4 bg-[var(--card)] shadow-sm">
-                        <h3 class="font-semibold text-base mb-1">Jawa</h3>
-                        <p class="text-xs text-[var(--muted)]">
-                            Pusat sejarah dan kebudayaan dengan beragam tradisi dan bahasa.
-                        </p>
-                    </div>
-                    <div class="border border-[var(--line)] rounded-xl p-4 bg-[var(--card)] shadow-sm">
-                        <h3 class="font-semibold text-base mb-1">Kalimantan</h3>
-                        <p class="text-xs text-[var(--muted)]">
-                            Pulau besar dengan kekayaan hutan tropis dan budaya Dayak.
-                        </p>
-                    </div>
-                    {{-- dst: nanti bisa diganti loop @foreach islands --}}
-                </div>
-            </section>
+                <a href="{{ $c['href'] }}" class="nus-card-link text-sm">
+                    Selengkapnya &gt;
+                </a>
+            </div>
+        @endforeach
+    </div>
 
-            {{-- ABOUT INDONESIA --}}
-            <section id="about">
-                <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-3">
-                    Tentang Budaya Indonesia
-                </h2>
-                <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                    Indonesia adalah negara kepulauan dengan ratusan suku, bahasa, dan tradisi. Halaman ini
-                    mengajakmu menjelajahi keragaman budaya dari Sabang sampai Merauke melalui pulau-pulau utama.
-                </p>
-                @include('partials.map-indonesia')
-            </section>
+    {{-- MODAL POPUP (gambar pulau) --}}
+    <div id="island-modal-backdrop"
+         class="fixed inset-0 z-50 bg-black/60 items-center justify-center px-4"
+         aria-hidden="true">
+        <div id="island-modal" class="w-full max-w-3xl">
+            <div class="flex items-start justify-between gap-4 p-4 sm:p-5 border-b"
+                 style="border-color: color-mix(in oklab, var(--line) 85%, transparent);">
+                <div>
+                    <h3 id="island-modal-title" class="text-lg sm:text-xl font-extrabold">Detail Pulau</h3>
+                    <p id="island-modal-subtitle" class="text-xs sm:text-sm mt-1"></p>
+                </div>
+
+                <button type="button"
+                        class="island-modal-close"
+                        id="island-modal-close"
+                        aria-label="Tutup">
+                    ✕
+                </button>
+            </div>
+
+            <img id="island-modal-image" src="" alt="Gambar Pulau" />
+
+            <div class="p-4 sm:p-5">
+                <div class="flex items-center justify-between gap-3">
+                    <p class="text-xs text-[var(--muted)]">
+                        Tip: tekan <strong>Esc</strong> atau klik area gelap untuk menutup.
+                    </p>
+                    <button type="button"
+                            id="island-modal-open-new"
+                            class="text-xs font-extrabold underline"
+                            style="color: color-mix(in oklab, var(--brand) 75%, #f59e0b 25%);">
+                        Buka gambar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- SCRIPT MODAL (ringan, no library) --}}
+    <script>
+        (function () {
+            const backdrop = document.getElementById('island-modal-backdrop');
+            const modalImg = document.getElementById('island-modal-image');
+            const modalTitle = document.getElementById('island-modal-title');
+            const modalSub = document.getElementById('island-modal-subtitle');
+            const closeBtn = document.getElementById('island-modal-close');
+            const openNewBtn = document.getElementById('island-modal-open-new');
+
+            if (!backdrop || !modalImg || !modalTitle || !modalSub || !closeBtn || !openNewBtn) return;
+
+            function openModal({ title, desc, img }) {
+                modalTitle.textContent = title || 'Detail Pulau';
+                modalSub.textContent = desc || '';
+                modalImg.src = img || '';
+                modalImg.alt = title ? ('Peta 3D ' + title) : 'Gambar Pulau';
+                openNewBtn.onclick = () => {
+                    if (img) window.location.href = img; // tab sama (sesuai request kamu)
+                };
+
+                backdrop.classList.add('is-open');
+                document.body.classList.add('overflow-hidden');
+            }
+
+            function closeModal() {
+                backdrop.classList.remove('is-open');
+                document.body.classList.remove('overflow-hidden');
+
+                // reset src biar hemat memory kalau gambar besar
+                modalImg.src = '';
+            }
+
+            document.querySelectorAll('#islands [data-island-modal="1"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    openModal({
+                        title: btn.getAttribute('data-title'),
+                        desc: btn.getAttribute('data-desc'),
+                        img: btn.getAttribute('data-img'),
+                    });
+                });
+            });
+
+            closeBtn.addEventListener('click', closeModal);
+            backdrop.addEventListener('click', (e) => {
+                if (e.target === backdrop) closeModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+        })();
+    </script>
+</section>
+    
+
+{{-- ABOUT INDONESIA --}}
+<section id="about" class="mt-14">
+    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-3">
+        Tentang Indonesia
+    </h2>
+
+    <div class="space-y-3">
+        <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
+            Indonesia dikenal sebagai negara kepulauan. Pembaruan data Badan Informasi Geospasial (BIG) pada tahun 2024
+            mencatat <strong>17.380 pulau</strong> yang sudah bernama dan memiliki koordinat.
+            Dari sisi kebahasaan, Peta Bahasa Kemendikbud mencatat <strong>718 bahasa daerah</strong>.
+            Sementara itu, IndonesiaBaik merangkum bahwa Indonesia memiliki <strong>1.340 suku bangsa</strong>.
+        </p>
+
+        <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
+            Identitas kebangsaan Indonesia tumbuh lewat perjalanan sejarah panjang, dan puncaknya ditegaskan melalui
+            Proklamasi Kemerdekaan pada 17 Agustus 1945.
+        </p>
+
+        {{-- sumber: biar juri bisa klik --}}
+        <div class="text-xs text-[var(--muted)] leading-relaxed">
+            <span class="font-semibold">Sumber resmi:</span>
+            <a class="underline hover:text-[var(--accent,#f97316)]" target="_blank" rel="noopener"
+               href="https://sipulau.big.go.id/news/11">BIG – SI PULAU (17.380 pulau)</a>
+            <span class="mx-2">•</span>
+            <a class="underline hover:text-[var(--accent,#f97316)]" target="_blank" rel="noopener"
+               href="https://petabahasa.kemdikbud.go.id/">Peta Bahasa Kemendikbud (718 bahasa)</a>
+            <span class="mx-2">•</span>
+            <a class="underline hover:text-[var(--accent,#f97316)]" target="_blank" rel="noopener"
+               href="https://indonesiabaik.id/infografis/sebaran-jumlah-suku-di-indonesia">IndonesiaBaik (1.340 suku)</a>
+            <span class="mx-2">•</span>
+            <a class="underline hover:text-[var(--accent,#f97316)]" target="_blank" rel="noopener"
+               href="https://www.setneg.go.id/baca/index/membuka_catatan_sejarah_detik_detik_proklamasi_17_agustus_1945">Setneg (Proklamasi 1945)</a>
+        </div>
+    </div>
+
+    {{-- MAP (hanya di Tentang, sesuai request kamu) --}}
+    @include('partials.map-indonesia')
+</section>
+
 
             {{-- HISTORY SECTION: Sejarah Nama Pulau di Indonesia --}}
             <section id="history" class="history-section">

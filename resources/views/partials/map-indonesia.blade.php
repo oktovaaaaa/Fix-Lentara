@@ -1,3 +1,4 @@
+```blade
 {{-- resources/views/partials/map-indonesia.blade.php --}}
 <section
     id="map-indonesia-section"
@@ -78,25 +79,29 @@
             background: #000;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
 
-            height: 100%;      /* tinggi ngikut baris grid */
-            min-height: 340px;
+            height: 100%;
+            min-height: 380px; /* FIX: pastikan tinggi map valid */
         }
 
         #mi-map-indonesia {
             width: 100%;
             height: 100%;
+            min-height: 380px; /* FIX: leafet butuh height/min-height */
         }
 
         @media (max-width: 900px) {
             .mi-map-inner {
-                min-height: 320px;
+                min-height: 340px;
+            }
+            #mi-map-indonesia {
+                min-height: 340px;
             }
         }
 
         /* ========= TITLE AREA (ATAS KEDUA KOLOM) ========= */
         .mi-title {
             font-size: clamp(2rem, 3vw, 2.6rem);
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 0.5rem;
             display: inline-block;
 
@@ -113,7 +118,7 @@
             font-size: 0.95rem;
             color: var(--muted, #9ca3af);
             margin-bottom: 1.75rem;
-            max-width: 640px;
+            max-width: 760px;
         }
 
         @keyframes mi-title-glow {
@@ -197,7 +202,6 @@
                 0 0 0 1px rgba(255, 255, 255, 0.06);
             z-index: 1;
             color: var(--txt-body, #f9fafb);
-
             display: flex;
             flex-direction: column;
         }
@@ -207,7 +211,7 @@
             align-items: center;
             justify-content: center;
             font-size: 0.8rem;
-            font-weight: 600;
+            font-weight: 700;
             padding: 0.25rem 0.85rem;
             margin-bottom: 0.6rem;
             border-radius: 999px;
@@ -216,27 +220,29 @@
         }
 
         .mi-card-heading {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             margin-bottom: 0.4rem;
+            font-weight: 800;
         }
 
         .mi-card-text {
             font-size: 0.95rem;
-            line-height: 1.6;
+            line-height: 1.65;
             color: var(--muted, #9ca3af);
         }
 
         .mi-card-list {
             margin-top: 0.9rem;
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             color: var(--txt-body, #e5e7eb);
         }
 
         .mi-card-list li {
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.45rem;
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            align-items: flex-start;
+            gap: 0.55rem;
+            line-height: 1.35;
         }
 
         .mi-dot {
@@ -245,6 +251,19 @@
             border-radius: 999px;
             background: #f97316;
             box-shadow: 0 0 10px rgba(249, 115, 22, 0.8);
+            margin-top: 0.35rem;
+            flex: 0 0 auto;
+        }
+
+        .mi-sources {
+            margin-top: 0.9rem;
+            font-size: 0.78rem;
+            color: var(--muted, #9ca3af);
+            line-height: 1.55;
+        }
+
+        .mi-sources a {
+            text-decoration: underline;
         }
 
         /* ========= CUSTOM POPUP ========= */
@@ -271,12 +290,12 @@
 
         .mi-popup-card {
             min-width: 260px;
-            max-width: 320px;
+            max-width: 380px;
         }
 
         .mi-popup-title {
             font-size: 1.25rem;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 0.4rem;
         }
 
@@ -289,13 +308,13 @@
         }
 
         .mi-popup-row {
-            margin-bottom: 0.35rem;
-            font-size: 0.9rem;
+            margin-bottom: 0.45rem;
+            font-size: 0.92rem;
         }
 
         .mi-popup-row strong {
             display: inline-block;
-            width: 90px;
+            width: 98px;
             color: #fef2f2;
         }
 
@@ -314,7 +333,7 @@
         .mi-popup-small {
             font-size: 0.8rem;
             color: #9ca3af;
-            margin-top: 0.5rem;
+            margin-top: 0.55rem;
         }
 
         .leaflet-container a {
@@ -326,12 +345,11 @@
         {{-- TITLE DI ATAS KEDUA KOLOM --}}
         <div class="text-center mb-8 sm:mb-10">
             <h2 class="mi-title mx-auto tracking-tight">
-                Peta Interaktif Indonesia
+                Peta Interaktif Nusantara
             </h2>
             <p class="mi-subtitle mx-auto">
-                Klik area berwarna pada peta untuk melihat informasi yang diambil dari
-                <code>map-indonesia.geojson</code>. Tema peta akan ikut tombol tema di navbar
-                (light / dark).
+                Jelajahi wilayah Indonesia lewat peta. Klik area berwarna untuk melihat ringkasan budaya dan karakter
+                tiap region, lalu lanjutkan ke halaman pulau untuk detail suku, tradisi, destinasi, dan kuliner.
             </p>
         </div>
 
@@ -344,23 +362,40 @@
                 </div>
             </div>
 
-            {{-- RIGHT: NEON CARD INFO --}}
+            {{-- RIGHT: NEON CARD INFO (SHOWCASE, tanpa bahas teknis) --}}
             <div class="mi-info-wrapper">
                 <div class="mi-card">
                     <div class="mi-card-glow"></div>
                     <div class="mi-card-inner">
-                        <div class="mi-card-badge">Panduan</div>
-                        <h3 class="mi-card-heading">Cara Menggunakan Peta</h3>
+                        <div class="mi-card-badge">Nusantara</div>
+                        <h3 class="mi-card-heading">Fakta yang membuat Indonesia unik</h3>
                         <p class="mi-card-text">
-                            Gunakan scroll untuk zoom, drag untuk menggeser peta, lalu klik polygon
-                            berwarna untuk membuka popup detail wilayah. Tema peta otomatis sinkron
-                            dengan tombol ☀️ / 🌙 di navbar.
+                            Indonesia adalah negara kepulauan dengan skala dan keragaman yang luar biasa—wilayah,
+                            bahasa, serta suku bangsa. Peta ini memberi gambaran besar sebelum kamu masuk ke detail
+                            tiap pulau di menu <strong>Pulau</strong>.
                         </p>
+
                         <ul class="mi-card-list">
-                            <li><span class="mi-dot"></span> GeoJSON: <code>public/data/map-indonesia.geojson</code></li>
-                            <li><span class="mi-dot"></span> Basemap: MapTiler Streets (light & dark)</li>
-                            <li><span class="mi-dot"></span> Neon border mengikuti desain timeline-mu</li>
+                            <li><span class="mi-dot"></span> <span><strong>17.380 pulau</strong> bernama & berkoordinat (pembaruan 2024).</span></li>
+                            <li><span class="mi-dot"></span> <span><strong>718 bahasa daerah</strong> tercatat dalam Peta Bahasa.</span></li>
+                            <li><span class="mi-dot"></span> <span><strong>1.340 suku bangsa</strong> tersebar di seluruh Indonesia.</span></li>
                         </ul>
+
+                        <div class="mt-5">
+                            <div class="mi-card-badge">Cara Eksplorasi</div>
+                            <h3 class="mi-card-heading">Klik wilayah, lanjut ke pulau</h3>
+                            <p class="mi-card-text">
+                                Klik area berwarna untuk ringkasan region. Setelah itu, buka halaman pulau untuk
+                                melihat suku-suku utama, tradisi, serta rekomendasi destinasi dan kuliner.
+                            </p>
+
+                            <div class="mi-sources">
+                                Sumber:
+                                <a target="_blank" rel="noopener" href="https://sipulau.big.go.id/news/11">BIG</a> •
+                                <a target="_blank" rel="noopener" href="https://petabahasa.kemdikbud.go.id/">Peta Bahasa Kemendikbud</a> •
+                                <a target="_blank" rel="noopener" href="https://indonesiabaik.id/infografis/sebaran-jumlah-suku-di-indonesia">IndonesiaBaik</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -388,28 +423,33 @@
                 '© <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>'
             );
 
-            // ====== BASEMAP (LIGHT & DARK) ======
-            const lightTiles = L.tileLayer(
-                "https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key={{ config('services.maptiler.key') }}",
-                {
-                    maxZoom: 20,
-                    tileSize: 256,
-                    attribution:
-                        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
-                        '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a>'
-                }
-            );
+            // ====== BASEMAP (LIGHT & DARK) + FALLBACK OSM ======
+            const maptilerKey = @json(config('services.maptiler.key'));
 
-            const darkTiles = L.tileLayer(
-                "https://api.maptiler.com/maps/streets-v2-dark/{z}/{x}/{y}.png?key={{ config('services.maptiler.key') }}",
-                {
+            const osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap'
+            });
+
+            const lightTiles = maptilerKey
+                ? L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${maptilerKey}`, {
                     maxZoom: 20,
                     tileSize: 256,
                     attribution:
                         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
                         '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a>'
-                }
-            );
+                })
+                : osmTiles;
+
+            const darkTiles = maptilerKey
+                ? L.tileLayer(`https://api.maptiler.com/maps/streets-v2-dark/{z}/{x}/{y}.png?key=${maptilerKey}`, {
+                    maxZoom: 20,
+                    tileSize: 256,
+                    attribution:
+                        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
+                        '&copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a>'
+                })
+                : osmTiles;
 
             let baseLayer = null;
 
@@ -444,8 +484,8 @@
             }
 
             function syncThemeFromDOM() {
-                const dark = detectIsDark();
-                setBaseMapTheme(dark);
+                setBaseMapTheme(detectIsDark());
+                setTimeout(() => map.invalidateSize(true), 160); // FIX blank map
             }
 
             syncThemeFromDOM();
@@ -477,6 +517,12 @@
                 };
             }
 
+            function safeText(v) {
+                if (v === null || v === undefined) return '-';
+                if (Array.isArray(v)) return v.filter(Boolean).join(', ') || '-';
+                return String(v).trim() || '-';
+            }
+
             function onEachWilayah(feature, layer) {
                 layer.on('mouseover', function () {
                     layer.setStyle({
@@ -494,35 +540,52 @@
                 layer.on('click', function (e) {
                     const p = feature.properties || {};
 
+                    const nama      = safeText(p.nama || p.name || 'Wilayah Indonesia');
+                    const ringkas   = safeText(p.ringkas || p.deskripsi || p.makna || '-');
+                    const suku      = safeText(p.suku_utama || p.suku || '-');
+                    const destinasi = safeText(p.destinasi_ikonik || p.destinasi || '-');
+                    const kuliner   = safeText(p.kuliner_khas || p.kuliner || '-');
+                    const wilayah   = safeText(p.digunakan_di || p.wilayah || p.provinsi || '-');
+
                     const content =
                         `<div class="mi-popup-card">
-                            <div class="mi-popup-title">${p.nama || 'Wilayah Indonesia'}</div>
+                            <div class="mi-popup-title">${nama}</div>
                             <div class="mi-popup-underline"></div>
+
                             <div class="mi-popup-row">
-                                <strong>Aksara:</strong>
-                                <span>${p.aksara || '-'}</span>
+                                <strong>Ringkas:</strong>
+                                <span>${ringkas}</span>
                             </div>
+
                             <div class="mi-popup-row">
-                                <strong>Kata Khas:</strong>
-                                <span>${p.kata_khas || '-'}</span>
+                                <strong>Suku:</strong>
+                                <span>${suku}</span>
                             </div>
+
                             <div class="mi-popup-row">
-                                <strong>Makna:</strong>
-                                <span>${p.makna || '-'}</span>
+                                <strong>Destinasi:</strong>
+                                <span>${destinasi}</span>
                             </div>
+
                             <div class="mi-popup-row">
-                                <strong>Digunakan di:</strong>
-                                <span>${p.digunakan_di || '-'}</span>
+                                <strong>Kuliner:</strong>
+                                <span>${kuliner}</span>
                             </div>
+
+                            <div class="mi-popup-row">
+                                <strong>Wilayah:</strong>
+                                <span>${wilayah}</span>
+                            </div>
+
                             <div class="mi-popup-small">
-                                Klik wilayah lain pada peta untuk melihat informasi berbeda.
+                                Klik wilayah lain pada peta untuk melihat ringkasan berbeda.
                             </div>
                         </div>`;
 
                     L.popup({
                         closeButton: true,
                         className: 'mi-leaflet-popup',
-                        maxWidth: 340
+                        maxWidth: 380
                     })
                         .setLatLng(e.latlng)
                         .setContent(content)
@@ -540,15 +603,16 @@
 
                     try {
                         map.fitBounds(geojsonLayer.getBounds(), { padding: [20, 20] });
-
-                        const currentZoom = map.getZoom();
-                        map.setZoom(currentZoom - 1);
+                        map.setZoom(map.getZoom() - 1);
                     } catch (err) {
                         console.warn('Tidak bisa fitBounds, pakai view default.', err);
                     }
+
+                    setTimeout(() => map.invalidateSize(true), 160); // FIX blank map after layer
                 })
                 .catch(err => {
                     console.error('Gagal memuat GeoJSON:', err);
+                    setTimeout(() => map.invalidateSize(true), 160);
                 });
         })();
     </script>
