@@ -184,11 +184,15 @@
             const _ = (id) => document.getElementById(id);
             const coverEl = document.querySelector('.cover');
 
+            // ✅ DIPERBAIKI: card punya data-url agar loader interceptor bisa menangkap
             const cards = data.map((i, index) => `
               <div
                 class="card"
                 id="card${index}"
                 data-slug="${i.slug}"
+                data-url="/islands/${i.slug}"
+                role="link"
+                tabindex="0"
                 style="background-image:url(${i.image})"
               >
                 <div class="card-content bg-gradient-to-t from-black/60 to-transparent p-4 sm:p-5">
@@ -215,15 +219,18 @@
             const slideNumbersEl = _('slide-numbers');
             if (slideNumbersEl) slideNumbersEl.innerHTML = slideNumbers;
 
+            // ✅ DIPERBAIKI: jangan pakai window.location.href di sini
+            // karena loader interceptor akan handle via data-url
+            // tapi tetap support keyboard Enter / Space
             function attachCardClicks() {
                 const cardElements = document.querySelectorAll('.card');
 
-                cardElements.forEach((card, index) => {
-                    const slugFromData = data[index]?.slug || card.dataset.slug;
-                    if (!slugFromData) return;
-
-                    card.addEventListener('click', () => {
-                        window.location.href = `/islands/${slugFromData}`;
+                cardElements.forEach((card) => {
+                    card.addEventListener('keydown', (ev) => {
+                        if (ev.key === 'Enter' || ev.key === ' ') {
+                            ev.preventDefault();
+                            card.click();
+                        }
                     });
                 });
             }

@@ -1593,6 +1593,7 @@
 
                 <div class="history-container">
                     <h2 class="neon-title">Sejarah Nama-Nama Pulau Besar di Indonesia</h2>
+                    <div class="mi-title-decoration"></div>
                     <p class="history-subtitle">
                         Banyak nama pulau di Indonesia berasal dari bahasa Sanskerta, bahasa lokal, hingga catatan para
                         pelaut dan penjelajah asing. Berikut beberapa kisah singkat di balik namanya.
@@ -2676,7 +2677,7 @@
 
 
                 @include('partials.camera-ar')
-                
+
             {{-- ================= QUIZ INDONESIA ================= --}}
             <section id="quiz" class="py-12">
                 <h2 class="neon-title">
