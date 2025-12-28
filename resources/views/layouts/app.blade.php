@@ -30,6 +30,8 @@
         {{-- NAVBAR UTAMA --}}
         @include('partials.navbar')
 
+        @include('partials.page-loader')
+
         {{-- KONTEN HALAMAN --}}
         <main class="flex-1">
             @yield('hero')
