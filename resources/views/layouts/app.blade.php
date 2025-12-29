@@ -150,7 +150,7 @@ html.nav-loading .page-loader__barFill{
             @yield('content')
         </main>
 
-<footer class="w-screen border-t border-slate-800/40 bg-[var(--bg-body)]">
+<footer class="w-full border-t border-slate-800/40 bg-[var(--bg-body)]">
     <div class="w-full flex flex-col items-center gap-3 py-4">
 
         {{-- Teks di ATAS --}}

@@ -5,42 +5,57 @@
     {{-- TOMBOL KARTU MELAYANG --}}
     <button
         id="nusantara-toggle"
-        class="flex items-center gap-3 px-4 py-3 rounded-full shadow-lg
+        class="flex items-center gap-3 shadow-lg
                bg-gradient-to-r from-amber-600 via-orange-500 to-red-500
                text-white hover:shadow-xl transition transform hover:-translate-y-0.5
-               w-full max-w-xs sm:max-w-sm"
+               w-14 h-14 rounded-full justify-center
+               sm:w-full sm:max-w-xs sm:max-w-sm sm:justify-start sm:px-4 sm:py-3 sm:rounded-full"
+        aria-label="Buka Nusantara AI"
     >
+        {{-- ICON (gambar, bukan emoji) --}}
         <div class="flex items-center justify-center w-9 h-9 rounded-full bg-white/20">
-            <span class="text-xl">🌏</span>
+            <img
+                src="{{ asset('images/icon/lentaraai.PNG') }}"
+                alt="Nusantara AI"
+                class="w-24 h-24 object-contain"
+                draggable="false"
+            />
         </div>
 
-        <div class="flex-1 text-left">
+        {{-- TEKS: HANYA MUNCUL DI DESKTOP (sm ke atas) --}}
+        <div class="hidden sm:block flex-1 text-left">
             <div class="text-sm font-semibold leading-tight">Nusantara AI</div>
             <div class="text-[11px] opacity-80">
                 Budaya Nusantara & Ekonomi Indonesia
             </div>
         </div>
 
-        <span class="ml-2 text-xl font-bold">+</span>
+        {{-- PLUS: HANYA MUNCUL DI DESKTOP (sm ke atas) --}}
+        <span class="hidden sm:inline ml-2 text-xl font-bold">+</span>
     </button>
 
     {{-- PANEL CHAT (ABSOLUTE, TIDAK NGEDORONG TOMBOL) --}}
     <div
-    id="nusantara-panel"
-    class="fixed bottom-4 right-4
-           w-[calc(100vw-2rem)] max-w-md rounded-3xl bg-slate-900 text-slate-50
-           shadow-2xl overflow-hidden border border-slate-800
-           transform origin-bottom-right
-           transition-all duration-200 ease-out
-           opacity-0 translate-y-2 scale-95
-           pointer-events-none"
+        id="nusantara-panel"
+        class="fixed bottom-4 right-4
+               w-[calc(100vw-2rem)] max-w-md rounded-3xl bg-slate-900 text-slate-50
+               shadow-2xl overflow-hidden border border-slate-800
+               transform origin-bottom-right
+               transition-all duration-200 ease-out
+               opacity-0 translate-y-2 scale-95
+               pointer-events-none"
     >
         {{-- Header --}}
         <div class="px-4 py-3 bg-gradient-to-r from-amber-600 via-orange-500 to-red-500">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                        <span>🌏</span>
+                        <img
+                            src="{{ asset('images/icon/lentaraai.PNG') }}"
+                            alt="Nusantara AI"
+                            class="w-24 h-24 object-contain"
+                            draggable="false"
+                        />
                     </div>
                     <div>
                         <div class="text-sm font-semibold">Nusantara AI</div>
@@ -52,6 +67,8 @@
                 <button
                     id="nusantara-close"
                     class="text-white/80 hover:text-white text-lg leading-none"
+                    aria-label="Tutup"
+                    type="button"
                 >
                     ×
                 </button>
@@ -66,7 +83,7 @@
             >
                 <div class="text-xs text-slate-400 text-center my-2">
                     Selamat datang di Nusantara AI 🇮🇩<br>
-                    Tanya apa saja seputar budaya Nusantara dan pertumbuhan ekonomi Indonesia.
+                    Tanya apa saja seputar budaya Nusantara dan Indonesia.
                 </div>
             </div>
 

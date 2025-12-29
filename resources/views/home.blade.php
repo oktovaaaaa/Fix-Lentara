@@ -2879,6 +2879,83 @@
                     html[data-theme="light"] .feedback-item {
                         background: rgba(0, 0, 0, 0.01);
                     }
+
+                    /* ===============================
+   FIX: MODAL REPORT DARK MODE
+   (select & dropdown option list)
+================================ */
+
+/* Modal card: pastikan benar-benar dark saat dark mode */
+html[data-theme="dark"] #reportModal .t-card{
+  background: linear-gradient(145deg, #0b1220, #020617) !important;
+  border: 1px solid rgba(255,107,0,.22) !important;
+  box-shadow: 0 26px 70px rgba(0,0,0,.55) !important;
+}
+
+/* Teks di modal biar kontras */
+html[data-theme="dark"] #reportModal h3,
+html[data-theme="dark"] #reportModal label{
+  color: rgba(255,255,255,.92) !important;
+}
+html[data-theme="dark"] #reportModal .t-muted{
+  color: rgba(255,255,255,.62) !important;
+}
+
+/* Select di modal (field dropdown) */
+#reportModal select.t-input{
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-clip: padding-box;
+}
+
+/* Dark mode: paksa background & text untuk select */
+html[data-theme="dark"] #reportModal select.t-input{
+  background-color: rgba(255,255,255,.06) !important;
+  color: rgba(255,255,255,.92) !important;
+  border-color: rgba(255,107,0,.28) !important;
+}
+
+/* Dark mode: paksa background & text untuk OPTION LIST (dropdown) */
+html[data-theme="dark"] #reportModal select.t-input option{
+  background-color: #0b1220 !important;   /* inilah yang bikin list dropdown tidak putih */
+  color: rgba(255,255,255,.92) !important;
+}
+
+/* Hover/selected (tidak semua browser support, tapi aman) */
+html[data-theme="dark"] #reportModal select.t-input option:checked,
+html[data-theme="dark"] #reportModal select.t-input option:hover{
+  background-color: #111b2f !important;
+  color: rgba(255,255,255,.95) !important;
+}
+
+/* Focus ring biar enak di dark */
+html[data-theme="dark"] #reportModal select.t-input:focus{
+  border-color: #ff6b00 !important;
+  box-shadow: 0 0 0 4px rgba(255,107,0,.22) !important;
+}
+
+/* Textarea di modal juga dipaksa dark biar konsisten */
+html[data-theme="dark"] #reportModal textarea.t-textarea{
+  background-color: rgba(255,255,255,.06) !important;
+  color: rgba(255,255,255,.92) !important;
+  border-color: rgba(255,107,0,.22) !important;
+}
+html[data-theme="dark"] #reportModal textarea.t-textarea::placeholder{
+  color: rgba(255,255,255,.45) !important;
+}
+
+/* Tombol Batal (yang pakai t-input) di modal biar gak kelihatan seperti input light */
+html[data-theme="dark"] #reportModal button.t-input{
+  background-color: rgba(255,255,255,.06) !important;
+  color: rgba(255,255,255,.88) !important;
+  border-color: rgba(255,107,0,.18) !important;
+}
+html[data-theme="dark"] #reportModal button.t-input:hover{
+  background-color: rgba(255,255,255,.09) !important;
+  border-color: rgba(255,107,0,.28) !important;
+}
+
                 </style>
 
                 <div class="t-wrap">

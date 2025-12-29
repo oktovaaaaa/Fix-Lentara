@@ -4,7 +4,7 @@
     {
       "type": "Feature",
       "properties": {
-        "nama": "Contoh Wilayah (Sumatera)",
+        "nama": "Sumatera",
         "aksara": "ᯖᯬᯅᯖ",
         "kata_khas": "Horas",
         "makna": "Salam, doa keselamatan dan kesejahteraan",
@@ -11282,7 +11282,7 @@
             [
               112.68285310210757,
               -7.034095357966123
-            ] 
+            ]
       ]
     ]
   }

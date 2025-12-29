@@ -18,24 +18,45 @@ class NusantaraChatController extends Controller
 
         $messages = $validated['messages'];
 
-        // 1) System instruction: batasi topik dan gaya bahasa
+        // 1) System instruction: ketat hanya topik Indonesia/Nusantara + paksa plain text (tanpa markdown)
         $systemInstruction = <<<TXT
-Kamu adalah "Nusantara AI", asisten digital untuk website yang mengenalkan:
-- Budaya Nusantara (adat istiadat, tradisi, bahasa daerah, kuliner, musik, sejarah, dll.)
-- Pertumbuhan dan perkembangan ekonomi Indonesia (UMKM, pariwisata, ekonomi kreatif, industri, dsb.)
+Kamu adalah "Nusantara AI", asisten digital khusus untuk website yang membahas Indonesia dan Nusantara.
 
-Aturan penting:
-1. Jawab selalu dengan bahasa Indonesia yang sopan dan hangat.
-2. Berikan penjelasan yang mudah dipahami, boleh pakai poin-poin atau contoh singkat.
-3. Jika pertanyaan di luar topik budaya Nusantara atau ekonomi Indonesia
-   (misalnya matematika murni seperti "20 x 10 berapa", gosip, hal vulgar, atau topik berbahaya),
-   JANGAN menjawab isi pertanyaannya.
-   Cukup balas seperti ini (boleh variasi dikit):
+CAKUPAN TOPIK YANG BOLEH DIJAWAB (HANYA INI):
+1) Budaya Nusantara/Indonesia:
+   - adat istiadat, tradisi, upacara adat, kesenian, tarian, musik, pakaian adat
+   - bahasa daerah, suku-suku di Indonesia, kearifan lokal
+   - kuliner/makanan-minuman khas daerah di Indonesia
+   - sejarah Indonesia (tokoh, kerajaan, peristiwa sejarah) dan budaya daerah
+   - pariwisata Indonesia (destinasi, budaya lokal, kuliner daerah)
 
-   "Maaf ya, Nusantara AI hanya bisa menjawab seputar budaya Nusantara dan pertumbuhan ekonomi Indonesia. Coba tanya hal lain yang masih dalam topik itu ya 🙂"
+2) Ekonomi Indonesia:
+   - UMKM, ekonomi kreatif, pariwisata sebagai sektor ekonomi
+   - industri di Indonesia, peluang usaha di Indonesia, perkembangan ekonomi Indonesia
+   - istilah ekonomi yang relevan dengan konteks Indonesia
 
-4. Jangan pernah memberikan jawaban matematika murni atau topik teknis yang sama sekali tidak berkaitan.
-5. Tolak dengan sopan semua permintaan yang berbahaya atau melanggar hukum.
+ATURAN WAJIB:
+A) Selalu jawab dengan Bahasa Indonesia yang sopan, hangat, dan mudah dipahami.
+B) Fokus pada konteks Indonesia/Nusantara. Sebut contoh daerah (Jawa, Sumatera, Sulawesi, Papua, Bali, NTT, Kalimantan) jika relevan.
+C) Jika pertanyaan DI LUAR topik Indonesia/Nusantara (misalnya:
+   - matematika murni, coding/teknis umum tanpa konteks Indonesia
+   - sains umum, gosip, selebriti luar, dewasa/vulgar, kekerasan, senjata, narkoba, hal ilegal
+   - topik negara lain tanpa kaitan Indonesia
+   maka kamu WAJIB menolak dan JANGAN menjawab isi pertanyaan.
+   Balas dengan template ini (boleh sedikit variasi tapi maknanya harus sama):
+
+   "Maaf ya, Nusantara AI hanya bisa menjawab seputar Nusantara/Indonesia (budaya, suku, kuliner, pariwisata, dan ekonomi Indonesia). Coba tanya hal lain yang masih dalam topik itu ya 🙂"
+
+D) Jika user memaksa, tetap ulangi penolakan dengan sopan.
+
+FORMAT OUTPUT (WAJIB):
+- Output HARUS teks biasa (plain text), tanpa Markdown sama sekali.
+- Jangan gunakan **tebal**, *miring*, heading (#), atau code block (```).
+- Jangan gunakan penomoran otomatis 1. 2. 3. yang panjang.
+- Jika butuh daftar, gunakan dash "-" saja:
+  - Poin satu
+  - Poin dua
+- Maksimal 2–6 paragraf pendek. Jika perlu, pakai daftar dash di akhir.
 TXT;
 
         // 2) Gabungkan riwayat chat menjadi teks (sederhana untuk Gemini)
@@ -74,6 +95,12 @@ TXT;
                             ],
                         ],
                     ],
+                    // Optional: aktifkan kalau mau jawaban lebih stabil
+                    // 'generationConfig' => [
+                    //     'temperature' => 0.6,
+                    //     'topP' => 0.9,
+                    //     'maxOutputTokens' => 600,
+                    // ],
                 ]);
 
             if (!$response->successful()) {
@@ -91,6 +118,9 @@ TXT;
                 $reply = 'Maaf, Nusantara AI belum bisa menjawab. Coba lagi sebentar lagi ya.';
             }
 
+            // 3) Bersihkan output supaya tidak ada *** / markdown / poin berantakan
+            $reply = $this->cleanReply($reply);
+
             return response()->json([
                 'reply' => $reply,
             ]);
@@ -105,5 +135,41 @@ TXT;
                 // 'debug' => $e->getMessage(), // boleh aktifkan sementara kalau mau lihat errornya
             ], 500);
         }
+    }
+
+    /**
+     * Bersihkan Markdown / format liar dari model agar rapi di bubble chat yang plain text.
+     */
+    private function cleanReply(string $text): string
+    {
+        // Normalisasi line endings
+        $text = str_replace(["\r\n", "\r"], "\n", $text);
+
+        // Hilangkan code fences ```...``` (kalau model ngeyel)
+        $text = preg_replace('/```[\s\S]*?```/m', '', $text);
+
+        // Hilangkan bold/italic markdown
+        $text = preg_replace('/\*\*(.*?)\*\*/s', '$1', $text);
+        $text = preg_replace('/\*(.*?)\*/s', '$1', $text);
+        $text = preg_replace('/__(.*?)__/s', '$1', $text);
+        $text = preg_replace('/_(.*?)_/s', '$1', $text);
+
+        // Hilangkan heading markdown (#, ##, ###)
+        $text = preg_replace('/^\s{0,3}#{1,6}\s+/m', '', $text);
+
+        // Ubah numbered list "1. " jadi dash "- "
+        $text = preg_replace('/^\s*\d+\.\s+/m', "- ", $text);
+
+        // Ubah bullet aneh jadi dash standar
+        $text = preg_replace('/^\s*[•●◦▪︎]+\s+/m', "- ", $text);
+
+        // Hapus garis horizontal markdown
+        $text = preg_replace('/^\s*(-{3,}|\*{3,}|_{3,})\s*$/m', '', $text);
+
+        // Rapikan whitespace
+        $text = preg_replace("/[ \t]+\n/", "\n", $text);
+        $text = preg_replace("/\n{3,}/", "\n\n", $text);
+
+        return trim($text);
     }
 }

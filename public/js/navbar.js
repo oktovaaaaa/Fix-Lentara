@@ -4,13 +4,16 @@
 
   const themeToggle = document.getElementById('themeToggle');
   const drawerTheme = document.getElementById('drawerTheme');
+
   const links = [...document.querySelectorAll('.nav-btn')];
   const indicator = document.querySelector('.active-indicator');
   const navLinksBox = document.getElementById('navLinks');
-  const hamburger = document.getElementById('hamburger');
+
+  const mobileMenuToggle = document.getElementById('mobileMenuToggle');
   const drawer = document.getElementById('drawer');
   const overlay = document.getElementById('drawerOverlay');
   const closeDrawerBtn = document.getElementById('closeDrawer');
+
   const navPill = document.querySelector('.nav-pill');
 
   // ===== THEME (light/dark) =====
@@ -28,13 +31,14 @@
   if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
   if (drawerTheme) drawerTheme.addEventListener('click', toggleTheme);
 
-  // ===== NAV ACTIVE INDICATOR (desktop only) =====
+  // ===== Helpers =====
   function isMobile() {
     return window.matchMedia('(max-width: 860px)').matches;
   }
 
+  // ===== NAV ACTIVE INDICATOR (desktop only) =====
   function moveIndicator(targetBtn) {
-    if (!indicator || !targetBtn || isMobile()) return;
+    if (!indicator || !targetBtn || isMobile() || !navLinksBox) return;
     const b = targetBtn.getBoundingClientRect();
     const p = navLinksBox.getBoundingClientRect();
     const w = Math.max(110, b.width + 10);
@@ -50,19 +54,18 @@
 
   // set awal
   const initial = document.querySelector('.nav-btn.is-active') || links[0];
-  if (!isMobile()) moveIndicator(initial); else hideIndicator();
+  if (!isMobile()) moveIndicator(initial);
+  else hideIndicator();
 
   // klik btn → scroll ke section / redirect Home (mode island)
   links.forEach(btn => {
     btn.addEventListener('click', () => {
       const url = btn.dataset.url;
       if (url) {
-        // MODE ISLAND: tombol Home → redirect ke Budaya Indonesia
         window.location.href = url;
         return;
       }
 
-      // behaviour lama untuk tombol yang scroll ke section
       const targetSelector = btn.dataset.target;
       const target = targetSelector ? document.querySelector(targetSelector) : null;
 
@@ -115,14 +118,10 @@
     if (currentIsland && labelSpan) {
       labelSpan.textContent = currentIsland;
       drop.classList.add('nav-dropdown--selected');
-      if (navLinksBox) {
-        navLinksBox.classList.add('nav-links--transparent');
-      }
+      if (navLinksBox) navLinksBox.classList.add('nav-links--transparent');
     }
 
-    // klik tombol "Pulau" → buka/tutup dropdown
     toggle.addEventListener('click', (e) => {
-      // biar nggak ikut klik di luar / dokumen
       e.stopPropagation();
       const willOpen = !drop.classList.contains('open');
       closeAllDropdowns();
@@ -132,7 +131,6 @@
       }
     });
 
-    // klik item di dropdown → ubah label, besarkan tombol, transparan, lalu redirect
     menu.querySelectorAll('.dropdown-item').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
@@ -140,57 +138,58 @@
         const islandName = item.dataset.island || item.textContent.trim();
         const url = item.dataset.url;
 
-        if (labelSpan && islandName) {
-          labelSpan.textContent = islandName;
-        }
+        if (labelSpan && islandName) labelSpan.textContent = islandName;
 
-        // tandai dropdown sudah memilih pulau → CSS akan membesarkan tombol
         drop.classList.add('nav-dropdown--selected');
+        if (navLinksBox) navLinksBox.classList.add('nav-links--transparent');
 
-        // jadikan kapsul nav-links transparan (walaupun sekarang memang sudah transparan)
-        if (navLinksBox) {
-          navLinksBox.classList.add('nav-links--transparent');
-        }
-
-        // tutup dropdown
         drop.classList.remove('open');
         toggle.setAttribute('aria-expanded', 'false');
 
-        // redirect ke halaman pulau
-        if (url) {
-          window.location.href = url;
-        }
+        if (url) window.location.href = url;
       });
     });
   });
 
-  // klik area luar navbar → tutup semua dropdown
   document.addEventListener('click', () => {
     closeAllDropdowns();
   });
 
   // ===== MOBILE DRAWER =====
   function openDrawer() {
+    if (!drawer || !overlay) return;
     drawer.classList.add('open');
     overlay.classList.add('show');
-    hamburger.classList.add('is-open');
-    hamburger.setAttribute('aria-expanded', 'true');
     drawer.setAttribute('aria-hidden', 'false');
+
+    // ✅ hide icon circle lewat class di html (CSS handle)
+    html.classList.add('drawer-open');
+
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
   }
 
   function closeDrawer() {
+    if (!drawer || !overlay) return;
     drawer.classList.remove('open');
     overlay.classList.remove('show');
-    if (hamburger) {
-      hamburger.classList.remove('is-open');
-      hamburger.setAttribute('aria-expanded', 'false');
-    }
     drawer.setAttribute('aria-hidden', 'true');
+
+    // ✅ show icon circle lagi
+    html.classList.remove('drawer-open');
+
+    // Restore body scroll
+    document.body.style.overflow = '';
   }
 
-  if (hamburger) {
-    hamburger.addEventListener('click', () => {
-      const willOpen = !drawer.classList.contains('open');
+  // Toggle drawer dengan klik circle logo di mobile
+  if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener('click', (e) => {
+      if (!isMobile()) return; // desktop: normal link
+      e.preventDefault();
+      e.stopPropagation();
+
+      const willOpen = !(drawer && drawer.classList.contains('open'));
       willOpen ? openDrawer() : closeDrawer();
     });
   }
@@ -198,12 +197,11 @@
   if (overlay) overlay.addEventListener('click', closeDrawer);
   if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
 
-  // close drawer dengan ESC
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeDrawer();
   });
 
-  // klik link di drawer → bisa scroll (kalau #anchor) atau redirect (kalau data-url)
+  // klik link di drawer → scroll (kalau #anchor) atau redirect (kalau data-url)
   document.querySelectorAll('.drawer-link').forEach(a => {
     a.addEventListener('click', (e) => {
       const url = a.dataset.url;
@@ -228,17 +226,19 @@
     });
   });
 
-  // indicator tetap rapi saat resize
+  // ✅ Resize: rapikan indicator + kalau pindah ke desktop, pastikan drawer tertutup
   window.addEventListener('resize', () => {
     if (isMobile()) {
       hideIndicator();
     } else {
+      // jika berubah ke desktop, tutup drawer biar tidak nyangkut
+      closeDrawer();
       const active = document.querySelector('.nav-btn.is-active') || links[0];
       moveIndicator(active);
     }
   });
 
-  // efek shrink/bounce saat scroll
+  // efek shrink/bounce saat scroll (desktop saja karena mobile nav-pill disembunyikan)
   let scrollTimer;
   window.addEventListener('scroll', () => {
     if (!navPill) return;
@@ -253,7 +253,3 @@
   }, { passive: true });
 
 })();
-
-
-// ANIMASI TRANSISI
-
