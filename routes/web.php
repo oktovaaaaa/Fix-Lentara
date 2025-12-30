@@ -122,4 +122,25 @@ Route::prefix('admin')
                 Route::delete('questions/{question}', [AdminQuizQuestionController::class, 'destroy'])
                     ->name('quiz-questions.destroy');
             });
+
+                    // WARISAN (Heritages)
+        Route::get('heritages', [\App\Http\Controllers\Admin\HeritageController::class, 'index'])
+            ->name('heritages.index');
+
+        // simpan/update title besar + deskripsi besar per suku
+        Route::post('heritages/page', [\App\Http\Controllers\Admin\HeritageController::class, 'savePage'])
+            ->name('heritages.page.save');
+
+        // create item warisan (pakaian/rumah_tradisi/senjata_alatmusik)
+        Route::post('heritages/item', [\App\Http\Controllers\Admin\HeritageController::class, 'storeItem'])
+            ->name('heritages.item.store');
+
+        // update item warisan
+        Route::patch('heritages/item/{item}', [\App\Http\Controllers\Admin\HeritageController::class, 'updateItem'])
+            ->name('heritages.item.update');
+
+        // delete item warisan
+        Route::delete('heritages/item/{item}', [\App\Http\Controllers\Admin\HeritageController::class, 'destroyItem'])
+            ->name('heritages.item.destroy');
+
     });

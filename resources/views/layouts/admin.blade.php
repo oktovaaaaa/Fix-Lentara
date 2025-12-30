@@ -105,6 +105,17 @@
                 <span class="tooltip">Quiz</span>
             </li>
 
+            {{-- Warisan --}}
+<li>
+    <a href="{{ route('admin.heritages.index') }}">
+        <i class="bx bx-landmark"></i>
+        <span class="links_name">Warisan</span>
+    </a>
+    <span class="tooltip">Warisan</span>
+</li>
+
+
+
             {{-- Pengaturan --}}
             <li>
                 <a href="#">

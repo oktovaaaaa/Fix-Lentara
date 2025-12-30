@@ -417,51 +417,12 @@
                     </div>
                 </section>
 
-                {{-- WARISAN --}}
-                <section id="warisan" class="space-y-4">
-                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
-                        Warisan & Sejarah
-                    </h2>
-
-                    {{-- Aceh --}}
-                    <div data-tribe-panel="aceh" class="space-y-2">
-                        <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Sejarah Aceh dipenuhi kisah kerajaan Islam, hubungan dagang internasional, serta perlawanan
-                            terhadap penjajahan. Banyak manuskrip keagamaan dan adat Aceh yang masih disimpan hingga kini.
-                        </p>
-                        <ul class="text-sm text-[var(--muted)] list-disc pl-5 space-y-1">
-                            <li>Kesultanan Aceh Darussalam sebagai pusat ilmu dan perdagangan.</li>
-                            <li>Tradisi tarekat dan pendidikan dayah (pesantren tradisional).</li>
-                            <li>Tari Saman yang telah diakui sebagai Warisan Budaya oleh UNESCO.</li>
-                        </ul>
-                    </div>
-
-                    {{-- Batak --}}
-                    <div data-tribe-panel="batak" class="space-y-2 hidden">
-                        <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Warisan Batak tercermin pada ukiran gorga, rumah adat, serta naskah-naskah kuno beraksara Batak
-                            yang berisi doa, hukum adat, dan catatan sejarah.
-                        </p>
-                        <ul class="text-sm text-[var(--muted)] list-disc pl-5 space-y-1">
-                            <li>Sistem Dalihan Na Tolu sebagai dasar hubungan sosial.</li>
-                            <li>Upacara adat seperti mangokkal holi dan pesta pernikahan adat.</li>
-                            <li>Alat musik tradisional gondang dan ulos sebagai simbol kasih sayang.</li>
-                        </ul>
-                    </div>
-
-                    {{-- Minangkabau --}}
-                    <div data-tribe-panel="minang" class="space-y-2 hidden">
-                        <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Warisan Minangkabau kaya akan sastra lisan seperti pantun dan kaba, serta arsitektur
-                            rumah gadang yang unik dengan atap bergonjong.
-                        </p>
-                        <ul class="text-sm text-[var(--muted)] list-disc pl-5 space-y-1">
-                            <li>Falsafah hidup adat basandi syarak, syarak basandi Kitabullah.</li>
-                            <li>Tradisi merantau yang membentuk jaringan Minang di berbagai daerah.</li>
-                            <li>Upacara adat seperti batagak penghulu dan perkawinan adat Minangkabau.</li>
-                        </ul>
-                    </div>
-                </section>
+{{-- WARISAN (DINAMIS DARI ADMIN) --}}
+@include('islands.partials.heritage.section', [
+    'tribeKey' => $tribeKey,
+    'tribePage' => $tribePage,
+    'itemsByCategory' => $itemsByCategory,
+])
 
                 {{-- ===================== QUIZ (SAMA SEPERTI HOME) ===================== --}}
                 <section id="quiz" class="space-y-4">
