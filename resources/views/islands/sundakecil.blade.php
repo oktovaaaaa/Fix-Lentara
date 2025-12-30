@@ -237,14 +237,12 @@
                     <div data-tribe-panel="atoni" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden"></div>
                 </section>
 
-                {{-- WARISAN (kosong) --}}
-                <section id="warisan" class="space-y-4">
-                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">Warisan & Sejarah</h2>
-
-                    <div data-tribe-panel="bali" class="space-y-2"></div>
-                    <div data-tribe-panel="sasak" class="space-y-2 hidden"></div>
-                    <div data-tribe-panel="atoni" class="space-y-2 hidden"></div>
-                </section>
+{{-- WARISAN (DINAMIS DARI ADMIN) --}}
+@include('islands.partials.heritage.section', [
+    'tribeKey' => $tribeKey,
+    'tribePage' => $tribePage,
+    'itemsByCategory' => $itemsByCategory,
+])
 
                 {{-- QUIZ (SAMA SEPERTI HOME) --}}
                 <section id="quiz" class="space-y-4">

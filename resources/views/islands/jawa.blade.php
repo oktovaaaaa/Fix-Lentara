@@ -408,46 +408,14 @@
                 <section id="warisan" class="space-y-4">
                     <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">Warisan & Sejarah</h2>
 
-                    {{-- (warisan kamu biarkan seperti semula) --}}
-                    {{-- Sunda --}}
-                    <div data-tribe-panel="sunda" class="space-y-2">
-                        <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Warisan Sunda tampak dalam situs-situs kerajaan kuno, naskah kuno beraksara Sunda,
-                            serta tradisi adat yang masih dijaga di berbagai kampung adat.
-                        </p>
-                        <ul class="text-sm text-[var(--muted)] list-disc pl-5 space-y-1">
-                            <li>Sisa-sisa Kerajaan Sunda dan Pajajaran.</li>
-                            <li>Upacara adat seperti seren taun dan hajat bumi.</li>
-                            <li>Kesenian degung, kecapi suling, dan jaipongan.</li>
-                        </ul>
-                    </div>
+                {{-- WARISAN (DINAMIS DARI ADMIN) --}}
+@include('islands.partials.heritage.section', [
+    'tribeKey' => $tribeKey,
+    'tribePage' => $tribePage,
+    'itemsByCategory' => $itemsByCategory,
+])
 
-                    {{-- Jawa --}}
-                    <div data-tribe-panel="jawa" class="space-y-2 hidden">
-                        <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Sejarah Jawa mencakup masa Hindu-Buddha, kerajaan Islam, kolonialisme, hingga
-                            masa kemerdekaan yang banyak terekam dalam candi, keraton, dan manuskrip.
-                        </p>
-                        <ul class="text-sm text-[var(--muted)] list-disc pl-5 space-y-1">
-                            <li>Candi-candi besar seperti Borobudur dan Prambanan.</li>
-                            <li>Tradisi keraton, abdi dalem, dan upacara Grebeg.</li>
-                            <li>Seni batik yang telah diakui UNESCO sebagai warisan dunia.</li>
-                        </ul>
-                    </div>
 
-                    {{-- Betawi --}}
-                    <div data-tribe-panel="betawi" class="space-y-2 hidden">
-                        <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Warisan Betawi adalah bukti pertemuan berbagai budaya yang kemudian
-                            menyatu menjadi identitas khas Jakarta.
-                        </p>
-                        <ul class="text-sm text-[var(--muted)] list-disc pl-5 space-y-1">
-                            <li>Tradisi palang pintu dalam pernikahan adat Betawi.</li>
-                            <li>Rumah adat Betawi dengan teras luas dan ornamen gigi balang.</li>
-                            <li>Bahasa dan logat Betawi yang populer di film dan sinetron.</li>
-                        </ul>
-                    </div>
-                </section>
 
                 {{-- KUIS (DIUBAH: SAMA SEPERTI HOME, DINAMIS) --}}
                 <section id="quiz" class="space-y-4">

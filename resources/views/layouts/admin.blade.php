@@ -97,13 +97,13 @@
             </li>
 
             {{-- ===== QUIZ (BARU) ===== --}}
-            <li>
+            {{-- <li>
                 <a href="{{ route('admin.quizzes.index') }}">
                     <i class='bx bx-joystick'></i>
                     <span class="links_name">Quiz</span>
                 </a>
                 <span class="tooltip">Quiz</span>
-            </li>
+            </li> --}}
 
             {{-- Warisan --}}
 <li>
