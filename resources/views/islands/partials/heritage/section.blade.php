@@ -23,6 +23,15 @@
         /* =========================================================
            NEON ORANGE COVERFLOW - IMPROVED LAYOUT
            Perbaikan untuk mobile & desktop
+
+           FIX DI FILE INI:
+           1) MODAL DESKTOP GAMBAR TIDAK MUNCUL: fix tinggi modal image (no height:100%)
+           2) LIGHT MODE MODAL TERLALU GELAP: overlay modal dibuat light-friendly
+           3) MOBILE CARD "KETUTUPAN": di mobile caption HANYA tampil JUDUL (desc disembunyikan)
+           4) OPACITY DITURUNKAN: gambar lebih jelas (card overlay + caption + modal overlay)
+
+           NOTES KUSTOMISASI:
+           - Semua opacity pakai rgba(..., X). X makin kecil = makin bening.
         ========================================================= */
 
         @property --neon-orange-angle {
@@ -32,16 +41,30 @@
         }
 
         #warisan{
-            /* Warna utama */
+            /* Warna utama - menggunakan variabel dari root */
             --wf-bg: var(--bg-body);
             --wf-txt: var(--txt-body);
             --wf-muted: var(--muted);
             --wf-line: var(--line);
 
             /* Warna neon orange */
-            --neon-primary: #f97316;
-            --neon-secondary: #fb923c;
-            --neon-glow: rgba(249, 115, 22, 0.7);
+            --neon-primary: var(--brand);
+            --neon-secondary: var(--brand-2);
+            --neon-glow: rgba(var(--brand-rgb, 249, 115, 22), 0.7);
+
+            /* Glass effect colors (OPACITY DITURUNKAN biar gambar lebih jelas) */
+            --wf-caption-bg-light: rgba(255, 255, 255, 0.08);
+            --wf-caption-bg-dark: rgba(20, 30, 45, 0.08);
+
+            --wf-modal-bg-light: rgba(255, 255, 255, 0.18);
+            --wf-modal-bg-dark: rgba(10, 15, 26, 0.20);
+
+            --wf-caption-border-light: rgba(185, 65, 14, 0.18);
+            --wf-caption-border-dark: rgba(249, 115, 22, 0.18);
+
+            /* Overlay modal per theme (light lebih terang) */
+            --wf-overlay-bg-light: rgba(255, 255, 255, 0.60);
+            --wf-overlay-bg-dark: rgba(0, 0, 0, 0.82);
 
             /* coverflow sizing - OPTIMIZED FOR RESPONSIVE */
             --wf-card-w: 280px;
@@ -53,17 +76,249 @@
             --wf-blur-step: 0.8px;
 
             --wf-radius: 24px;
-            --wf-shadow: 0 25px 50px rgba(0,0,0,.25);
-            --wf-shadow-active: 0 0 40px rgba(249, 115, 22, 0.4);
-
-            /* Mobile visibility settings */
-            --visible-cards: 3; /* Tampilkan 3 kartu di mobile */
+            --wf-shadow: var(--shadow);
+            --wf-shadow-active: 0 0 40px rgba(var(--brand-rgb, 249, 115, 22), 0.35);
         }
 
         /* Animation untuk efek neon */
         @keyframes orange-neon-spin {
             0% { --neon-orange-angle: 0deg; }
             100% { --neon-orange-angle: 360deg; }
+        }
+
+        /* ================= MODAL DETAIL STYLES ================= */
+        .wf-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            /* FIX: light mode tidak gelap */
+            background: var(--wf-overlay-bg-light);
+            backdrop-filter: blur(14px) saturate(130%);
+            -webkit-backdrop-filter: blur(14px) saturate(130%);
+
+            z-index: 9999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        html[data-theme="dark"] .wf-modal-overlay {
+            background: var(--wf-overlay-bg-dark);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .wf-modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+
+        .wf-modal-container {
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+
+            /* light mode: terang & glass */
+            background: rgba(255, 255, 255, 0.30);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border: 1px solid rgba(var(--brand-rgb, 249, 115, 22), 0.16);
+
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: var(--shadow),
+                        0 0 80px rgba(var(--brand-rgb, 249, 115, 22), 0.22);
+            opacity: 0;
+            transform: translateY(30px) scale(0.9);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        html[data-theme="dark"] .wf-modal-container {
+            background: rgba(10, 15, 26, 0.34);
+            border: 1px solid rgba(var(--brand-rgb, 249, 115, 22), 0.20);
+            box-shadow: var(--shadow),
+                        0 0 80px rgba(var(--brand-rgb, 249, 115, 22), 0.32);
+        }
+
+        .wf-modal-overlay.active .wf-modal-container {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .wf-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--card);
+            border: 2px solid rgba(var(--brand-rgb, 249, 115, 22), 0.5);
+            color: var(--txt-body);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.20);
+        }
+
+        .wf-modal-close:hover {
+            border-color: var(--brand);
+            background: rgba(var(--brand-rgb, 249, 115, 22), 0.10);
+            transform: rotate(90deg) scale(1.1);
+            box-shadow: 0 0 30px rgba(var(--brand-rgb, 249, 115, 22), 0.55);
+        }
+
+        .wf-modal-close svg {
+            width: 24px;
+            height: 24px;
+            stroke-width: 2.5;
+        }
+
+        .wf-modal-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            .wf-modal-content {
+                flex-direction: row;
+            }
+        }
+
+        /* ========== MODAL IMAGE (FIX desktop collapse + konsisten crop) ========== */
+        .wf-modal-image {
+            flex: 1;
+            min-height: 300px;
+
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px 20px 0 0;
+        }
+
+        /* Kontrol posisi fokus gambar */
+        .wf-modal-image.pos-center { background-position: center center; }
+        .wf-modal-image.pos-top { background-position: center top; }
+        .wf-modal-image.pos-bottom { background-position: center bottom; }
+
+        @media (min-width: 768px) {
+            /* FIX: desktop jangan collapse (jangan pakai height:100%) */
+            .wf-modal-content { min-height: 440px; }
+            .wf-modal-image {
+                min-height: 440px;
+                height: auto;
+                border-radius: 20px 0 0 20px;
+            }
+        }
+
+        /* Overlay di atas gambar modal (dibuat lebih tipis biar gambar lebih jelas) */
+        .wf-modal-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom,
+                rgba(0,0,0,0.05) 0%,
+                rgba(0,0,0,0.03) 50%,
+                transparent 100%);
+            pointer-events: none;
+        }
+
+        .wf-modal-image-fallback {
+            background: linear-gradient(135deg,
+                rgba(var(--brand-rgb, 249, 115, 22), 0.10),
+                rgba(var(--brand-2-rgb, 251, 146, 60), 0.06),
+                rgba(10, 15, 26, 0.35));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--brand);
+            font-size: 4rem;
+            opacity: 0.85;
+        }
+
+        .wf-modal-info {
+            flex: 1;
+            padding: 2.5rem;
+            overflow-y: auto;
+            max-height: 60vh;
+
+            background: var(--wf-modal-bg-light);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(var(--brand-rgb, 249, 115, 22), 0.15);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            border-radius: 0 0 20px 20px;
+        }
+
+        @media (min-width: 768px) {
+            .wf-modal-info {
+                max-height: 90vh;
+                border-radius: 0 20px 20px 0;
+                border-left: none;
+            }
+        }
+
+        .wf-modal-title {
+            margin: 0 0 1.5rem 0;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--txt-body);
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.10);
+        }
+
+        .wf-modal-description {
+            margin: 0 0 2rem 0;
+            color: var(--txt-body);
+            line-height: 1.8;
+            font-size: 1.15rem;
+            opacity: 0.95;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .wf-modal-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            padding: 1.2rem;
+            border-radius: 16px;
+            background: rgba(var(--brand-rgb, 249, 115, 22), 0.08);
+            border: 1px solid rgba(var(--brand-rgb, 249, 115, 22), 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .wf-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: var(--txt-body);
+            font-weight: 600;
+            opacity: 0.92;
+        }
+
+        .wf-meta-item svg {
+            width: 20px;
+            height: 20px;
+            color: var(--brand);
         }
 
         /* ================= KATEGORI TITLE ================= */
@@ -86,7 +341,6 @@
             padding: 0 2rem;
         }
 
-        /* Garis dekoratif */
         #warisan .wf-category-title::before,
         #warisan .wf-category-title::after {
             content: '';
@@ -96,8 +350,8 @@
             height: 2px;
             background: linear-gradient(90deg,
                 transparent,
-                var(--neon-primary),
-                var(--neon-secondary),
+                var(--brand),
+                var(--brand-2),
                 transparent
             );
             transform: translateY(-50%);
@@ -148,10 +402,10 @@
             width: 100%;
         }
 
-        /* ================= VIEWPORT - IMPROVED ================= */
+        /* ================= VIEWPORT ================= */
         #warisan .wf-viewport{
             position: relative;
-            height: calc(var(--wf-card-h) + 40px); /* Space for mobile buttons */
+            height: calc(var(--wf-card-h) + 40px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -160,7 +414,7 @@
             width: 100%;
         }
 
-        /* ================= TRACK - IMPROVED ================= */
+        /* ================= TRACK ================= */
         #warisan .wf-track{
             position: relative;
             width: 100%;
@@ -170,7 +424,7 @@
             justify-content: center;
         }
 
-        /* Kartu dengan posisi yang lebih terpusat */
+        /* ================= CARD ================= */
         #warisan .wf-card{
             position: absolute;
             top: 50%;
@@ -181,12 +435,11 @@
             border-radius: var(--wf-radius);
             overflow: hidden;
             border: none;
-            background: #0a0f1a;
+            background: var(--card);
             cursor: pointer;
             user-select: none;
             transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1.2);
 
-            /* Transform untuk distribusi yang lebih baik */
             transform:
                 translate(-50%, -50%)
                 translateX(calc(var(--off) * var(--wf-gap-x)))
@@ -209,9 +462,9 @@
             background: conic-gradient(
                 from var(--neon-orange-angle),
                 transparent,
-                var(--neon-primary),
-                var(--neon-secondary),
-                var(--neon-primary),
+                var(--brand),
+                var(--brand-2),
+                var(--brand),
                 transparent
             );
             padding: 3px;
@@ -238,7 +491,7 @@
         }
 
         #warisan .wf-card[data-active="1"]::before {
-            opacity: 0.8;
+            opacity: 0.75;
         }
 
         /* Hover efek */
@@ -257,75 +510,75 @@
             inset: 0;
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
             z-index: 1;
         }
 
-        /* Overlay */
+        /* Overlay gambar card (DITIPISKAN biar gambar jelas) */
         #warisan .wf-media::after{
             content:"";
             position:absolute;
             inset:0;
-            background:
-                linear-gradient(to bottom,
-                    transparent 0%,
-                    rgba(0,0,0,0.1) 30%,
-                    rgba(0,0,0,0.6) 70%,
-                    rgba(0,0,0,0.8) 100%),
-                linear-gradient(to right,
-                    rgba(249, 115, 22, 0.05),
-                    transparent 30%,
-                    transparent 70%,
-                    rgba(251, 146, 60, 0.05));
+            background: linear-gradient(
+                to bottom,
+                transparent 60%,
+                rgba(0,0,0,0.03) 78%,
+                rgba(0,0,0,0.08) 100%
+            );
+            pointer-events: none;
         }
 
-        /* Caption */
+        /* Caption card (glass, opacity diturunkan) */
         #warisan .wf-caption{
             position:absolute;
             left: 16px;
             right: 16px;
             bottom: 16px;
-            padding: 16px;
+            padding: 18px;
             border-radius: 16px;
-            background: rgba(10, 15, 26, 0.85);
-            border: 1px solid rgba(249, 115, 22, 0.3);
-            backdrop-filter: blur(15px);
+            background: var(--wf-caption-bg-light);
+            backdrop-filter: blur(18px) saturate(170%);
+            -webkit-backdrop-filter: blur(18px) saturate(170%);
+            border: 1px solid var(--wf-caption-border-light);
             z-index: 2;
             transform: translateY(5px);
             transition: all 0.3s ease;
         }
 
+        /* glow aktif dibuat lebih halus */
         #warisan .wf-card[data-active="1"] .wf-caption {
-            border-color: var(--neon-primary);
-            box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+            border-color: rgba(var(--brand-rgb, 249, 115, 22), 0.22);
+            box-shadow: 0 0 16px rgba(var(--brand-rgb, 249, 115, 22), 0.18);
         }
 
         #warisan .wf-caption h4{
-            margin:0 0 6px 0;
-            color: #fff;
-            font-size: 1.1rem;
+            margin:0 0 8px 0;
+            color: var(--txt-body);
+            font-size: 1.15rem;
             font-weight: 800;
             letter-spacing: -0.01em;
             line-height: 1.2;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
 
         #warisan .wf-caption p{
             margin: 0;
-            color: rgba(255,255,255,0.85);
-            font-size: .85rem;
+            color: var(--txt-body);
+            font-size: .9rem;
             line-height: 1.5;
+            opacity: 0.92;
         }
 
         /* Fallback gradient */
         #warisan .wf-fallback{
             background:
                 radial-gradient(70% 60% at 30% 20%,
-                    rgba(249, 115, 22, 0.4),
+                    rgba(var(--brand-rgb, 249, 115, 22), 0.35),
                     transparent 55%),
                 radial-gradient(70% 60% at 70% 30%,
-                    rgba(251, 146, 60, 0.3),
+                    rgba(var(--brand-2-rgb, 251, 146, 60), 0.25),
                     transparent 55%),
-                linear-gradient(135deg, #0a0f1a, #111827, #0a0f1a);
+                linear-gradient(135deg, var(--card), var(--bg-body), var(--card));
         }
 
         /* ================= NAV BUTTONS DESKTOP ================= */
@@ -337,16 +590,17 @@
             width: 52px;
             height: 52px;
             border-radius: 50%;
-            border: 2px solid rgba(249, 115, 22, 0.5);
-            background: rgba(10, 15, 26, 0.9);
-            color: var(--neon-primary);
+            border: 2px solid rgba(var(--brand-rgb, 249, 115, 22), 0.5);
+            background: var(--card);
+            color: var(--brand);
             display:flex;
             align-items:center;
             justify-content:center;
             box-shadow:
-                0 15px 35px rgba(0,0,0,0.3),
-                0 0 25px rgba(249, 115, 22, 0.4);
+                0 15px 35px rgba(0,0,0,0.28),
+                0 0 22px rgba(var(--brand-rgb, 249, 115, 22), 0.35);
             backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             transition: all 0.3s ease;
             cursor: pointer;
         }
@@ -359,9 +613,9 @@
             background: conic-gradient(
                 from var(--neon-orange-angle),
                 transparent,
-                var(--neon-primary),
-                var(--neon-secondary),
-                var(--neon-primary),
+                var(--brand),
+                var(--brand-2),
+                var(--brand),
                 transparent
             );
             padding: 3px;
@@ -378,11 +632,11 @@
 
         #warisan .wf-nav:hover{
             transform: translateY(-50%) scale(1.1);
-            border-color: rgba(249,115,22,0.8);
-            background: rgba(249,115,22,0.15);
+            border-color: rgba(var(--brand-rgb, 249, 115, 22), 0.8);
+            background: rgba(var(--brand-rgb, 249, 115, 22), 0.08);
             box-shadow:
-                0 20px 40px rgba(0,0,0,0.4),
-                0 0 40px rgba(249, 115, 22, 0.6);
+                0 20px 40px rgba(0,0,0,0.35),
+                0 0 35px rgba(var(--brand-rgb, 249, 115, 22), 0.55);
         }
 
         #warisan .wf-nav:hover::before {
@@ -397,7 +651,7 @@
             width: 24px;
             height: 24px;
             stroke-width: 2.5;
-            filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.8));
+            filter: drop-shadow(0 0 8px rgba(var(--brand-rgb, 249, 115, 22), 0.7));
         }
 
         #warisan .wf-prev{ left: -25px; }
@@ -421,27 +675,28 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            border: 2px solid rgba(249, 115, 22, 0.6);
-            background: rgba(10, 15, 26, 0.9);
-            color: var(--neon-primary);
+            border: 2px solid rgba(var(--brand-rgb, 249, 115, 22), 0.6);
+            background: var(--card);
+            color: var(--brand);
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow:
-                0 10px 25px rgba(0,0,0,0.3),
-                0 0 20px rgba(249, 115, 22, 0.4);
+                0 10px 25px rgba(0,0,0,0.28),
+                0 0 18px rgba(var(--brand-rgb, 249, 115, 22), 0.35);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             transition: all 0.3s ease;
             cursor: pointer;
         }
 
         #warisan .wf-mobile-btn:hover {
             transform: scale(1.1);
-            border-color: rgba(249,115,22,0.9);
-            background: rgba(249,115,22,0.2);
+            border-color: rgba(var(--brand-rgb, 249, 115, 22), 0.9);
+            background: rgba(var(--brand-rgb, 249, 115, 22), 0.15);
             box-shadow:
-                0 15px 30px rgba(0,0,0,0.4),
-                0 0 30px rgba(249, 115, 22, 0.6);
+                0 15px 30px rgba(0,0,0,0.35),
+                0 0 28px rgba(var(--brand-rgb, 249, 115, 22), 0.55);
         }
 
         #warisan .wf-mobile-btn svg {
@@ -465,9 +720,10 @@
             width: 100%;
             border-radius: 20px;
             padding: 2.5rem 2rem;
-            border: 2px dashed rgba(249, 115, 22, 0.4);
-            background: rgba(249, 115, 22, 0.08);
+            border: 2px dashed rgba(var(--brand-rgb, 249, 115, 22), 0.35);
+            background: rgba(var(--brand-rgb, 249, 115, 22), 0.06);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             position: relative;
             overflow: hidden;
         }
@@ -481,7 +737,7 @@
             background: conic-gradient(
                 from var(--neon-orange-angle),
                 transparent,
-                rgba(249, 115, 22, 0.3),
+                rgba(var(--brand-rgb, 249, 115, 22), 0.25),
                 transparent
             );
             -webkit-mask:
@@ -490,15 +746,15 @@
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             filter: blur(8px);
-            opacity: 0.6;
+            opacity: 0.55;
             animation: orange-neon-spin 10s linear infinite;
         }
 
         #warisan .wf-empty-ico{
             font-size: 3rem;
             margin-bottom: 1rem;
-            color: var(--neon-primary);
-            filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.5));
+            color: var(--brand);
+            filter: drop-shadow(0 0 15px rgba(var(--brand-rgb, 249, 115, 22), 0.45));
         }
 
         #warisan .wf-empty-title{
@@ -512,6 +768,33 @@
             margin: 0.75rem 0 0;
             font-size: 1rem;
             color: var(--wf-muted);
+        }
+
+        /* ================= DARK MODE OVERRIDES ================= */
+        html[data-theme="dark"] #warisan {
+            --neon-glow: rgba(var(--brand-rgb, 249, 115, 22), 0.7);
+            --wf-shadow-active: 0 0 40px rgba(var(--brand-rgb, 249, 115, 22), 0.35);
+        }
+
+        html[data-theme="dark"] .wf-modal-info {
+            background: var(--wf-modal-bg-dark);
+            border: 1px solid rgba(var(--brand-rgb, 249, 115, 22), 0.20);
+        }
+
+        html[data-theme="dark"] #warisan .wf-caption {
+            background: var(--wf-caption-bg-dark);
+            border: 1px solid var(--wf-caption-border-dark);
+        }
+
+        html[data-theme="dark"] .wf-modal-close {
+            background: var(--card);
+            color: var(--txt-body);
+        }
+
+        html[data-theme="dark"] #warisan .wf-nav,
+        html[data-theme="dark"] #warisan .wf-mobile-btn {
+            background: var(--card);
+            color: var(--brand);
         }
 
         /* ================= RESPONSIVE - IMPROVED ================= */
@@ -561,15 +844,15 @@
             #warisan{
                 --wf-card-w: 200px;
                 --wf-card-h: 300px;
-                --wf-gap-x: 40px; /* DIKURANGI DRASTIS untuk 3 kartu */
-                --wf-tilt: 10deg; /* Kurangi tilt di mobile */
+                --wf-gap-x: 40px;
+                --wf-tilt: 10deg;
                 --wf-depth: 60px;
-                --wf-scale-step: .08; /* Kurangi scale difference */
-                --wf-blur-step: 0.3px; /* Kurangi blur */
+                --wf-scale-step: .08;
+                --wf-blur-step: 0.3px;
             }
 
             #warisan .wf-viewport {
-                height: calc(var(--wf-card-h) + 60px); /* Extra space for mobile */
+                height: calc(var(--wf-card-h) + 60px);
             }
 
             #warisan .wf-category-title {
@@ -587,9 +870,53 @@
                 margin: 0 auto 2rem;
             }
 
-            /* Adjust card opacity untuk visibility yang lebih baik */
             #warisan .wf-card {
                 opacity: calc(0.9 - (var(--abs) * .2));
+            }
+
+            /* ===========================
+               FIX: MOBILE CAPTION JANGAN NUTUPI GAMBAR
+               - DI MOBILE: tampilkan JUDUL SAJA
+               - sembunyikan deskripsi (p)
+               - kecilkan padding dan radius biar clean
+            =========================== */
+            #warisan .wf-caption{
+                padding: 12px 14px;
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+                border-radius: 14px;
+            }
+
+            #warisan .wf-caption p{
+                display: none !important; /* INI KUNCI: cuma judul yang tampil */
+            }
+
+            #warisan .wf-caption h4{
+                margin: 0;
+                font-size: 1.05rem;
+                line-height: 1.2;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .wf-modal-container {
+                width: 95%;
+                max-height: 85vh;
+            }
+
+            .wf-modal-info {
+                padding: 1.8rem;
+            }
+
+            .wf-modal-title {
+                font-size: 1.7rem;
+            }
+
+            .wf-modal-description {
+                font-size: 1.05rem;
             }
         }
 
@@ -610,21 +937,6 @@
                 display: none;
             }
 
-            #warisan .wf-caption {
-                padding: 12px;
-                left: 10px;
-                right: 10px;
-                bottom: 10px;
-            }
-
-            #warisan .wf-caption h4 {
-                font-size: 1rem;
-            }
-
-            #warisan .wf-caption p {
-                font-size: 0.75rem;
-            }
-
             #warisan .wf-mobile-btn {
                 width: 55px;
                 height: 55px;
@@ -633,6 +945,18 @@
             #warisan .wf-mobile-btn svg {
                 width: 24px;
                 height: 24px;
+            }
+
+            .wf-modal-info {
+                padding: 1.5rem;
+            }
+
+            .wf-modal-title {
+                font-size: 1.5rem;
+            }
+
+            .wf-modal-description {
+                font-size: 1rem;
             }
         }
 
@@ -660,6 +984,24 @@
                 width: 22px;
                 height: 22px;
             }
+
+            .wf-modal-info {
+                padding: 1.2rem;
+            }
+
+            .wf-modal-title {
+                font-size: 1.4rem;
+            }
+
+            .wf-modal-description {
+                font-size: 0.95rem;
+                line-height: 1.7;
+            }
+
+            .wf-modal-meta {
+                padding: 1rem;
+                margin-bottom: 2rem;
+            }
         }
 
         @media (max-width: 360px){
@@ -670,12 +1012,15 @@
             }
 
             #warisan .wf-caption h4 {
-                font-size: 0.9rem;
+                font-size: 0.95rem;
             }
 
-            #warisan .wf-caption p {
-                font-size: 0.7rem;
-                line-height: 1.4;
+            .wf-modal-info {
+                padding: 1rem;
+            }
+
+            .wf-modal-title {
+                font-size: 1.3rem;
             }
         }
 
@@ -705,6 +1050,20 @@
             }
         }
     </style>
+
+    {{-- MODAL CONTAINER (hanya satu untuk semua) --}}
+    <div class="wf-modal-overlay" id="wf-modal-overlay">
+        <div class="wf-modal-container" id="wf-modal-container">
+            <button class="wf-modal-close" id="wf-modal-close" aria-label="Tutup modal">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            <div class="wf-modal-content" id="wf-modal-content">
+                <!-- Konten akan dimuat dinamis -->
+            </div>
+        </div>
+    </div>
 
     {{-- 3 ROWS: PAKAIAN / RUMAH+TRADISI / SENJATA+MUSIK --}}
     @foreach($labels as $key => $label)
@@ -743,7 +1102,10 @@
                         <div class="wf-track" data-wf-track>
                             @foreach($items as $item)
                                 @php
-                                    $img = $item->image_path ? asset('storage/'.$item->image_path) : null;
+                                    $img = null;
+                                    if ($item->image_path) {
+                                        $img = asset('storage/'.$item->image_path);
+                                    }
                                     $desc = $item->description ? Str::limit($item->description, 70) : null;
                                 @endphp
 
@@ -751,10 +1113,16 @@
                                     class="wf-card"
                                     data-wf-card
                                     data-index="{{ $loop->index }}"
+                                    data-item-id="{{ $item->id }}"
+                                    data-item-title="{{ $item->title }}"
+                                    data-item-description="{{ $item->description ?? '' }}"
+                                    data-item-image="{{ $img ?? '' }}"
+                                    data-item-category="{{ $label }}"
+                                    data-item-focus="center"
                                     style="--off: 0; --abs: 0;"
                                     role="button"
                                     tabindex="0"
-                                    aria-label="Lihat {{ $item->title }}"
+                                    aria-label="Lihat detail {{ $item->title }}"
                                 >
                                     <div
                                         class="wf-media {{ $img ? '' : 'wf-fallback' }}"
@@ -806,10 +1174,127 @@
  * - 2 tombol nav di mobile (dibawah)
  * - Tampilkan 3 kartu di mobile
  * - Fixed overflow di mobile
+ * - MODAL DETAIL ketika card diklik
+ * - Support tema light/dark
  */
 (function () {
     const rows = document.querySelectorAll('#warisan [data-wf-row]');
+    const modalOverlay = document.getElementById('wf-modal-overlay');
+    const modalContent = document.getElementById('wf-modal-content');
+    const modalClose = document.getElementById('wf-modal-close');
+
     if (!rows.length) return;
+
+    // Decode HTML entities (mis. &amp;)
+    function decodeHtmlEntities(str) {
+        if (!str) return '';
+        const txt = document.createElement('textarea');
+        txt.innerHTML = str;
+        return txt.value;
+    }
+
+    // Fungsi untuk menampilkan modal detail
+    function showDetailModal(card) {
+        if (!card || !modalOverlay || !modalContent) return;
+
+        const itemData = {
+            title: card.dataset.itemTitle || 'Judul tidak tersedia',
+            description: card.dataset.itemDescription || 'Deskripsi tidak tersedia',
+            image: decodeHtmlEntities(card.dataset.itemImage || ''),
+            category: card.dataset.itemCategory || 'Kategori'
+        };
+
+        // fokus crop modal image: top/center/bottom (default center)
+        const focus = (card.dataset.itemFocus || 'center').toLowerCase();
+        const focusClass = (focus === 'top') ? 'pos-top' : (focus === 'bottom' ? 'pos-bottom' : 'pos-center');
+
+        let imageUrl = (itemData.image || '').trim();
+        let imageHTML = '';
+
+        if (imageUrl !== '') {
+            // Pakai URL apa adanya (asset() dari Blade sudah final). Hanya rapikan spasi.
+            imageHTML = `
+                <div class="wf-modal-image ${focusClass}"
+                     style="background-image:url('${imageUrl}')"
+                     data-image-url="${imageUrl}">
+                </div>
+            `;
+        } else {
+            imageHTML = `
+                <div class="wf-modal-image wf-modal-image-fallback">
+                    <span>🏛️</span>
+                </div>
+            `;
+        }
+
+        const modalHTML = `
+            ${imageHTML}
+            <div class="wf-modal-info">
+                <div class="wf-modal-meta">
+                    <div class="wf-meta-item">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                        </svg>
+                        <span>${itemData.category}</span>
+                    </div>
+                </div>
+                <h2 class="wf-modal-title">${itemData.title}</h2>
+                <div class="wf-modal-description">
+                    ${String(itemData.description).replace(/\n/g, '<br>')}
+                </div>
+            </div>
+        `;
+
+        modalContent.innerHTML = modalHTML;
+
+        modalOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        // Preload gambar (opsional) supaya bisa fallback kalau error
+        if (imageUrl !== '') {
+            const img = new Image();
+            img.onload = function(){ /* ok */ };
+            img.onerror = function(){
+                const imageDiv = modalContent.querySelector('.wf-modal-image');
+                if (imageDiv) {
+                    imageDiv.classList.add('wf-modal-image-fallback');
+                    imageDiv.innerHTML = '<span>🏛️</span>';
+                    imageDiv.style.backgroundImage = 'none';
+                }
+            };
+            img.src = imageUrl;
+        }
+
+        setTimeout(() => {
+            if (modalClose) modalClose.focus();
+        }, 100);
+    }
+
+    let lastClickedCard = null;
+
+    function closeDetailModal() {
+        if (!modalOverlay) return;
+        modalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+
+        if (lastClickedCard) {
+            setTimeout(() => lastClickedCard.focus(), 100);
+        }
+    }
+
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeDetailModal();
+        });
+    }
+
+    if (modalClose) modalClose.addEventListener('click', closeDetailModal);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modalOverlay && modalOverlay.classList.contains('active')) {
+            closeDetailModal();
+        }
+    });
 
     function setupRow(row) {
         const track = row.querySelector('[data-wf-track]');
@@ -821,7 +1306,6 @@
         const viewport = row.querySelector('[data-wf-viewport]');
         if (!track || !cards.length) return;
 
-        // Start from center
         let active = Math.min(Math.floor(cards.length / 2), cards.length - 1);
         let isAnimating = false;
         let isMobile = window.innerWidth <= 768;
@@ -843,7 +1327,6 @@
             cards.forEach((card, idx) => {
                 let off = idx - active;
 
-                // Cari jalur terpendek dengan wrap
                 const wrapDistance = Math.abs(off);
                 const wrapLeft = Math.abs(off + cards.length);
                 const wrapRight = Math.abs(off - cards.length);
@@ -857,13 +1340,10 @@
                 card.style.setProperty('--abs', abs);
                 card.dataset.active = (idx === active) ? "1" : "0";
 
-                // Atur z-index untuk stacking
                 card.style.zIndex = String(100 - abs * 10);
 
-                // Tabindex hanya untuk kartu aktif
                 card.tabIndex = (idx === active) ? 0 : -1;
 
-                // Di mobile, sembunyikan kartu yang terlalu jauh
                 if (isMobile && abs > 2) {
                     card.style.opacity = '0';
                     card.style.pointerEvents = 'none';
@@ -881,7 +1361,6 @@
             active = clampIndex(active + delta);
             render();
 
-            // Fokus ke kartu aktif
             const activeCard = cards[active];
             if (activeCard) {
                 setTimeout(() => {
@@ -890,9 +1369,6 @@
             }
         }
 
-        /* =========================
-           DESKTOP NAVIGATION
-        ========================= */
         if (prevBtn) {
             prevBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -911,9 +1387,6 @@
             nextBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
         }
 
-        /* =========================
-           MOBILE NAVIGATION (dibawah)
-        ========================= */
         if (mobilePrevBtn) {
             mobilePrevBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -930,33 +1403,39 @@
             });
         }
 
-        /* =========================
-           CLICK CARD TO FOCUS
-        ========================= */
         cards.forEach((card, idx) => {
             card.addEventListener('click', (e) => {
                 e.preventDefault();
+                lastClickedCard = card;
+
                 if (idx !== active) {
                     active = idx;
                     render();
+                    setTimeout(() => showDetailModal(card), 200);
+                } else {
+                    showDetailModal(card);
                 }
             });
 
             card.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
+                    lastClickedCard = card;
+
                     if (idx !== active) {
                         active = idx;
                         render();
+                        setTimeout(() => showDetailModal(card), 200);
+                    } else {
+                        showDetailModal(card);
                     }
                 }
             });
         });
 
-        /* =========================
-           KEYBOARD NAVIGATION
-        ========================= */
         row.addEventListener('keydown', (e) => {
+            if (modalOverlay && modalOverlay.classList.contains('active')) return;
+
             if (e.key === 'ArrowLeft') {
                 e.preventDefault();
                 go(-1);
@@ -967,14 +1446,11 @@
             }
         });
 
-        /* =========================
-           SWIPE SUPPORT (MOBILE)
-        ========================= */
         let swipeStartX = 0;
         let isSwiping = false;
 
         function handleTouchStart(e) {
-            if (!e.touches) return;
+            if (!e.touches || (modalOverlay && modalOverlay.classList.contains('active'))) return;
             swipeStartX = e.touches[0].clientX;
             isSwiping = true;
         }
@@ -990,13 +1466,9 @@
             const endX = e.changedTouches[0].clientX;
             const deltaX = endX - swipeStartX;
 
-            // Threshold swipe
             if (Math.abs(deltaX) > 50) {
-                if (deltaX > 0) {
-                    go(-1); // Swipe kanan -> prev
-                } else {
-                    go(1); // Swipe kiri -> next
-                }
+                if (deltaX > 0) go(-1);
+                else go(1);
             }
 
             isSwiping = false;
@@ -1008,58 +1480,31 @@
             viewport.addEventListener('touchend', handleTouchEnd, { passive: true });
         }
 
-        /* =========================
-           RESIZE HANDLER
-        ========================= */
         function handleResize() {
             updateMobileState();
-            render(); // Re-render untuk menyesuaikan dengan ukuran layar
+            render();
         }
 
-        // Debounce resize untuk performa
         let resizeTimeout;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(handleResize, 150);
         });
 
-        /* =========================
-           INITIAL SETUP
-        ========================= */
         updateMobileState();
-
-        // Initial render dengan timeout untuk memastikan DOM siap
         setTimeout(() => {
             render();
-            // Fokus ke kartu tengah
-            if (cards[active]) {
-                cards[active].tabIndex = 0;
-            }
+            if (cards[active]) cards[active].tabIndex = 0;
         }, 100);
     }
 
-    // Setup semua rows
-    rows.forEach(row => {
-        setupRow(row);
-    });
+    rows.forEach(row => setupRow(row));
 
-    // Global keyboard handler
-    document.addEventListener('keydown', (e) => {
-        const activeRow = document.activeElement?.closest('[data-wf-row]');
-        if (!activeRow) return;
-
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-            e.preventDefault();
-        }
-    });
-
-    // Fix untuk overflow di mobile
     function fixMobileOverflow() {
         const warisanSection = document.getElementById('warisan');
         if (!warisanSection) return;
 
         if (window.innerWidth <= 768) {
-            // Pastikan section tidak menyebabkan horizontal scroll
             document.body.style.overflowX = 'hidden';
             warisanSection.style.width = '100vw';
             warisanSection.style.maxWidth = '100vw';
@@ -1070,14 +1515,10 @@
         }
     }
 
-    // Jalankan saat load dan resize
     window.addEventListener('load', fixMobileOverflow);
     window.addEventListener('resize', fixMobileOverflow);
-
-    // Initial call
     setTimeout(fixMobileOverflow, 100);
 })();
 </script>
 
 </section>
-
