@@ -6,6 +6,7 @@
 @section('content')
 <div class="max-w-6xl mx-auto px-4 py-6">
 
+    {{-- HEADER --}}
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-semibold">History Pulau &amp; Suku</h1>
         <a href="{{ route('admin.histories.create') }}"
@@ -23,6 +24,7 @@
 
     {{-- FILTER --}}
     <form method="GET" class="mb-5 flex flex-wrap gap-3 items-end">
+        {{-- Pulau --}}
         <div>
             <label class="text-xs font-medium block mb-1">Pulau</label>
             <select name="island_id"
@@ -36,13 +38,16 @@
             </select>
         </div>
 
+        {{-- Suku --}}
         <div>
             <label class="text-xs font-medium block mb-1">Suku</label>
             <select name="tribe"
                     class="rounded-lg border border-slate-700 bg-slate-900/60 text-sm px-3 py-2">
-                <option value="">Semua</option>
-@foreach($tribes as $t)
-                    <option value="{{ $t }}" @selected($tribe === $t)>{{ $t }}</option>
+                <option value="">Semua Suku</option>
+                @foreach($tribes as $t)
+                    <option value="{{ $t }}" @selected($tribe === $t)>
+                        {{ $t }}
+                    </option>
                 @endforeach
             </select>
         </div>
@@ -51,6 +56,13 @@
                 class="px-4 py-2 rounded-lg bg-slate-800 text-sm border border-slate-700">
             Filter
         </button>
+
+        @if($islandId || $tribe)
+            <a href="{{ route('admin.histories.index') }}"
+               class="px-4 py-2 rounded-lg bg-slate-900 text-sm border border-slate-700 text-slate-400">
+                Reset
+            </a>
+        @endif
     </form>
 
     {{-- TABLE --}}
@@ -62,30 +74,48 @@
                     <th class="px-4 py-3">Suku</th>
                     <th class="px-4 py-3">Tahun / Waktu</th>
                     <th class="px-4 py-3">Judul</th>
-                    <th class="px-4 py-3">Link?</th>
+                    <th class="px-4 py-3">Header?</th>
                     <th class="px-4 py-3 text-right">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($histories as $history)
                     <tr class="border-t border-slate-800/70">
-                        <td class="px-4 py-3">{{ $history->island->name ?? '-' }}</td>
-                        <td class="px-4 py-3">{{ $history->tribe }}</td>
-                        <td class="px-4 py-3">{{ $history->year_label }}</td>
+                        <td class="px-4 py-3">
+                            {{ $history->island->name ?? '-' }}
+                        </td>
+
+                        <td class="px-4 py-3">
+                            {{ $history->tribe }}
+                        </td>
+
+                        <td class="px-4 py-3">
+                            {{ $history->year_label }}
+                        </td>
+
                         <td class="px-4 py-3">
                             {{ \Illuminate\Support\Str::limit($history->title, 50) }}
                         </td>
+
+                        {{-- INFO HEADER (TRIBE PAGE) --}}
                         <td class="px-4 py-3">
-                            @if($history->more_link)
+                            @php
+                                $hasHeader = \App\Models\TribePage::where('island_id', $history->island_id)
+                                    ->where('tribe_key', $history->tribe)
+                                    ->exists();
+                            @endphp
+
+                            @if($hasHeader)
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs">
                                     Ada
                                 </span>
                             @else
                                 <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-400 text-xs">
-                                    Tidak ada
+                                    Belum
                                 </span>
                             @endif
                         </td>
+
                         <td class="px-4 py-3 text-right space-x-2">
                             <a href="{{ route('admin.histories.edit', $history) }}"
                                class="text-xs px-3 py-1 rounded-full border border-slate-700 hover:bg-slate-800">
@@ -107,7 +137,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-4 py-5 text-center text-slate-500">
+                        <td colspan="6" class="px-4 py-6 text-center text-slate-500">
                             Belum ada data history.
                         </td>
                     </tr>
@@ -116,6 +146,7 @@
         </table>
     </div>
 
+    {{-- PAGINATION --}}
     <div class="mt-4">
         {{ $histories->withQueryString()->links() }}
     </div>

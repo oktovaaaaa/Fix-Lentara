@@ -2,19 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TribePage extends Model
+class TribeAboutPage extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'island_id',
         'tribe_key',
+        'label_small',
         'hero_title',
         'hero_description',
-        'hero_image',
+        'more_link',
     ];
 
     public function island()

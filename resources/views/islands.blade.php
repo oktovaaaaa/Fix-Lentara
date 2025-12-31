@@ -68,7 +68,7 @@
     {{-- WRAPPER UNIVERSAL --}}
     <section class="relative z-[10] py-12 sm:py-16 px-4 sm:px-6 bg-[var(--bg-body)] text-[var(--txt-body)]">
 
-        {{-- Styles untuk tabs + timeline (pakai punyamu yang sudah ada) --}}
+        {{-- Styles untuk tabs + timeline (punyamu yang sudah ada) --}}
         @include('islands.partials.tribe-styles')
 
         <div class="max-w-5xl mx-auto space-y-10">
@@ -108,94 +108,24 @@
                    ABOUT SUKU (judul template, isi nanti dari CRUD)
                    Sementara: fallback ke feature about pulau-level
                    =================================================== --}}
-                <section id="about" class="space-y-3">
-                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
-                        Tentang Suku {{ $tribeKey !== '' ? $tribeKey : '—' }}
-                    </h2>
-
-                    {{-- ✅ Jika kamu sudah punya CRUD "Tentang per suku", taruh outputnya di sini --}}
-                    {{-- Untuk sekarang: fallback ke data feature pulau-level --}}
-                    @if($aboutFeatures->count())
-                        @foreach($aboutFeatures as $f)
-                            <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
-                                <h3 class="text-sm sm:text-base font-semibold mb-1">{{ $f->title }}</h3>
-                                <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
-                                    {{ $f->content }}
-                                </p>
-                            </div>
-                        @endforeach
-                    @else
-                        <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                            Konten “Tentang Suku {{ $tribeKey }}” belum diinput dari admin.
-                            (Saat ini file universal tidak hardcode agar kamu tidak capek bikin per pulau.)
-                        </p>
-                    @endif
-                </section>
+{{-- ===================================================
+   ABOUT SUKU (DINAMIS: TribeAboutPage + TribeAboutItem)
+   =================================================== --}}
+@include('islands.partials.about', [
+    'tribeKey'   => $tribeKey,
+    'aboutPage'  => $aboutPage,
+    'aboutItems' => $aboutItems,
+])
 
                 {{-- ===================================================
                    SEJARAH SUKU (DINAMIS: IslandHistory per tribe)
+                   DIPINDAH KE PARTIAL + CSS DI DALAM PARTIAL
                    =================================================== --}}
-                <section id="history" class="space-y-3">
-                    <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
-                        Sejarah Suku {{ $tribeKey !== '' ? $tribeKey : '—' }}
-                    </h2>
-
-                    @if($currentTribeHistories->count())
-                        <section class="history-section">
-                            <div class="history-container">
-                                <h3 class="history-title">Timeline Sejarah</h3>
-                                <p class="history-subtitle">
-                                    Rangkaian peristiwa penting yang membentuk identitas budaya dan sejarah Suku {{ $tribeKey }}.
-                                </p>
-
-                                <div class="timeline">
-                                    @foreach($currentTribeHistories as $item)
-                                        <div class="timeline-item">
-                                            <div class="timeline-card">
-                                                <div class="timeline-card-glow"></div>
-                                                <div class="timeline-card-inner">
-                                                    <div class="timeline-badge">
-                                                        {{ !empty($item->year_label) ? $item->year_label : 'Jejak Sejarah' }}
-                                                    </div>
-
-                                                    <h3 class="timeline-heading">{{ $item->title }}</h3>
-                                                    <p class="timeline-text">{{ $item->content }}</p>
-
-                                                    @if($item->more_link)
-                                                        <a href="{{ $item->more_link }}" target="_blank" rel="noopener" class="timeline-link">
-                                                            Lihat selengkapnya →
-                                                        </a>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </section>
-                    @else
-                        <p class="history-empty">
-                            Belum ada data sejarah {{ $tribeKey }} yang diinput dari admin.
-                        </p>
-                    @endif
-
-                    {{-- OPTIONAL: sejarah pulau-level dari features (kalau kamu pakai) --}}
-                    @if($historyFeatures->count())
-                        <div class="space-y-3 mt-6">
-                            <h3 class="text-base sm:text-lg font-semibold">
-                                Sejarah Pulau (Umum)
-                            </h3>
-                            @foreach($historyFeatures as $f)
-                                <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
-                                    <h4 class="text-sm sm:text-base font-semibold mb-1">{{ $f->title }}</h4>
-                                    <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
-                                        {{ $f->content }}
-                                    </p>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </section>
+                @include('islands.partials.history', [
+                    'tribeKey' => $tribeKey,
+                    'currentTribeHistories' => $currentTribeHistories,
+                    'historyFeatures' => $historyFeatures,
+                ])
 
                 {{-- ===================================================
                    DESTINASI SUKU (judul template, isi nanti dari CRUD)
@@ -272,7 +202,7 @@
                 @endif
 
                 {{-- ===================================================
-                   WARISAN (DINAMIS DARI ADMIN) - SUDAH SESUAI SISTEMMU
+                   WARISAN (DINAMIS DARI ADMIN)
                    =================================================== --}}
                 @include('islands.partials.heritage.section', [
                     'tribeKey' => $tribeKey,

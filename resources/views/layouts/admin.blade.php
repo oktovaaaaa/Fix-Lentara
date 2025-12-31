@@ -34,14 +34,23 @@
                 <span class="tooltip">Search</span>
             </li>
 
-            {{-- Dashboard --}}
             <li>
+    <a href="{{ route('admin.abouts.index') }}">
+        <i class='bx bx-info-circle'></i>
+        <span class="links_name">About Suku</span>
+    </a>
+    <span class="tooltip">About Suku</span>
+</li>
+
+
+            {{-- Dashboard --}}
+            {{-- <li>
                 <a href="{{ route('admin.dashboard') }}">
                     <i class="bx bx-grid-alt"></i>
                     <span class="links_name">Dashboard</span>
                 </a>
                 <span class="tooltip">Dashboard</span>
-            </li>
+            </li> --}}
 
             {{-- History Pulau & Suku --}}
             <li>
@@ -117,13 +126,13 @@
 
 
             {{-- Pengaturan --}}
-            <li>
+            {{-- <li>
                 <a href="#">
                     <i class="bx bx-cog"></i>
                     <span class="links_name">Pengaturan</span>
                 </a>
                 <span class="tooltip">Pengaturan</span>
-            </li>
+            </li> --}}
 
             {{-- Profile + Logout --}}
             <li class="profile">

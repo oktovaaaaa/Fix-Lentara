@@ -11,6 +11,10 @@ use App\Models\Quiz;
 use App\Models\TribePage;
 use App\Models\HeritageItem;
 
+// ✅ ABOUT (BARU)
+use App\Models\TribeAboutPage;
+use App\Models\TribeAboutItem;
+
 use Illuminate\Http\Request;
 
 class IslandController extends Controller
@@ -73,6 +77,7 @@ class IslandController extends Controller
      * Detail pulau (UNIVERSAL VIEW)
      * - tribes (tabs) ambil dari config tribes.php (prioritas)
      * - tribe dipilih via query: ?tribe=Aceh
+     * - about per tribe (TribeAboutPage + TribeAboutItem)
      * - warisan per tribe (TribePage + HeritageItem)
      * - quiz per tribe (fallback globalQuiz)
      *
@@ -158,7 +163,7 @@ class IslandController extends Controller
             ->first();
 
         // =========================================================
-        // ✅ WARISAN FLOW (PER SUKU)
+        // ✅ TRIBE KEY VALIDATION (UNIVERSAL)
         // =========================================================
 
         // 1) Ambil tribe dari query
@@ -173,6 +178,30 @@ class IslandController extends Controller
         if ($tribeKey !== '' && !in_array($tribeKey, $availableTribes, true)) {
             $tribeKey = !empty($availableTribes) ? (string) $availableTribes[0] : '';
         }
+
+        // =========================================================
+        // ✅ ABOUT FLOW (PER SUKU) - BARU
+        // =========================================================
+        $aboutPage = null;
+        $aboutItems = collect();
+
+        if ($tribeKey !== '') {
+            $aboutPage = TribeAboutPage::query()
+                ->where('island_id', $island->id)
+                ->where('tribe_key', $tribeKey)
+                ->first();
+
+            $aboutItems = TribeAboutItem::query()
+                ->where('island_id', $island->id)
+                ->where('tribe_key', $tribeKey)
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->get();
+        }
+
+        // =========================================================
+        // ✅ WARISAN FLOW (PER SUKU)
+        // =========================================================
 
         // 4) Default payload warisan
         $tribePage = null;
@@ -222,6 +251,10 @@ class IslandController extends Controller
 
             'quizzesByTribe'    => $quizzesByTribe,
             'globalQuiz'        => $globalQuiz,
+
+            // ✅ ABOUT data (BARU)
+            'aboutPage'         => $aboutPage,
+            'aboutItems'        => $aboutItems,
 
             // ✅ WARISAN data
             'tribeKey'               => $tribeKey,

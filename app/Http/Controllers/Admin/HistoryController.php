@@ -5,17 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Island;
 use App\Models\IslandHistory;
+use App\Models\TribePage;
 use Illuminate\Http\Request;
 
 class HistoryController extends Controller
 {
-    /**
-     * List semua history (bisa difilter per pulau & suku).
-     */
     public function index(Request $request)
     {
-        $islandId = $request->island_id;
-        $tribe    = $request->tribe;
+        $islandId = $request->get('island_id');
+        $tribe    = $request->get('tribe');
 
         $islands   = Island::orderBy('order')->get();
         $histories = IslandHistory::with('island');
@@ -30,7 +28,7 @@ class HistoryController extends Controller
             }
         }
 
-        if ($tribe) {
+        if (!empty($tribe)) {
             $histories->where('tribe', $tribe);
         }
 
@@ -48,13 +46,9 @@ class HistoryController extends Controller
         ]);
     }
 
-    /**
-     * Form tambah history.
-     */
     public function create()
     {
         $islands = Island::orderBy('order')->get();
-
         $tribesConfig = config('tribes') ?? [];
 
         $selectedIslandId = old('island_id') ?? $islands->first()?->id;
@@ -64,32 +58,55 @@ class HistoryController extends Controller
             ? ($tribesConfig[$selectedIsland->slug] ?? [])
             : [];
 
+        $oldTribe  = old('tribe');
+        $tribePage = null;
+
+        if ($selectedIslandId && $oldTribe) {
+            $tribePage = TribePage::where('island_id', $selectedIslandId)
+                ->where('tribe_key', $oldTribe)
+                ->first();
+        }
+
         return view('admin.histories.create', [
             'islands'          => $islands,
             'tribes'           => $tribes,
             'tribesConfig'     => $tribesConfig,
             'selectedIslandId' => $selectedIslandId,
+            'tribePage'        => $tribePage,
         ]);
     }
 
-    /**
-     * SIMPAN history baru.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'island_id'  => 'required|exists:islands,id',
-            'tribe'      => 'required|string|max:100',
-            'year_label' => 'required|string|max:100',
-            'title'      => 'required|string|max:255',
-            'content'    => 'required|string',
-            'more_link'  => 'nullable|url',
-            'order'      => 'nullable|integer|min:0',
+            'island_id'        => 'required|exists:islands,id',
+            'tribe'            => 'required|string|max:100',
+            'year_label'       => 'required|string|max:100',
+            'title'            => 'required|string|max:255',
+            'content'          => 'required|string',
+            'more_link'        => 'nullable|url',
+            'order'            => 'nullable|integer|min:0',
+
+            'hero_title'       => 'nullable|string|max:255',
+            'hero_description' => 'nullable|string',
+            'hero_image'       => 'nullable|string|max:255',
         ]);
 
-        if (! isset($validated['order'])) {
-            $validated['order'] = 0;
-        }
+        $validated['order'] = $validated['order'] ?? 0;
+
+        TribePage::updateOrCreate(
+            [
+                'island_id' => $validated['island_id'],
+                'tribe_key' => $validated['tribe'],
+            ],
+            [
+                'hero_title'       => $validated['hero_title'] ?? null,
+                'hero_description' => $validated['hero_description'] ?? null,
+                'hero_image'       => $validated['hero_image'] ?? null,
+            ]
+        );
+
+        unset($validated['hero_title'], $validated['hero_description'], $validated['hero_image']);
 
         IslandHistory::create($validated);
 
@@ -98,9 +115,6 @@ class HistoryController extends Controller
             ->with('success', 'History berhasil ditambahkan.');
     }
 
-    /**
-     * Form edit history.
-     */
     public function edit(IslandHistory $history)
     {
         $islands = Island::orderBy('order')->get();
@@ -111,31 +125,49 @@ class HistoryController extends Controller
             $tribes = config("tribes." . $history->island->slug, []);
         }
 
+        $tribePage = TribePage::where('island_id', $history->island_id)
+            ->where('tribe_key', $history->tribe)
+            ->first();
+
         return view('admin.histories.edit', [
-            'history' => $history,
-            'islands' => $islands,
-            'tribes'  => $tribes,
+            'history'   => $history,
+            'islands'   => $islands,
+            'tribes'    => $tribes,
+            'tribePage' => $tribePage,
         ]);
     }
 
-    /**
-     * UPDATE history.
-     */
     public function update(Request $request, IslandHistory $history)
     {
         $validated = $request->validate([
-            'island_id'  => 'required|exists:islands,id',
-            'tribe'      => 'required|string|max:100',
-            'year_label' => 'required|string|max:100',
-            'title'      => 'required|string|max:255',
-            'content'    => 'required|string',
-            'more_link'  => 'nullable|url',
-            'order'      => 'nullable|integer|min:0',
+            'island_id'        => 'required|exists:islands,id',
+            'tribe'            => 'required|string|max:100',
+            'year_label'       => 'required|string|max:100',
+            'title'            => 'required|string|max:255',
+            'content'          => 'required|string',
+            'more_link'        => 'nullable|url',
+            'order'            => 'nullable|integer|min:0',
+
+            'hero_title'       => 'nullable|string|max:255',
+            'hero_description' => 'nullable|string',
+            'hero_image'       => 'nullable|string|max:255',
         ]);
 
-        if (! isset($validated['order'])) {
-            $validated['order'] = 0;
-        }
+        $validated['order'] = $validated['order'] ?? 0;
+
+        TribePage::updateOrCreate(
+            [
+                'island_id' => $validated['island_id'],
+                'tribe_key' => $validated['tribe'],
+            ],
+            [
+                'hero_title'       => $validated['hero_title'] ?? null,
+                'hero_description' => $validated['hero_description'] ?? null,
+                'hero_image'       => $validated['hero_image'] ?? null,
+            ]
+        );
+
+        unset($validated['hero_title'], $validated['hero_description'], $validated['hero_image']);
 
         $history->update($validated);
 
@@ -144,9 +176,6 @@ class HistoryController extends Controller
             ->with('success', 'History berhasil diperbarui.');
     }
 
-    /**
-     * HAPUS history.
-     */
     public function destroy(IslandHistory $history)
     {
         $history->delete();
@@ -154,5 +183,24 @@ class HistoryController extends Controller
         return redirect()
             ->route('admin.histories.index')
             ->with('success', 'History berhasil dihapus.');
+    }
+
+    /**
+     * GET /admin/tribe-pages/lookup?island_id=1&tribe_key=Aceh
+     */
+    public function lookupTribePage(Request $request)
+    {
+        $islandId = $request->get('island_id');
+        $tribeKey = $request->get('tribe_key');
+
+        if (!$islandId || !$tribeKey) {
+            return response()->json(null);
+        }
+
+        $page = TribePage::where('island_id', $islandId)
+            ->where('tribe_key', $tribeKey)
+            ->first();
+
+        return response()->json($page);
     }
 }

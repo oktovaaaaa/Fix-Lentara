@@ -87,6 +87,11 @@ Route::prefix('admin')
             ->names('histories')
             ->except(['show']);
 
+        // ✅ ENDPOINT JSON UNTUK AUTO-LOAD HEADER (TRIBE PAGES)
+        // GET /admin/tribe-pages/lookup?island_id=1&tribe_key=Aceh
+        Route::get('tribe-pages/lookup', [HistoryController::class, 'lookupTribePage'])
+            ->name('tribe-pages.lookup');
+
         // STATS
         Route::resource('stats', IslandStatController::class)->names('stats');
 
@@ -142,4 +147,31 @@ Route::prefix('admin')
         // delete item warisan
         Route::delete('heritages/item/{item}', [\App\Http\Controllers\Admin\HeritageController::class, 'destroyItem'])
             ->name('heritages.item.destroy');
+
+
+            // about untuk crud admin
+            // ABOUT SUKU (About pages + items)
+Route::get('abouts', [\App\Http\Controllers\Admin\TribeAboutController::class, 'index'])
+    ->name('abouts.index');
+
+// JSON lookup header about (auto-load saat pilih pulau+suku)
+Route::get('about-pages/lookup', [\App\Http\Controllers\Admin\TribeAboutController::class, 'lookupAboutPage'])
+    ->name('about-pages.lookup');
+
+// simpan/update header about
+Route::post('abouts/page', [\App\Http\Controllers\Admin\TribeAboutController::class, 'savePage'])
+    ->name('abouts.page.save');
+
+// create item about
+Route::post('abouts/item', [\App\Http\Controllers\Admin\TribeAboutController::class, 'storeItem'])
+    ->name('abouts.item.store');
+
+// update item about
+Route::patch('abouts/item/{item}', [\App\Http\Controllers\Admin\TribeAboutController::class, 'updateItem'])
+    ->name('abouts.item.update');
+
+// delete item about
+Route::delete('abouts/item/{item}', [\App\Http\Controllers\Admin\TribeAboutController::class, 'destroyItem'])
+    ->name('abouts.item.destroy');
+
     });
