@@ -123,7 +123,7 @@ Route::prefix('admin')
                     ->name('quiz-questions.destroy');
             });
 
-                    // WARISAN (Heritages)
+        // WARISAN (Heritages)
         Route::get('heritages', [\App\Http\Controllers\Admin\HeritageController::class, 'index'])
             ->name('heritages.index');
 
@@ -142,5 +142,4 @@ Route::prefix('admin')
         // delete item warisan
         Route::delete('heritages/item/{item}', [\App\Http\Controllers\Admin\HeritageController::class, 'destroyItem'])
             ->name('heritages.item.destroy');
-
     });
