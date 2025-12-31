@@ -8,21 +8,48 @@
     @include('partials.landing-hero')
 
     @php
-        // dikirim dari controller, tapi jaga-jaga kalau belum ada
+        // ===============================
+        // SAFETY DEFAULTS
+        // ===============================
         $historiesByTribe = $historiesByTribe ?? collect();
-        $acehHistories = $historiesByTribe['Aceh'] ?? collect();
+        $quizzesByTribe   = $quizzesByTribe ?? collect();
+
+        // Controller kamu ngirim "globalQuiz", tapi file ini sebelumnya pakai "generalIslandQuiz"
+        $generalIslandQuiz = $generalIslandQuiz ?? ($globalQuiz ?? null);
+
+        // ===============================
+        // TRIBE KEY dari controller (query ?tribe=...)
+        // ===============================
+        $tribeKey = $tribeKey ?? request()->query('tribe', 'Aceh');
+        $tribeKey = trim((string) $tribeKey);
+        if ($tribeKey === '') $tribeKey = 'Aceh';
+
+        // Map tribeKey -> panel key (sesuai data-tribe-panel)
+        $panelKey = 'aceh';
+        if (strcasecmp($tribeKey, 'Batak') === 0) $panelKey = 'batak';
+        if (strcasecmp($tribeKey, 'Minangkabau') === 0) $panelKey = 'minang';
+
+        // Histories per suku (dari DB)
+        $acehHistories  = $historiesByTribe['Aceh'] ?? collect();
         $batakHistories = $historiesByTribe['Batak'] ?? collect();
         $minangHistories = $historiesByTribe['Minangkabau'] ?? collect();
 
-        // ===== QUIZ PER SUKU (dari controller) =====
-        // $quizzesByTribe: Collection map [ 'Aceh' => Quiz, 'Batak' => Quiz, 'Minangkabau' => Quiz, '__general__' => Quiz ]
-        // $generalIslandQuiz: Quiz fallback utk pulau jika tribe spesifik belum ada
-        $quizzesByTribe = $quizzesByTribe ?? collect();
-        $generalIslandQuiz = $generalIslandQuiz ?? null;
-
-        $acehQuiz  = $quizzesByTribe['Aceh'] ?? null;
-        $batakQuiz = $quizzesByTribe['Batak'] ?? null;
+        // Quiz per suku
+        $acehQuiz   = $quizzesByTribe['Aceh'] ?? null;
+        $batakQuiz  = $quizzesByTribe['Batak'] ?? null;
         $minangQuiz = $quizzesByTribe['Minangkabau'] ?? null;
+
+$tribeUrl = function(string $t) {
+    // pakai URL halaman sekarang (mis: /islands/sumatera)
+    // lalu tempel query tribe yang baru
+    $base = request()->url();
+    return $base . '?tribe=' . urlencode($t);
+};
+
+
+        // Helper class: active / hidden berdasarkan panelKey
+        $isActive = fn(string $k) => ($panelKey === $k);
+        $panelClass = fn(string $k) => $isActive($k) ? '' : 'hidden';
     @endphp
 
     {{-- WRAPPER SUMATERA --}}
@@ -34,6 +61,7 @@
         <div class="max-w-5xl mx-auto space-y-10">
 
             {{-- PILIHAN SUKU (TABS) --}}
+            {{-- FIX: tab jadi <a href="?tribe=..."> biar server tahu tribeKey-nya --}}
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
                 <div>
                     <p class="text-xs uppercase tracking-[0.18em] text-[var(--muted)] mb-1">
@@ -45,15 +73,23 @@
                 </div>
 
                 <div class="inline-flex gap-2 bg-[color-mix(in_srgb,var(--bg-body)_80%,#e5e7eb_20%)] p-1.5 rounded-full">
-                    <button type="button" class="tribe-tab is-active" data-tribe-tab="aceh">
+                    <a href="{{ $tribeUrl('Aceh') }}"
+                       class="tribe-tab {{ $isActive('aceh') ? 'is-active' : '' }}"
+                       aria-current="{{ $isActive('aceh') ? 'page' : 'false' }}">
                         Aceh
-                    </button>
-                    <button type="button" class="tribe-tab" data-tribe-tab="batak">
+                    </a>
+
+                    <a href="{{ $tribeUrl('Batak') }}"
+                       class="tribe-tab {{ $isActive('batak') ? 'is-active' : '' }}"
+                       aria-current="{{ $isActive('batak') ? 'page' : 'false' }}">
                         Batak
-                    </button>
-                    <button type="button" class="tribe-tab" data-tribe-tab="minang">
+                    </a>
+
+                    <a href="{{ $tribeUrl('Minangkabau') }}"
+                       class="tribe-tab {{ $isActive('minang') ? 'is-active' : '' }}"
+                       aria-current="{{ $isActive('minang') ? 'page' : 'false' }}">
                         Minangkabau
-                    </button>
+                    </a>
                 </div>
             </div>
 
@@ -67,7 +103,7 @@
                     </h2>
 
                     {{-- Aceh --}}
-                    <div data-tribe-panel="aceh">
+                    <div data-tribe-panel="aceh" class="{{ $panelClass('aceh') }}">
                         <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
                             Suku Aceh dikenal sebagai masyarakat pesisir yang religius dan tangguh. Mereka
                             banyak bermukim di wilayah Aceh yang disebut sebagai <span class="italic">Serambi Mekkah</span>,
@@ -120,7 +156,7 @@
                     </div>
 
                     {{-- Batak --}}
-                    <div class="hidden" data-tribe-panel="batak">
+                    <div data-tribe-panel="batak" class="{{ $panelClass('batak') }}">
                         <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
                             Suku Batak terutama mendiami kawasan Sumatera Utara, seperti sekitar Danau Toba.
                             Mereka memiliki sistem marga yang kuat serta tradisi kekeluargaan yang sangat erat.
@@ -172,7 +208,7 @@
                     </div>
 
                     {{-- Minangkabau --}}
-                    <div class="hidden" data-tribe-panel="minang">
+                    <div data-tribe-panel="minang" class="{{ $panelClass('minang') }}">
                         <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
                             Suku Minangkabau bermukim terutama di Sumatera Barat dan dikenal dengan sistem
                             kekerabatan matrilineal, di mana garis keturunan ditarik dari pihak ibu.
@@ -231,7 +267,7 @@
                     </h2>
 
                     {{-- Aceh --}}
-                    <div data-tribe-panel="aceh" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div data-tribe-panel="aceh" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm {{ $panelClass('aceh') }}">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <p class="text-xs uppercase tracking-wide text-[var(--muted)]">Wilayah Utama</p>
                             <p class="text-lg font-semibold mt-1">Provinsi Aceh</p>
@@ -251,7 +287,7 @@
                     </div>
 
                     {{-- Batak --}}
-                    <div data-tribe-panel="batak" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm hidden">
+                    <div data-tribe-panel="batak" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm {{ $panelClass('batak') }}">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <p class="text-xs uppercase tracking-wide text-[var(--muted)]">Wilayah Utama</p>
                             <p class="text-lg font-semibold mt-1">Sekitar Danau Toba</p>
@@ -271,7 +307,7 @@
                     </div>
 
                     {{-- Minangkabau --}}
-                    <div data-tribe-panel="minang" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm hidden">
+                    <div data-tribe-panel="minang" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm {{ $panelClass('minang') }}">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <p class="text-xs uppercase tracking-wide text-[var(--muted)]">Wilayah Utama</p>
                             <p class="text-lg font-semibold mt-1">Sumatera Barat</p>
@@ -302,7 +338,7 @@
                     </h2>
 
                     {{-- Aceh --}}
-                    <div data-tribe-panel="aceh" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div data-tribe-panel="aceh" class="grid grid-cols-1 sm:grid-cols-2 gap-4 {{ $panelClass('aceh') }}">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Banda Aceh & Masjid Raya Baiturrahman</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -320,7 +356,7 @@
                     </div>
 
                     {{-- Batak --}}
-                    <div data-tribe-panel="batak" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                    <div data-tribe-panel="batak" class="grid grid-cols-1 sm:grid-cols-2 gap-4 {{ $panelClass('batak') }}">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Danau Toba & Pulau Samosir</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -338,7 +374,7 @@
                     </div>
 
                     {{-- Minangkabau --}}
-                    <div data-tribe-panel="minang" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                    <div data-tribe-panel="minang" class="grid grid-cols-1 sm:grid-cols-2 gap-4 {{ $panelClass('minang') }}">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Bukittinggi & Jam Gadang</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -363,7 +399,7 @@
                     </h2>
 
                     {{-- Aceh --}}
-                    <div data-tribe-panel="aceh" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div data-tribe-panel="aceh" class="grid grid-cols-1 sm:grid-cols-2 gap-4 {{ $panelClass('aceh') }}">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Mie Aceh</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -381,7 +417,7 @@
                     </div>
 
                     {{-- Batak --}}
-                    <div data-tribe-panel="batak" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                    <div data-tribe-panel="batak" class="grid grid-cols-1 sm:grid-cols-2 gap-4 {{ $panelClass('batak') }}">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Arsik</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -399,7 +435,7 @@
                     </div>
 
                     {{-- Minangkabau --}}
-                    <div data-tribe-panel="minang" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+                    <div data-tribe-panel="minang" class="grid grid-cols-1 sm:grid-cols-2 gap-4 {{ $panelClass('minang') }}">
                         <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
                             <h3 class="text-sm sm:text-base font-semibold mb-1">Rendang</h3>
                             <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
@@ -417,33 +453,34 @@
                     </div>
                 </section>
 
-{{-- WARISAN (DINAMIS DARI ADMIN) --}}
-@include('islands.partials.heritage.section', [
-    'tribeKey' => $tribeKey,
-    'tribePage' => $tribePage,
-    'itemsByCategory' => $itemsByCategory,
-])
+                {{-- WARISAN (DINAMIS DARI ADMIN) --}}
+                {{-- IMPORTANT: ini akan benar kalau tribeKey berubah via query string --}}
+                @include('islands.partials.heritage.section', [
+                    'tribeKey' => $tribeKey,
+                    'tribePage' => $tribePage,
+                    'itemsByCategory' => $itemsByCategory,
+                ])
 
                 {{-- ===================== QUIZ (SAMA SEPERTI HOME) ===================== --}}
                 <section id="quiz" class="space-y-4">
                     <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">Kuis Mini</h2>
 
                     {{-- Aceh --}}
-                    <div data-tribe-panel="aceh" class="space-y-4">
+                    <div data-tribe-panel="aceh" class="space-y-4 {{ $panelClass('aceh') }}">
                         @include('partials.quiz-section', [
                             'quiz' => $acehQuiz ?: $generalIslandQuiz
                         ])
                     </div>
 
                     {{-- Batak --}}
-                    <div data-tribe-panel="batak" class="space-y-4 hidden">
+                    <div data-tribe-panel="batak" class="space-y-4 {{ $panelClass('batak') }}">
                         @include('partials.quiz-section', [
                             'quiz' => $batakQuiz ?: $generalIslandQuiz
                         ])
                     </div>
 
                     {{-- Minangkabau --}}
-                    <div data-tribe-panel="minang" class="space-y-4 hidden">
+                    <div data-tribe-panel="minang" class="space-y-4 {{ $panelClass('minang') }}">
                         @include('partials.quiz-section', [
                             'quiz' => $minangQuiz ?: $generalIslandQuiz
                         ])
@@ -453,9 +490,9 @@
 
             </div> {{-- end #suku-wrapper --}}
 
-            {{-- SCRIPT KECIL UNTUK GANTI TAB SUKU --}}
-            @include('islands.partials.tribe-tabs-script')
-
+            {{-- SCRIPT TAB LAMA DIHAPUS --}}
+            {{-- Karena sekarang perpindahan suku dilakukan via link (?tribe=...) --}}
+            {{-- Kalau kamu masih include tribe-tabs-script, itu justru bikin bug balik lagi. --}}
         </div>
     </section>
 @endsection

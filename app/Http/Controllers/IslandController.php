@@ -73,13 +73,16 @@ class IslandController extends Controller
      * Detail pulau
      * Quiz di pulau = per suku (scope tribe)
      *
-     * ✅ Tambahan: Warisan per suku (Header + 3 kategori)
+     * ✅ Warisan per suku (Header + 3 kategori)
      *   - pilih suku via query ?tribe=Aceh
      */
-    public function show(Island $island, Request $request)
+    public function show(Request $request, Island $island)
     {
         abort_unless($island->is_active, 404);
 
+        // =============================
+        // DATA GLOBAL UNTUK LAYOUT PULAU
+        // =============================
         $islands = Island::query()
             ->where('is_active', true)
             ->orderBy('order')
@@ -113,7 +116,9 @@ class IslandController extends Controller
             'language'  => $island->demographics->where('type', 'language')->sortBy('order')->values(),
         ];
 
-        // histories per suku
+        // =============================
+        // HISTORIES PER SUKU
+        // =============================
         $histories = IslandHistory::where('island_id', $island->id)
             ->orderBy('order')
             ->orderBy('year_label')
@@ -121,12 +126,16 @@ class IslandController extends Controller
 
         $historiesByTribe = $histories->groupBy('tribe');
 
-        $availableTribes = config("tribes.{$island->slug}") ?? [];
-        if (empty($availableTribes)) {
-            $availableTribes = $histories->pluck('tribe')->unique()->values()->all();
-        }
+        // =========================================================
+        // ✅ AVAILABLE TRIBES (PRIORITAS: config tribes.php)
+        // - Masalah umum: slug island kadang beda dengan key config
+        // - Kita coba beberapa kandidat key biar nggak kosong
+        // =========================================================
+        $availableTribes = $this->resolveTribesForIsland($island, $histories);
 
-        // ===== QUIZ PER SUKU (AKTIF) =====
+        // =============================
+        // QUIZ PER SUKU (AKTIF)
+        // =============================
         $quizRows = Quiz::query()
             ->active()
             ->where('scope', 'tribe')
@@ -147,41 +156,43 @@ class IslandController extends Controller
             ->first();
 
         // =========================================================
-        // ✅ WARISAN FLOW (PER SUKU)
+        // ✅ WARISAN FLOW (PER SUKU) - FIX UTAMA
         // - tribeKey dipilih dari query ?tribe=...
-        // - fallback ke tribe pertama dari config tribes.php
-        // - ambil header (TribePage) + items (HeritageItem) 3 kategori
+        // - VALIDASI: harus termasuk availableTribes
+        // - Query header + items pakai (island_id + tribe_key)
         // =========================================================
 
-        // 1) Ambil tribe dari query, kalau tidak ada -> tribe pertama
+        // 1) Ambil tribe dari query
         $tribeKey = (string) $request->query('tribe', '');
         $tribeKey = trim($tribeKey);
 
+        // 2) Kalau kosong, fallback ke tribe pertama
         if ($tribeKey === '' && !empty($availableTribes)) {
             $tribeKey = (string) $availableTribes[0];
         }
 
-        // 2) Validasi tribeKey harus ada di availableTribes (biar aman)
+        // 3) Kalau tribeKey tidak valid, paksa balik ke pertama
         if ($tribeKey !== '' && !in_array($tribeKey, $availableTribes, true)) {
             $tribeKey = !empty($availableTribes) ? (string) $availableTribes[0] : '';
         }
 
-        // 3) Default payload warisan
+        // 4) Default payload
         $tribePage = null;
-
         $itemsByCategory = [
             'pakaian'           => collect(),
             'rumah_tradisi'     => collect(),
             'senjata_alatmusik' => collect(),
         ];
 
-        // 4) Kalau tribeKey valid, query DB warisan
+        // 5) Query DB warisan
         if ($tribeKey !== '') {
+            // ✅ header per suku (bukan per pulau)
             $tribePage = TribePage::query()
                 ->where('island_id', $island->id)
                 ->where('tribe_key', $tribeKey)
                 ->first();
 
+            // ✅ item per suku
             $items = HeritageItem::query()
                 ->where('island_id', $island->id)
                 ->where('tribe_key', $tribeKey)
@@ -200,16 +211,19 @@ class IslandController extends Controller
 
         [$testimonials, $testimonialStats] = $this->getTestimonialsPayload();
 
-        // ✅ View name:
-        // - default: islands.{slug}
-        // - tambahan: kalau slug mengandung karakter aneh, coba juga versi raw file yang kamu pakai (mis. papua&maluku)
+        // =========================================================
+        // ✅ VIEW NAME FIX:
+        // - slug seperti "papua&maluku" bikin nama file view jadi aneh
+        // - prioritas: islands.{slug}
+        // - fallback: islands.{slug_sanitized}
+        // - fallback terakhir: islands.default
+        // =========================================================
         $viewName = 'islands.' . $island->slug;
 
-        // fallback kalau view belum ada:
         if (!view()->exists($viewName)) {
-            // coba versi slug aman (replace '-'<->'&' tidak kita tebak macam-macam),
-            // tapi minimal ini bantu kalau kamu suatu saat rename.
-            $alt = 'islands.' . str_replace('&', '&', $island->slug); // no-op, tapi disisakan supaya kamu gampang modif
+            $sanitized = $this->sanitizeViewKey($island->slug);
+            $alt = 'islands.' . $sanitized;
+
             if (view()->exists($alt)) {
                 $viewName = $alt;
             } else {
@@ -222,6 +236,7 @@ class IslandController extends Controller
             'selectedIsland'    => $island,
             'featuresByType'    => $featuresByType,
             'demographics'      => $demographics,
+
             'historiesByTribe'  => $historiesByTribe,
             'availableTribes'   => $availableTribes,
 
@@ -231,12 +246,67 @@ class IslandController extends Controller
             'quizzesByTribe'    => $quizzesByTribe,
             'globalQuiz'        => $globalQuiz,
 
-            // ✅ WARISAN data dikirim ke view
-            'tribeKey'              => $tribeKey,
-            'tribePage'             => $tribePage,
-            'itemsByCategory'       => $itemsByCategory,
-            'heritageCategoryLabels'=> HeritageItem::CATEGORIES,
+            // ✅ WARISAN data
+            'tribeKey'               => $tribeKey,
+            'tribePage'              => $tribePage,
+            'itemsByCategory'        => $itemsByCategory,
+            'heritageCategoryLabels' => HeritageItem::CATEGORIES,
         ]);
+    }
+
+    /**
+     * Ambil tribes dari config tribes.php dengan beberapa kandidat key
+     * agar tidak “kosong” kalau slug tidak match persis.
+     */
+    private function resolveTribesForIsland(Island $island, $histories)
+    {
+        $slug = (string) $island->slug;
+
+        // kandidat key untuk config('tribes.<key>')
+        $candidates = array_values(array_unique([
+            $slug,
+            strtolower($slug),
+            str_replace('-', '', strtolower($slug)),
+            str_replace('-', '_', strtolower($slug)),
+            str_replace('_', '', strtolower($slug)),
+            str_replace(['-', '_'], '&', strtolower($slug)), // jaga-jaga ada yang pakai &
+            str_replace(['-', '_'], '', str_replace('&', '', strtolower($slug))),
+        ]));
+
+        $tribes = [];
+
+        foreach ($candidates as $key) {
+            $tribes = config('tribes.' . $key, []);
+            if (!empty($tribes)) {
+                break;
+            }
+        }
+
+        // fallback: dari histories
+        if (empty($tribes)) {
+            $tribes = $histories->pluck('tribe')->filter()->unique()->values()->all();
+        }
+
+        // pastikan tipe string rapi
+        $tribes = array_values(array_filter(array_map(function ($t) {
+            $t = trim((string) $t);
+            return $t !== '' ? $t : null;
+        }, $tribes)));
+
+        return $tribes;
+    }
+
+    /**
+     * Sanitize slug untuk nama view.
+     * Contoh: "papua&maluku" -> "papua_maluku"
+     */
+    private function sanitizeViewKey(string $slug): string
+    {
+        $slug = strtolower($slug);
+        $slug = str_replace(['&', ' '], '_', $slug);
+        $slug = preg_replace('/[^a-z0-9_\-]/', '_', $slug);
+        $slug = preg_replace('/_+/', '_', $slug);
+        return trim($slug, '_');
     }
 
     private function getTestimonialsPayload(): array
