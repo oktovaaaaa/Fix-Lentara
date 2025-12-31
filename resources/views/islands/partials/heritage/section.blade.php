@@ -19,6 +19,14 @@
 
 <section id="warisan" class="py-10 w-full overflow-x-hidden">
 
+    {{-- ================= SECTION TITLE (DARI DATABASE) ================= --}}
+    <h2 class="neon-title">{{ $heroTitle }}</h2>
+    <div class="title-decoration"></div>
+
+    @if($heroDescription)
+        <p class="wf-hero-desc">{{ $heroDescription }}</p>
+    @endif
+
     <style>
         /* =========================================================
            NEON ORANGE COVERFLOW - IMPROVED LAYOUT
@@ -29,6 +37,11 @@
            2) LIGHT MODE MODAL TERLALU GELAP: overlay modal dibuat light-friendly
            3) MOBILE CARD "KETUTUPAN": di mobile caption HANYA tampil JUDUL (desc disembunyikan)
            4) OPACITY DITURUNKAN: gambar lebih jelas (card overlay + caption + modal overlay)
+
+           TAMBAHAN DI TURN INI:
+           - SECTION TITLE pakai $heroTitle dari DB
+           - Title decoration mirip konsep About (judul + garis dekorasi)
+           - Hero desc besar (opsional) tampil tepat di bawah title decoration
 
            NOTES KUSTOMISASI:
            - Semua opacity pakai rgba(..., X). X makin kecil = makin bening.
@@ -84,6 +97,53 @@
         @keyframes orange-neon-spin {
             0% { --neon-orange-angle: 0deg; }
             100% { --neon-orange-angle: 360deg; }
+        }
+
+        /* =========================================================
+           SECTION TITLE + DECORATION (MIRIP ABOUT)
+           - Judul besar neon
+           - Garis dekorasi tepat di bawah judul
+        ========================================================= */
+        #warisan .neon-title{
+            margin: 0 auto;
+            text-align: center;
+            font-size: clamp(1.8rem, 2.6vw, 2.6rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            color: var(--wf-txt);
+            line-height: 1.15;
+
+            /* neon gradient text */
+            background: linear-gradient(90deg, var(--brand), var(--brand-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+
+            filter: drop-shadow(0 0 18px rgba(var(--brand-rgb, 249, 115, 22), 0.35));
+        }
+
+        #warisan .title-decoration{
+            width: 160px;
+            height: 4px;
+            margin: 14px auto 0;
+            border-radius: 999px;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(var(--brand-rgb, 249, 115, 22), 0.85),
+                rgba(var(--brand-2-rgb, 251, 146, 60), 0.85),
+                transparent
+            );
+            box-shadow:
+                0 0 18px rgba(var(--brand-rgb, 249, 115, 22), 0.25);
+        }
+
+        #warisan .wf-hero-desc{
+            max-width: 58rem;
+            margin: 12px auto 0;
+            padding: 0 1rem;
+            text-align: center;
+            color: var(--wf-muted);
+            line-height: 1.7;
+            font-size: 1.05rem;
         }
 
         /* ================= MODAL DETAIL STYLES ================= */
@@ -918,6 +978,14 @@
             .wf-modal-description {
                 font-size: 1.05rem;
             }
+
+            #warisan .title-decoration{
+                width: 140px;
+            }
+
+            #warisan .wf-hero-desc{
+                font-size: 1rem;
+            }
         }
 
         @media (max-width: 640px){
@@ -1001,6 +1069,10 @@
             .wf-modal-meta {
                 padding: 1rem;
                 margin-bottom: 2rem;
+            }
+
+            #warisan .title-decoration{
+                width: 120px;
             }
         }
 

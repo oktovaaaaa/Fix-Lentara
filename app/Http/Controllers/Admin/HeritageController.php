@@ -12,6 +12,39 @@ use Illuminate\Validation\Rule;
 
 class HeritageController extends Controller
 {
+    /**
+     * Normalisasi list suku dari config tribes.php
+     * - Kalau config-nya associative, kita ambil values-nya
+     * - Trim biar aman dari spasi
+     */
+    private function normalizeTribes(array $tribes): array
+    {
+        // ambil values (aman untuk associative / indexed)
+        $vals = array_values($tribes);
+
+        // pastikan string + trim
+        $vals = array_map(function ($v) {
+            return is_string($v) ? trim($v) : (string) $v;
+        }, $vals);
+
+        // buang yang kosong
+        $vals = array_values(array_filter($vals, fn($v) => $v !== ''));
+
+        return $vals;
+    }
+
+    /**
+     * Pastikan tribe_key valid untuk pulau, kalau tidak valid -> null
+     */
+    private function sanitizeSelectedTribe(?string $tribeKey, array $allowedTribes): ?string
+    {
+        $tribeKey = is_string($tribeKey) ? trim($tribeKey) : null;
+        if (!$tribeKey) return null;
+
+        // harus match persis (case-sensitive) sesuai config
+        return in_array($tribeKey, $allowedTribes, true) ? $tribeKey : null;
+    }
+
     public function index(Request $request)
     {
         $islands = Island::query()
@@ -20,7 +53,9 @@ class HeritageController extends Controller
             ->get();
 
         $selectedIslandId = $request->integer('island_id');
-        $selectedTribeKey = $request->string('tribe')->toString();
+
+        // IMPORTANT: request('tribe') bisa jadi null/"" -> kita raw dulu, nanti disanitize
+        $selectedTribeKeyRaw = $request->input('tribe'); // jangan pakai string()->toString() biar null tetap null
 
         $selectedIsland = null;
         $tribes = [];
@@ -36,19 +71,28 @@ class HeritageController extends Controller
             $selectedIsland = $islands->firstWhere('id', $selectedIslandId);
 
             if ($selectedIsland) {
-                $tribes = config('tribes.' . $selectedIsland->slug, []);
+                // normalisasi tribes supaya aman jika config associative
+                $tribes = $this->normalizeTribes(config('tribes.' . $selectedIsland->slug, []));
 
-                // default tribe pertama kalau belum dipilih
+                // sanitize pilihan suku dari query
+                $selectedTribeKey = $this->sanitizeSelectedTribe(
+                    is_string($selectedTribeKeyRaw) ? $selectedTribeKeyRaw : null,
+                    $tribes
+                );
+
+                // kalau belum dipilih / tidak valid, default ke suku pertama (kalau ada)
                 if (!$selectedTribeKey && count($tribes)) {
                     $selectedTribeKey = $tribes[0];
                 }
 
                 if ($selectedTribeKey) {
+                    // === INI KUNCI: AMBIL HEADER HARUS island_id + tribe_key ===
                     $tribePage = TribePage::query()
                         ->where('island_id', $selectedIsland->id)
                         ->where('tribe_key', $selectedTribeKey)
                         ->first();
 
+                    // === Ambil items juga harus island_id + tribe_key ===
                     $items = HeritageItem::query()
                         ->where('island_id', $selectedIsland->id)
                         ->where('tribe_key', $selectedTribeKey)
@@ -61,8 +105,15 @@ class HeritageController extends Controller
                         'rumah_tradisi' => $items->where('category', 'rumah_tradisi')->values(),
                         'senjata_alatmusik' => $items->where('category', 'senjata_alatmusik')->values(),
                     ];
+                } else {
+                    // tidak ada suku valid untuk pulau ini
+                    $selectedTribeKey = null;
                 }
+            } else {
+                $selectedTribeKey = null;
             }
+        } else {
+            $selectedTribeKey = null;
         }
 
         return view('admin.heritages.index', [
@@ -86,23 +137,26 @@ class HeritageController extends Controller
             'hero_image' => ['nullable', 'image', 'max:2048'], // 2MB
         ]);
 
-        // pastikan tribe_key valid sesuai config
         $island = Island::findOrFail($data['island_id']);
-        $allowedTribes = config('tribes.' . $island->slug, []);
-        if (!in_array($data['tribe_key'], $allowedTribes, true)) {
+
+        // normalisasi allowed tribes supaya match persis dengan yang di index
+        $allowedTribes = $this->normalizeTribes(config('tribes.' . $island->slug, []));
+
+        $tribeKey = trim($data['tribe_key'] ?? '');
+        if ($tribeKey === '' || !in_array($tribeKey, $allowedTribes, true)) {
             return back()->withErrors(['tribe_key' => 'Suku tidak valid untuk pulau ini.'])->withInput();
         }
 
-        $page = TribePage::firstOrNew([
+        // === INI KUNCI: SIMPAN HARUS island_id + tribe_key (sesuai unique index) ===
+        $page = TribePage::query()->firstOrNew([
             'island_id' => $island->id,
-            'tribe_key' => $data['tribe_key'],
+            'tribe_key' => $tribeKey,
         ]);
 
         $page->hero_title = $data['hero_title'] ?? null;
         $page->hero_description = $data['hero_description'] ?? null;
 
         if ($request->hasFile('hero_image')) {
-            // hapus lama
             if ($page->hero_image) {
                 Storage::disk('public')->delete($page->hero_image);
             }
@@ -112,9 +166,10 @@ class HeritageController extends Controller
 
         $page->save();
 
+        // IMPORTANT: redirect harus bawa query tribe supaya gak balik ke suku pertama
         return redirect()->route('admin.heritages.index', [
             'island_id' => $island->id,
-            'tribe' => $data['tribe_key'],
+            'tribe' => $tribeKey,
         ])->with('success', 'Header suku berhasil disimpan.');
     }
 
@@ -132,14 +187,17 @@ class HeritageController extends Controller
         ]);
 
         $island = Island::findOrFail($data['island_id']);
-        $allowedTribes = config('tribes.' . $island->slug, []);
-        if (!in_array($data['tribe_key'], $allowedTribes, true)) {
+
+        $allowedTribes = $this->normalizeTribes(config('tribes.' . $island->slug, []));
+
+        $tribeKey = trim($data['tribe_key'] ?? '');
+        if ($tribeKey === '' || !in_array($tribeKey, $allowedTribes, true)) {
             return back()->withErrors(['tribe_key' => 'Suku tidak valid untuk pulau ini.'])->withInput();
         }
 
         $item = new HeritageItem();
         $item->island_id = $island->id;
-        $item->tribe_key = $data['tribe_key'];
+        $item->tribe_key = $tribeKey;
         $item->category = $data['category'];
         $item->title = $data['title'];
         $item->description = $data['description'] ?? null;
@@ -154,7 +212,7 @@ class HeritageController extends Controller
 
         return redirect()->route('admin.heritages.index', [
             'island_id' => $island->id,
-            'tribe' => $data['tribe_key'],
+            'tribe' => $tribeKey,
         ])->with('success', 'Item warisan berhasil ditambahkan.');
     }
 
@@ -169,7 +227,8 @@ class HeritageController extends Controller
 
         $item->title = $data['title'];
         $item->description = $data['description'] ?? null;
-        if (isset($data['sort_order'])) {
+
+        if (array_key_exists('sort_order', $data)) {
             $item->sort_order = (int)$data['sort_order'];
         }
 
