@@ -1,4 +1,4 @@
-{{-- resources/views/islands/show.blade.php --}}
+{{-- resources/views/islands.blade.php --}}
 @extends('layouts.app')
 
 @section('title', ($selectedIsland->title ?? $selectedIsland->name ?? 'Pulau') . ' – Lentara')
@@ -21,6 +21,10 @@
 
         $quizzesByTribe    = $quizzesByTribe ?? collect();
         $globalQuiz        = $globalQuiz ?? null;
+
+        // ABOUT PULAU (BARU) - dari controller
+        $aboutIslandPage   = $aboutIslandPage ?? null;
+        $aboutIslandItems  = $aboutIslandItems ?? collect();
 
         // Warisan payload dari controller
         $tribeKey          = $tribeKey ?? request()->query('tribe', '');
@@ -73,6 +77,18 @@
 
         <div class="max-w-5xl mx-auto space-y-10">
 
+            {{-- ===================================================
+               ABOUT PULAU + STATISTIK (BARU)
+               - tampil di bawah HERO
+               - tampil sebelum picker suku
+               =================================================== --}}
+            @include('islands.partials.about-island-stats', [
+                'selectedIsland'    => $selectedIsland,
+                'aboutIslandPage'   => $aboutIslandPage,
+                'aboutIslandItems'  => $aboutIslandItems,
+                'demographics'      => $demographics,
+            ])
+
             {{-- =========================
                TABS SUKU (SERVER DRIVEN)
                ========================= --}}
@@ -105,17 +121,16 @@
             <div class="space-y-12" id="suku-wrapper">
 
                 {{-- ===================================================
-                   ABOUT SUKU (judul template, isi nanti dari CRUD)
-                   Sementara: fallback ke feature about pulau-level
+                   ABOUT SUKU (DINONAKTIFKAN)
+                   Karena kamu mau About GENERAL per pulau.
                    =================================================== --}}
-{{-- ===================================================
-   ABOUT SUKU (DINAMIS: TribeAboutPage + TribeAboutItem)
-   =================================================== --}}
-@include('islands.partials.about', [
-    'tribeKey'   => $tribeKey,
-    'aboutPage'  => $aboutPage,
-    'aboutItems' => $aboutItems,
-])
+                {{--
+                @include('islands.partials.about', [
+                    'tribeKey'   => $tribeKey,
+                    'aboutPage'  => $aboutPage,
+                    'aboutItems' => $aboutItems,
+                ])
+                --}}
 
                 {{-- ===================================================
                    SEJARAH SUKU (DINAMIS: IslandHistory per tribe)
@@ -128,8 +143,7 @@
                 ])
 
                 {{-- ===================================================
-                   DESTINASI SUKU (judul template, isi nanti dari CRUD)
-                   Sementara: fallback ke feature destination pulau-level
+                   DESTINASI SUKU
                    =================================================== --}}
                 <section id="destinations" class="space-y-4">
                     <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">
@@ -155,8 +169,7 @@
                 </section>
 
                 {{-- ===================================================
-                   KULINER SUKU (judul template, isi nanti dari CRUD)
-                   Sementara: fallback ke feature food pulau-level
+                   KULINER SUKU
                    =================================================== --}}
                 <section id="foods" class="space-y-4">
                     <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold">

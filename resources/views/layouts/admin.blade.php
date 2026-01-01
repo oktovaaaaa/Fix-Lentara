@@ -33,6 +33,13 @@
                 <input type="text" placeholder="Search..." />
                 <span class="tooltip">Search</span>
             </li>
+<li>
+    <a href="{{ route('admin.about_stats.index') }}">
+        <i class='bx bx-info-circle'></i>
+        <span class="links_name">About Pulau + Statistik</span>
+    </a>
+    <span class="tooltip">About Pulau + Statistik</span>
+</li>
 
             <li>
     <a href="{{ route('admin.abouts.index') }}">

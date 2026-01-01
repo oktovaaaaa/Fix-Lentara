@@ -15,6 +15,11 @@ use App\Models\HeritageItem;
 use App\Models\TribeAboutPage;
 use App\Models\TribeAboutItem;
 
+// about pulau
+use App\Models\IslandAboutPage;
+use App\Models\IslandAboutItem;
+
+
 use Illuminate\Http\Request;
 
 class IslandController extends Controller
@@ -122,6 +127,17 @@ class IslandController extends Controller
             'ethnicity' => $island->demographics->where('type', 'ethnicity')->sortBy('order')->values(),
             'language'  => $island->demographics->where('type', 'language')->sortBy('order')->values(),
         ];
+
+        $aboutIslandPage = IslandAboutPage::query()
+    ->where('island_id', $island->id)
+    ->first();
+
+$aboutIslandItems = IslandAboutItem::query()
+    ->where('island_id', $island->id)
+    ->orderBy('sort_order')
+    ->orderBy('id')
+    ->get();
+
 
         // =============================
         // HISTORIES PER SUKU
@@ -261,6 +277,11 @@ class IslandController extends Controller
             'tribePage'              => $tribePage,
             'itemsByCategory'        => $itemsByCategory,
             'heritageCategoryLabels' => HeritageItem::CATEGORIES,
+
+            // about pulau
+            'aboutIslandPage'  => $aboutIslandPage,
+            'aboutIslandItems' => $aboutIslandItems,
+
         ]);
     }
 

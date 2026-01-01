@@ -18,6 +18,9 @@ use App\Http\Controllers\Admin\TestimonialReportController as AdminTestimonialRe
 use App\Http\Controllers\Admin\QuizController as AdminQuizController;
 use App\Http\Controllers\Admin\QuizQuestionController as AdminQuizQuestionController;
 
+use App\Http\Controllers\Admin\IslandAboutStatsController;
+
+
 /*
 |--------------------------------------------------------------------------
 | NUSANTARA AI (PUBLIC)
@@ -173,5 +176,22 @@ Route::patch('abouts/item/{item}', [\App\Http\Controllers\Admin\TribeAboutContro
 // delete item about
 Route::delete('abouts/item/{item}', [\App\Http\Controllers\Admin\TribeAboutController::class, 'destroyItem'])
     ->name('abouts.item.destroy');
+
+
+    // ✅ ABOUT PULAU + STATISTIK
+    Route::get('/about-stats', [IslandAboutStatsController::class, 'index'])
+        ->name('about_stats.index');
+
+    Route::post('/about-stats/{island}/about-page', [IslandAboutStatsController::class, 'upsertAboutPage'])
+        ->name('about_stats.about_page');
+
+    Route::post('/about-stats/{island}/items', [IslandAboutStatsController::class, 'storeItem'])
+        ->name('about_stats.items.store');
+
+    Route::put('/about-stats/{island}/items/{item}', [IslandAboutStatsController::class, 'updateItem'])
+        ->name('about_stats.items.update');
+
+    Route::delete('/about-stats/{island}/items/{item}', [IslandAboutStatsController::class, 'destroyItem'])
+        ->name('about_stats.items.destroy');
 
     });

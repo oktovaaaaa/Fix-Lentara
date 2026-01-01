@@ -16,6 +16,7 @@ class Island extends Model
         'title',             // baris besar 1 (misal: PULAU)
         'subtitle',          // baris besar 2 (misal: SUMATRA)
         'short_description', // bisa dipakai untuk halaman detail
+        'population',        // tambahan kolom populasi
         'image_url',
         'order',
         'is_active',
