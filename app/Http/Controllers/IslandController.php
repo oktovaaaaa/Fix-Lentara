@@ -19,6 +19,10 @@ use App\Models\TribeAboutItem;
 use App\Models\IslandAboutPage;
 use App\Models\IslandAboutItem;
 
+use App\Models\TribeFoodRecommendation;
+use Illuminate\Support\Carbon;
+
+
 
 use Illuminate\Http\Request;
 
@@ -250,6 +254,17 @@ $aboutIslandItems = IslandAboutItem::query()
 
         [$testimonials, $testimonialStats] = $this->getTestimonialsPayload();
 
+
+$aiFoodRecommendation = null;
+if ($tribeKey !== '') {
+    $aiFoodRecommendation = TribeFoodRecommendation::query()
+        ->where('tribe_key', $tribeKey)
+        ->orderByDesc('generated_at')
+        ->first();
+}
+
+
+
         // =========================================================
         // ✅ RETURN VIEW: islands.blade.php (bukan islands.show)
         // =========================================================
@@ -281,6 +296,10 @@ $aboutIslandItems = IslandAboutItem::query()
             // about pulau
             'aboutIslandPage'  => $aboutIslandPage,
             'aboutIslandItems' => $aboutIslandItems,
+
+
+            'aiFoodRecommendation' => $aiFoodRecommendation,
+
 
         ]);
     }

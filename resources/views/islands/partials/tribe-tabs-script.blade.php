@@ -1,40 +1,34 @@
 {{-- resources/views/islands/partials/tribe-tabs-script.blade.php --}}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const tabs   = document.querySelectorAll('[data-tribe-tab]');
-        const panels = document.querySelectorAll('[data-tribe-panel]');
+document.addEventListener('DOMContentLoaded', function () {
+    const tabs   = document.querySelectorAll('[data-tribe-tab]');
+    const panels = document.querySelectorAll('[data-tribe-panel]');
 
-        function setTribe(name) {
-            // ganti style tab
-            tabs.forEach(tab => {
-                if (tab.dataset.tribeTab === name) {
-                    tab.classList.add('is-active');
-                } else {
-                    tab.classList.remove('is-active');
-                }
-            });
+    if (!tabs.length || !panels.length) return;
 
-            // tampilkan konten sesuai suku
-            panels.forEach(panel => {
-                if (panel.dataset.tribePanel === name) {
-                    panel.classList.remove('hidden');
-                } else {
-                    panel.classList.add('hidden');
-                }
-            });
-        }
-
+    function setTribe(name) {
+        // tab active
         tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                setTribe(tab.dataset.tribeTab);
-            });
+            tab.classList.toggle('is-active', tab.dataset.tribeTab === name);
         });
 
-        // default suku pertama – tiap pulau bisa override lewat data-atribut kalau mau
-        // di Sumatera: 'aceh', di Jawa nanti bisa 'sunda', dll
-        const defaultTab = document.querySelector('[data-tribe-tab].is-active');
-        if (defaultTab) {
-            setTribe(defaultTab.dataset.tribeTab);
-        }
+        // panel show/hide
+        panels.forEach(panel => {
+            panel.classList.toggle('hidden', panel.dataset.tribePanel !== name);
+        });
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => setTribe(tab.dataset.tribeTab));
     });
+
+    // default active: yang sudah punya class is-active
+    const defaultTab = document.querySelector('[data-tribe-tab].is-active');
+    if (defaultTab) {
+        setTribe(defaultTab.dataset.tribeTab);
+    } else {
+        // fallback: tab pertama
+        setTribe(tabs[0].dataset.tribeTab);
+    }
+});
 </script>

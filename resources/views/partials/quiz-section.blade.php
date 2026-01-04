@@ -4,8 +4,8 @@
 @endphp
 
 @if(!$quiz || $quiz->questions->count() === 0)
-  <div class="border border-[var(--line)] rounded-2xl p-5 bg-[var(--card)] shadow-sm">
-    <p class="text-sm text-[var(--muted)]">Belum ada quiz global yang aktif.</p>
+  {{-- <div class="border border-[var(--line)] rounded-2xl p-5 bg-[var(--card)] shadow-sm">
+    <p class="text-sm text-[var(--muted)]">Belum ada quiz global yang aktif.</p> --}}
   </div>
 @else
   @php

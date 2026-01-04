@@ -54,20 +54,27 @@
 <section id="about" class="py-12">
     <div class="max-w-6xl mx-auto space-y-10 px-4">
 
-        {{-- HEADER --}}
+        {{-- HEADER (ABOUT PULAU) --}}
         <div class="text-center">
             <div class="inline-block text-xs tracking-[0.18em] uppercase font-semibold px-3 py-1 rounded"
                  style="color: var(--brand); background: color-mix(in srgb, var(--brand) 10%, transparent);">
                 {{ $labelSmall }}
             </div>
 
-            <h2 class="mt-3 text-2xl sm:text-3xl font-semibold">
-                {{ $heroTitle }}
-            </h2>
+            {{-- TITLE + DECORATION (HARUS SAMA PERSIS DENGAN HOME SYSTEM) --}}
+            <div class="mt-3">
+                <h2 class="neon-title">{{ $heroTitle }}</h2>
+                <div class="title-decoration"></div>
+            </div>
 
             @if($heroDesc)
-                <p class="mt-3 text-sm sm:text-base text-[var(--muted)] max-w-2xl mx-auto leading-relaxed">
+                <p class="neon-subtitle">
                     {{ $heroDesc }}
+                </p>
+            @else
+                {{-- kalau tidak ada subtitle dari admin, kita buat default supaya konsisten dengan HOME --}}
+                <p class="neon-subtitle">
+                    Ringkasan tentang pulau ini, termasuk gambaran umum dan poin-poin penting yang kamu input di admin.
                 </p>
             @endif
 
@@ -97,7 +104,8 @@
                     $hasImage  = !empty($img);
                 @endphp
 
-                <div class="border border-[var(--line)] rounded-2xl bg-[var(--card)] p-4 sm:p-6">
+<div class="rounded-2xl p-4 sm:p-6 bg-transparent border-0">
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
                         {{-- Gambar (opsional) --}}
                         @if($hasImage)
@@ -150,445 +158,15 @@
             @endforelse
         </div>
 
-        {{-- ================= STATISTIK PULAU (NEON THEME) ================= --}}
+        {{-- ================= STATISTIK PULAU ================= --}}
         <section id="stats" class="py-4">
+
+            {{-- TITLE + DECORATION + SUBTITLE (SAMA PERSIS DENGAN HOME SYSTEM) --}}
             <h2 class="neon-title">Statistik Pulau</h2>
             <div class="title-decoration"></div>
             <p class="neon-subtitle">
                 Ringkasan demografi pulau: jumlah penduduk, serta komposisi suku, bahasa, dan agama berdasarkan data yang kamu input di admin.
             </p>
-
-            <style>
-                /* =========================================================
-                   STATS PULAU - NEON THEME (MATCH STYLE KAMU)
-                   - 3 Stat Cards (click -> modal)
-                   - 3 Charts (bar / donut / pie)
-                   - Works in light/dark with CSS vars
-                ========================================================= */
-                @property --neon-angle {
-                    syntax: "<angle>";
-                    inherits: false;
-                    initial-value: 0deg;
-                }
-
-                #stats .neon-title {
-                    font-size: 1.8rem;
-                    font-weight: 900;
-                    text-align: center;
-                    letter-spacing: 0.02em;
-                    margin-bottom: .25rem;
-                    color: var(--txt-body);
-                }
-
-                #stats .title-decoration {
-                    width: 120px;
-                    height: 6px;
-                    margin: .4rem auto 0;
-                    border-radius: 999px;
-                    background: linear-gradient(90deg, #f97316, #22d3ee, #34d399);
-                    filter: blur(.2px);
-                    opacity: .9;
-                }
-
-                #stats .neon-subtitle {
-                    max-width: 48rem;
-                    margin: 1rem auto 0;
-                    text-align: center;
-                    font-size: .95rem;
-                    line-height: 1.7;
-                    color: var(--muted);
-                }
-
-                /* ================= STAT CARD UTAMA ================= */
-                #stats .stat-card {
-                    position: relative;
-                    border-radius: 26px;
-                    padding: 1.5rem;
-                    overflow: hidden;
-                    cursor: pointer;
-                    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-
-                    opacity: 0;
-                    transform: translateY(20px);
-                    animation: statsFadeUp 0.7s ease-out forwards;
-                    text-align: left;
-                }
-
-                #stats .stat-card::before {
-                    content: "";
-                    position: absolute;
-                    inset: -6px;
-                    border-radius: inherit;
-                    padding: 10px;
-                    pointer-events: none;
-                    z-index: 0;
-                    background: conic-gradient(
-                        from var(--neon-angle),
-                        rgba(249, 115, 22, 0) 0deg,
-                        rgba(249, 115, 22, 0.20) 22deg,
-                        #f97316 55deg,
-                        #22d3ee 110deg,
-                        #34d399 165deg,
-                        rgba(34, 211, 238, 0.20) 220deg,
-                        #f97316 300deg,
-                        rgba(249, 115, 22, 0) 360deg
-                    );
-                    -webkit-mask:
-                        linear-gradient(#000 0 0) content-box,
-                        linear-gradient(#000 0 0);
-                    -webkit-mask-composite: xor;
-                    mask-composite: exclude;
-                    filter: blur(6px);
-                    opacity: 0;
-                    transition: opacity 0.4s ease;
-                    animation: neon-spin 7.5s linear infinite paused;
-                }
-
-                #stats .stat-card:hover::before {
-                    opacity: 0.95;
-                    animation-play-state: running;
-                }
-
-                @keyframes neon-spin { to { --neon-angle: 360deg; } }
-
-                #stats .stat-card > * { position: relative; z-index: 1; }
-
-                #stats .stat-card:hover {
-                    transform: translateY(-10px) scale(1.02);
-                    box-shadow:
-                        0 30px 80px rgba(0, 0, 0, 0.4),
-                        0 0 40px rgba(249, 115, 22, 0.3);
-                }
-
-                #stats .stat-card:active { animation: stat-click 0.3s ease-out; }
-                @keyframes stat-click {
-                    0% { transform: translateY(-10px) scale(1.02); }
-                    50% { transform: translateY(-10px) scale(0.98); box-shadow: 0 40px 100px rgba(249,115,22,.4), 0 0 60px rgba(249,115,22,.5); }
-                    100% { transform: translateY(-10px) scale(1.02); }
-                }
-
-                #stats .stat-card--red {
-                    background: linear-gradient(135deg,
-                        rgba(249, 115, 22, 0.92),
-                        rgba(220, 38, 38, 0.78),
-                        rgba(251, 146, 60, 0.92)
-                    );
-                    color: #fff;
-                }
-
-                #stats .stat-card--purple {
-                    background: linear-gradient(135deg,
-                        rgba(124, 58, 237, 0.9),
-                        rgba(139, 92, 246, 0.8),
-                        rgba(168, 85, 247, 0.9)
-                    );
-                    color: #fff;
-                }
-
-                #stats .stat-card--green {
-                    background: linear-gradient(135deg,
-                        rgba(5, 150, 105, 0.9),
-                        rgba(16, 185, 129, 0.8),
-                        rgba(34, 197, 94, 0.9)
-                    );
-                    color: #fff;
-                }
-
-                #stats .stat-number {
-                    font-size: 2.6rem;
-                    line-height: 1;
-                    font-weight: 900;
-                    color: #fff;
-                    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-                    margin-bottom: 0.5rem;
-                    word-break: break-word;
-                }
-
-                #stats .stat-label {
-                    font-size: 1.05rem;
-                    font-weight: 800;
-                    color: rgba(255,255,255,.95);
-                    margin-bottom: 0.9rem;
-                }
-
-                #stats .stat-card p {
-                    font-size: 0.95rem;
-                    line-height: 1.6;
-                    color: rgba(255,255,255,.85);
-                    margin-bottom: 1.2rem;
-                }
-
-                #stats .stat-more {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 8px;
-                    font-size: 0.85rem;
-                    font-weight: 800;
-                    text-transform: uppercase;
-                    letter-spacing: 0.06em;
-                    color: #fff;
-                    padding: 8px 14px;
-                    border-radius: 12px;
-                    background: rgba(255, 255, 255, 0.15);
-                    backdrop-filter: blur(10px);
-                    border: 1px solid rgba(255, 255, 255, 0.2);
-                    transition: all 0.3s ease;
-                }
-
-                #stats .stat-card:hover .stat-more {
-                    background: rgba(255, 255, 255, 0.25);
-                    transform: translateX(5px);
-                    border-color: rgba(255, 255, 255, 0.4);
-                }
-
-                #stats .stat-more-icon { transition: transform 0.3s ease; }
-                #stats .stat-card:hover .stat-more-icon { transform: translateX(4px) rotate(45deg); }
-
-                /* ================= CHART CARD ================= */
-                #stats .chart-card {
-                    position: relative;
-                    border-radius: 26px;
-                    padding: 1.5rem;
-                    background: linear-gradient(145deg,
-                        color-mix(in oklab, var(--card) 92%, transparent),
-                        color-mix(in oklab, var(--card) 78%, transparent)
-                    );
-                    border: 1px solid rgba(249, 115, 22, 0.18);
-                    box-shadow:
-                        0 20px 60px rgba(0, 0, 0, 0.35),
-                        0 0 0 1px rgba(255, 255, 255, 0.06);
-                    overflow: hidden;
-                    transition: all 0.3s ease;
-
-                    opacity: 0;
-                    transform: translateY(20px);
-                    animation: statsFadeUp 0.7s ease-out forwards;
-                    color: var(--txt-body);
-                }
-
-                html[data-theme="dark"] #stats .chart-card {
-                    background: linear-gradient(145deg, #111827, #020617);
-                    color: #fff;
-                    border-color: rgba(249, 115, 22, 0.22);
-                }
-
-                html[data-theme="light"] #stats .chart-card {
-                    background: linear-gradient(145deg, #ffffff, #f8fafc);
-                    color: #0f172a;
-                }
-
-                #stats .chart-card::before {
-                    content: "";
-                    position: absolute;
-                    inset: -6px;
-                    border-radius: inherit;
-                    padding: 10px;
-                    pointer-events: none;
-                    z-index: 0;
-                    background: conic-gradient(
-                        from var(--neon-angle),
-                        rgba(249, 115, 22, 0) 0deg,
-                        rgba(249, 115, 22, 0.15) 22deg,
-                        #f97316 55deg,
-                        #22d3ee 110deg,
-                        #34d399 165deg,
-                        rgba(34, 211, 238, 0.15) 220deg,
-                        #f97316 300deg,
-                        rgba(249, 115, 22, 0) 360deg
-                    );
-                    -webkit-mask:
-                        linear-gradient(#000 0 0) content-box,
-                        linear-gradient(#000 0 0);
-                    -webkit-mask-composite: xor;
-                    mask-composite: exclude;
-                    filter: blur(4px);
-                    opacity: 0.72;
-                    animation: neon-spin 10s linear infinite;
-                }
-
-                #stats .chart-card > * { position: relative; z-index: 1; }
-
-                #stats .chart-card:hover {
-                    transform: translateY(-8px);
-                    box-shadow:
-                        0 30px 80px rgba(0, 0, 0, 0.5),
-                        0 0 40px rgba(249, 115, 22, 0.25);
-                }
-
-                #stats .chart-title {
-                    font-size: 1.02rem;
-                    font-weight: 900;
-                    margin-bottom: 0.5rem;
-                    color: var(--txt-body);
-                }
-
-                html[data-theme="dark"] #stats .chart-title { color: #fff; }
-                html[data-theme="light"] #stats .chart-title { color: #0f172a; }
-
-                #stats .chart-subtitle {
-                    font-size: 0.8rem;
-                    color: var(--muted);
-                    background: rgba(249, 115, 22, 0.18);
-                    padding: 4px 10px;
-                    border-radius: 20px;
-                    font-weight: 800;
-                }
-
-                #stats .chart-wrapper {
-                    position: relative;
-                    width: 100%;
-                    height: 240px;
-                    margin: 1rem 0;
-                }
-
-                @keyframes statsFadeUp {
-                    from { opacity: 0; transform: translateY(20px) scale(0.98); }
-                    to { opacity: 1; transform: translateY(0) scale(1); }
-                }
-
-                #stats .stat-card[data-stat="population"] { animation-delay: 0.12s; }
-                #stats .stat-card[data-stat="ethnicity"]  { animation-delay: 0.22s; }
-                #stats .stat-card[data-stat="language"]   { animation-delay: 0.32s; }
-
-                #stats .chart-card:nth-child(1) { animation-delay: 0.42s; }
-                #stats .chart-card:nth-child(2) { animation-delay: 0.52s; }
-                #stats .chart-card:nth-child(3) { animation-delay: 0.62s; }
-
-                /* ================= MODAL ================= */
-                #stats-modal-backdrop {
-                    display: none;
-                    backdrop-filter: blur(12px);
-                    background: rgba(0, 0, 0, 0.82);
-                }
-                #stats-modal-backdrop.is-open { display: flex; }
-
-                #stats-modal {
-                    position: relative;
-                    border-radius: 26px;
-                    background: linear-gradient(145deg,
-                        color-mix(in oklab, var(--card) 95%, transparent),
-                        color-mix(in oklab, var(--card) 82%, transparent)
-                    );
-                    color: var(--txt-body);
-                    border: 1px solid rgba(249, 115, 22, 0.26);
-                    box-shadow:
-                        0 30px 80px rgba(0, 0, 0, 0.6),
-                        0 0 0 1px rgba(255, 255, 255, 0.06);
-                    transform: translateY(20px) scale(0.97);
-                    opacity: 0;
-                    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-                    overflow: hidden;
-                    max-width: 860px;
-                    width: 92%;
-                    padding: 2rem;
-                }
-
-                html[data-theme="dark"] #stats-modal { background: linear-gradient(145deg, #111827, #020617); color: #fff; }
-                html[data-theme="light"] #stats-modal { background: linear-gradient(145deg, #ffffff, #f8fafc); color: #0f172a; }
-
-                #stats-modal::before {
-                    content: "";
-                    position: absolute;
-                    inset: -6px;
-                    border-radius: inherit;
-                    padding: 10px;
-                    pointer-events: none;
-                    z-index: 0;
-                    background: conic-gradient(
-                        from var(--neon-angle),
-                        rgba(249, 115, 22, 0) 0deg,
-                        rgba(249, 115, 22, 0.20) 22deg,
-                        #f97316 55deg,
-                        #22d3ee 110deg,
-                        #34d399 165deg,
-                        rgba(34, 211, 238, 0.20) 220deg,
-                        #f97316 300deg,
-                        rgba(249, 115, 22, 0) 360deg
-                    );
-                    -webkit-mask:
-                        linear-gradient(#000 0 0) content-box,
-                        linear-gradient(#000 0 0);
-                    -webkit-mask-composite: xor;
-                    mask-composite: exclude;
-                    filter: blur(6px);
-                    opacity: 0.82;
-                    animation: neon-spin 7.5s linear infinite;
-                }
-
-                #stats-modal > * { position: relative; z-index: 1; }
-
-                #stats-modal-backdrop.is-open #stats-modal {
-                    transform: translateY(0) scale(1);
-                    opacity: 1;
-                }
-
-                #stats-modal-title {
-                    font-size: 1.7rem;
-                    font-weight: 950;
-                    margin-bottom: 1.1rem;
-                    background: linear-gradient(90deg, #f97316, #22d3ee, #34d399);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-size: 200% auto;
-                    animation: neon-glow 3s ease-in-out infinite;
-                }
-                @keyframes neon-glow {
-                    0%, 100% { background-position: 0% 50%; filter: drop-shadow(0 0 10px rgba(249,115,22,0.22)); }
-                    50% { background-position: 100% 50%; filter: drop-shadow(0 0 18px rgba(34,211,238,0.22)); }
-                }
-
-                #stats-modal-body {
-                    color: color-mix(in oklab, var(--txt-body) 82%, transparent);
-                    font-size: 1rem;
-                    line-height: 1.75;
-                }
-                html[data-theme="dark"] #stats-modal-body { color: #d1d5db; }
-                html[data-theme="light"] #stats-modal-body { color: #374151; }
-
-                #stats-modal-body strong { color: var(--txt-body); font-weight: 800; }
-                html[data-theme="dark"] #stats-modal-body strong { color: #fff; }
-                html[data-theme="light"] #stats-modal-body strong { color: #111827; }
-
-                #stats-modal-body ul { margin: 1rem 0; padding-left: 1.25rem; }
-                #stats-modal-body li { margin-bottom: 0.5rem; color: var(--muted); }
-
-                #stats-modal-close {
-                    position: absolute;
-                    right: 1.25rem;
-                    top: 1.25rem;
-                    width: 44px;
-                    height: 44px;
-                    border-radius: 50%;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: color-mix(in oklab, var(--card) 10%, transparent);
-                    border: 1px solid rgba(249, 115, 22, 0.3);
-                    color: #f97316;
-                    font-size: 1.5rem;
-                    cursor: pointer;
-                    transition: all 0.3s ease;
-                    z-index: 2;
-                }
-
-                html[data-theme="dark"] #stats-modal-close { background: rgba(255, 255, 255, 0.1); }
-                html[data-theme="light"] #stats-modal-close { background: rgba(0, 0, 0, 0.05); color: #b7410e; border-color: rgba(183, 65, 14, 0.3); }
-
-                #stats-modal-close:hover {
-                    background: rgba(249, 115, 22, 0.9);
-                    color: #fff;
-                    transform: rotate(90deg);
-                    border-color: #f97316;
-                }
-
-                @media (max-width: 768px) {
-                    #stats .stat-number { font-size: 2.25rem; }
-                    #stats .chart-wrapper { height: 210px; }
-                    #stats-modal { padding: 1.35rem; }
-                }
-            </style>
 
             {{-- 3 CARD UTAMA --}}
             <div class="grid gap-6 lg:grid-cols-3 mb-8 mt-6">
