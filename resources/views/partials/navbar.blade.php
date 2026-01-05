@@ -18,7 +18,12 @@
 <header class="site-header" id="top">
     {{-- ===== ICON LINGKARAN GLASS HANYA UNTUK MOBILE ===== --}}
     <div class="circle-logo-container mobile-only" id="circleLogoContainer">
-        <a class="circle-logo" href="{{ route('home') }}" id="mobileMenuToggle" aria-label="Buka menu">
+        {{-- ✅ FIX: jangan href ke home, biar tidak balik ke home ketika JS salah deteksi mobile --}}
+        <a class="circle-logo"
+           href="#"
+           data-home-url="{{ route('home') }}"
+           id="mobileMenuToggle"
+           aria-label="Buka menu">
             <img src="{{ asset('images/icon/icon_lentara.png') }}"
                  alt="Lentara"
                  class="circle-logo-img">
@@ -169,15 +174,7 @@
         {{-- ================= KANAN: ADMIN + THEME ================= --}}
         <div class="flex items-center gap-2 ml-auto">
 
-            {{-- Link Admin (desktop) --}}
-            <a href="{{ route('login') }}"
-               class="hidden sm:inline-flex items-center gap-2 px-3 py-2
-                      text-sm font-semibold rounded-full
-                      border border-amber-300/60
-                      bg-amber-400/90 text-slate-900
-                      shadow-sm hover:bg-amber-300 transition">
-                <span>Admin</span>
-            </a>
+
 
             {{-- Toggle Tema (DESKTOP ONLY) --}}
             <button class="theme-toggle hidden md:flex" id="themeToggle" aria-label="Ubah tema">
@@ -273,11 +270,7 @@
                 <span>Ganti Tema</span>
             </button>
 
-            {{-- Link Admin (mobile) --}}
-            <a href="{{ route('login') }}" class="btn full mt-2">
-                <span class="drawer-admin-icon">👤</span>
-                <span>Admin</span>
-            </a>
+
         </div>
     </aside>
 

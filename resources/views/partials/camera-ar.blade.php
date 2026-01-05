@@ -326,13 +326,39 @@
         }
 
         /* ================= FILTER BAR ================= */
-        #camera-ar .filter-bar {
-            display: flex;
-            gap: 14px;
-            overflow: auto;
-            padding: 12px 6px;
-            scroll-snap-type: x mandatory;
-        }
+#camera-ar .filter-bar {
+    display: flex;
+    gap: 14px;
+    overflow: auto;
+    padding: 12px 6px;
+    scroll-snap-type: x mandatory;
+
+    /* ===== Scrollbar ORANGE (Firefox) ===== */
+    scrollbar-color: #f97316 rgba(249,115,22,.12);
+    scrollbar-width: auto;
+}
+
+/* ===== Scrollbar ORANGE (Chrome/Edge/Safari) ===== */
+#camera-ar .filter-bar::-webkit-scrollbar {
+    height: 12px; /* karena scroll horizontal */
+}
+
+#camera-ar .filter-bar::-webkit-scrollbar-track {
+    background: rgba(249,115,22,.12);
+    border-radius: 999px;
+    border: 1px solid rgba(249,115,22,.18);
+}
+
+#camera-ar .filter-bar::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #f97316, #fb923c);
+    border-radius: 999px;
+    border: 2px solid rgba(0,0,0,.18);
+}
+
+#camera-ar .filter-bar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #fb923c, #f97316);
+}
+
 
         #camera-ar .filter-pill {
             scroll-snap-align: start;

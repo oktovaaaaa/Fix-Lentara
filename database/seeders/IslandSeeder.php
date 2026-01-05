@@ -60,7 +60,7 @@ class IslandSeeder extends Seeder
                 'slug'   => 'sundakecil',
                 'place_label' => 'Masyarakat Bali',
                 'title'  => 'Pulau',
-                'subtitle' => 'Bali  & Nusa Tenggara',
+                'subtitle' => 'BALI & NUSA TENGGARA',
                 'short_description' => 'Pulau wisata dunia dengan pantai, budaya, dan pura yang ikonik.',
                 'image_url' => 'https://images.unsplash.com/photo-1741272689174-f7f03b09a0ab?auto=format&fit=crop&q=80&w=1173',
                 'order'  => 5,

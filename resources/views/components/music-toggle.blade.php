@@ -1,18 +1,18 @@
 {{-- resources/views/components/music-toggle.blade.php --}}
 
 <style>
-  /* =========================================================
-     FLOATING MUSIC BUTTON
-     - circle orange (brand)
-     - icon theme aware (light: black / dark: white)
-     - animated toggle (play <-> pause)
-     - glow while playing
-  ========================================================= */
+  /* Warna khusus tombol musik: dibuat tetap (tidak ikut --brand navbar) */
+  :root{
+    --music-brand: #f97316; /* sama seperti --brand versi dark */
+  }
+  html[data-theme="dark"]{
+    --music-brand: #f97316; /* tetap sama juga */
+  }
 
   .music-fab {
     position: fixed;
     right: 20px;
-    bottom: 92px; /* biar gak nabrak chatbot */
+    bottom: 92px;
     z-index: 40;
 
     width: 58px;
@@ -23,8 +23,9 @@
     align-items: center;
     justify-content: center;
 
-    background: var(--brand);
-    border: 1px solid color-mix(in oklab, var(--brand) 70%, transparent);
+    /* ✅ FIX: jangan pakai --brand, pakai --music-brand agar tidak berubah */
+    background: var(--music-brand);
+    border: 1px solid color-mix(in oklab, var(--music-brand) 70%, transparent);
 
     box-shadow:
       0 18px 38px rgba(0,0,0,.25),
@@ -70,7 +71,8 @@
     height: 26px;
     display: block;
 
-    fill: var(--txt-body); /* LIGHT => hitam, DARK => putih */
+    /* ✅ ini sudah betul: icon ikut tema (light hitam, dark putih) */
+    fill: var(--txt-body);
 
     opacity: 0;
     transform: scale(.85) rotate(-8deg);
@@ -104,12 +106,12 @@
     0%,100%{
       box-shadow:
         0 18px 38px rgba(0,0,0,.25),
-        0 0 0 0 rgba(255, 107, 0, 0.0);
+        0 0 0 0 color-mix(in oklab, var(--music-brand) 0%, transparent);
     }
     50%{
       box-shadow:
         0 22px 50px rgba(0,0,0,.28),
-        0 0 0 12px rgba(255, 107, 0, 0.18);
+        0 0 0 12px color-mix(in oklab, var(--music-brand) 18%, transparent);
     }
   }
 
@@ -125,6 +127,7 @@
     }
   }
 </style>
+
 
 {{-- AUDIO: loop terus sampai user klik pause --}}
 <audio id="lentaraMusic" preload="none" loop>

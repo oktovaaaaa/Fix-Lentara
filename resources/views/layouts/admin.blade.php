@@ -79,13 +79,13 @@
             </li>
 
             {{-- Statistik Pulau --}}
-            <li>
+            {{-- <li>
                 <a href="{{ route('admin.stats.index') }}">
                     <i class='bx bx-pie-chart-alt-2'></i>
                     <span class="links_name">Statistik</span>
                 </a>
                 <span class="tooltip">Statistik</span>
-            </li>
+            </li> --}}
 
             {{-- Destinasi --}}
             <li>
@@ -98,14 +98,7 @@
             </li>
 
             {{-- Makanan --}}
-            <li>
-                <a href="#">
-                    {{-- nanti ganti ke route('admin.foods.index') --}}
-                    <i class="bx bx-bowl-hot"></i>
-                    <span class="links_name">Makanan</span>
-                </a>
-                <span class="tooltip">Makanan</span>
-            </li>
+
 
             <li>
                 <a href="{{ route('admin.testimonials.index') }}">
@@ -122,13 +115,13 @@
             </li>
 
             {{-- ===== QUIZ (BARU) ===== --}}
-            {{-- <li>
+            <li>
                 <a href="{{ route('admin.quizzes.index') }}">
                     <i class='bx bx-joystick'></i>
                     <span class="links_name">Quiz</span>
                 </a>
                 <span class="tooltip">Quiz</span>
-            </li> --}}
+            </li>
 
             {{-- Warisan --}}
 <li>

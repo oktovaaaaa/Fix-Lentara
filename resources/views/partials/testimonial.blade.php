@@ -338,13 +338,34 @@
                 </div>
 
                 <div class="mt-3 flex items-center justify-center gap-1">
-                    @php
-                        $rounded = (int) round($avg);
-                    @endphp
-                    @for($i=1; $i<=5; $i++)
-                        <span class="text-3xl" style="color: {{ $i <= $rounded ? '#f59e0b' : 'rgba(156, 163, 175, 0.3)' }};">★</span>
-                    @endfor
-                </div>
+    @php
+        // 4.5 => 4 full + 1 half
+        $full = (int) floor($avg);
+        $dec  = $avg - $full;
+        $half = $dec >= 0.5 ? 1 : 0;
+        $empty = 5 - $full - $half;
+        if ($empty < 0) $empty = 0;
+    @endphp
+
+    {{-- FULL STARS --}}
+    @for($i=0; $i < $full; $i++)
+        <span class="text-3xl" style="color:#f59e0b;">★</span>
+    @endfor
+
+    {{-- HALF STAR (pakai 2 layer: abu + emas setengah) --}}
+    @if($half === 1)
+        <span class="text-3xl relative inline-block" aria-hidden="true" style="line-height:1;">
+            <span style="color: rgba(156, 163, 175, 0.3);">★</span>
+            <span style="position:absolute; left:0; top:0; width:50%; overflow:hidden; color:#f59e0b;">★</span>
+        </span>
+    @endif
+
+    {{-- EMPTY STARS --}}
+    @for($i=0; $i < $empty; $i++)
+        <span class="text-3xl" style="color: rgba(156, 163, 175, 0.3);">★</span>
+    @endfor
+</div>
+
 
                 <div class="mt-2 t-muted text-sm">
                     Dari {{ $total }} rating

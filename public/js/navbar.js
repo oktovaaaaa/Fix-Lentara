@@ -37,16 +37,21 @@
   }
 
   // ===== NAV ACTIVE INDICATOR (desktop only) =====
-  function moveIndicator(targetBtn) {
-    if (!indicator || !targetBtn || isMobile() || !navLinksBox) return;
-    const b = targetBtn.getBoundingClientRect();
-    const p = navLinksBox.getBoundingClientRect();
-    const w = Math.max(110, b.width + 10);
-    const x = b.left - p.left + (b.width - w) / 2;
-    indicator.style.transform = `translateX(${x}px)`;
-    indicator.style.width = `${w}px`;
-    indicator.style.opacity = 1;
-  }
+function moveIndicator(targetBtn) {
+  if (!indicator || !targetBtn || isMobile() || !navLinksBox) return;
+
+  // ukuran & posisi real sesuai layout flex
+  const w = targetBtn.offsetWidth;
+  const x = targetBtn.offsetLeft;
+
+  // sedikit “napas” biar indikator tidak terlalu mepet (opsional)
+  const pad = 6;
+
+  indicator.style.transform = `translateX(${x - pad}px)`;
+  indicator.style.width = `${w + (pad * 2)}px`;
+  indicator.style.opacity = 1;
+}
+
 
   function hideIndicator() {
     if (indicator) indicator.style.opacity = 0;
@@ -184,15 +189,20 @@
 
   // Toggle drawer dengan klik circle logo di mobile
   if (mobileMenuToggle) {
-    mobileMenuToggle.addEventListener('click', (e) => {
-      if (!isMobile()) return; // desktop: normal link
-      e.preventDefault();
-      e.stopPropagation();
+  mobileMenuToggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-      const willOpen = !(drawer && drawer.classList.contains('open'));
-      willOpen ? openDrawer() : closeDrawer();
-    });
-  }
+    if (!isMobile()) {
+      const homeUrl = mobileMenuToggle.dataset.homeUrl;
+      if (homeUrl) window.location.href = homeUrl;
+      return;
+    }
+
+    const willOpen = !(drawer && drawer.classList.contains('open'));
+    willOpen ? openDrawer() : closeDrawer();
+  });
+}
 
   if (overlay) overlay.addEventListener('click', closeDrawer);
   if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);

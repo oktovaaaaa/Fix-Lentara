@@ -366,6 +366,8 @@ html[data-theme="dark"] .nav-links.nav-links--transparent{ background: transpare
 
 .active-indicator{
   position: absolute;
+  top: 6px;      /* sama dengan padding .nav-links */
+  left: 6px;     /* sama dengan padding .nav-links */
   height: 40px;
   width: 120px;
   border-radius: 999px;
@@ -375,6 +377,7 @@ html[data-theme="dark"] .nav-links.nav-links--transparent{ background: transpare
   pointer-events: none;
   opacity: 0;
 }
+
 
 /* ===== DROPDOWN DI DALAM NAVBAR (desktop) ===== */
 .nav-dropdown{
