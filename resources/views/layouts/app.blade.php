@@ -148,30 +148,134 @@ html.nav-loading .page-loader__barFill{
         <main class="flex-1">
             @yield('hero')
             @yield('content')
+
         </main>
 
-<footer class="w-full border-t border-slate-800/40 bg-[var(--bg-body)]">
-    <div class="w-full flex flex-col items-center gap-3 py-4">
+<footer class="w-full border-t border-slate-800/40 bg-[var(--bg-body)] relative overflow-hidden">
 
-        {{-- Teks di ATAS --}}
-        <div class="text-xs text-slate-500">
-            © {{ date('Y') }} Piforrr G6 Lentara Nusantara.
-        </div>
+    {{-- GARIS NEON TIPIS DI ATAS FOOTER --}}
+    <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-orange-500/0 via-orange-500/60 to-orange-500/0 animate-pulse"></div>
 
-        {{-- Gambar FULL kiri-kanan --}}
+<div class="w-full flex flex-col items-center gap-4 py-6 relative z-10">
+
+    {{-- ================= TEXT ATAS ================= --}}
+    <div class="text-center text-xs text-slate-400 leading-relaxed">
+        © {{ date('Y') }} <span class="text-slate-300 font-medium">Piforrr G6 – Lentara Nusantara</span><br>
+        Platform digital berbasis AI untuk mengenal budaya dan suku bangsa Indonesia.
+    </div>
+
+    {{-- ================= DEVELOPER SIGNATURE ================= --}}
+    <div class="flex items-center gap-3 text-xs text-slate-400">
+
+        {{-- LOGO PROFIL DEVELOPER (KECIL & ELEGAN) --}}
         <img
-            src="{{ asset('images/icon/footer.PNG') }}"
-            alt="Lentara Footer"
-            class="w-full h-24 object-cover block opacity-90"
+            src="{{ asset('images/icon/oktovaaaaa.PNG') }}"
+            alt="Developer Logo"
+            class="w-6 h-6 rounded-full ring-1 ring-orange-500/40 object-cover"
             loading="lazy"
         />
-    </div>
-</footer>
+
+        <span>
+            Dibangun dengan <span class="text-orange-400">❤</span> oleh
+            <span class="text-slate-200 font-semibold">Oktovaaaaa</span>
+        </span>
 
     </div>
+
+    {{-- ================= LINK PORTOFOLIO (ALL ICON) ================= --}}
+    <div class="flex items-center gap-4 text-xs">
+
+        {{-- ================= PORTFOLIO / PROFILE ICON ================= --}}
+        <a
+            href="https://www.oktovaaaaa.cloud/"
+            target="_blank"
+            aria-label="Portfolio"
+            title="Portfolio"
+            class="group inline-flex items-center justify-center text-slate-400 transition"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="w-5 h-5 transition-all duration-200
+                       text-slate-400 group-hover:text-orange-400"
+                fill="currentColor"
+                aria-hidden="true"
+            >
+                {{-- icon: user --}}
+                <path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5Zm0 2c-3.33 0-10 1.67-10 5v1h20v-1c0-3.33-6.67-5-10-5Z"/>
+            </svg>
+        </a>
+
+        <span class="text-slate-600">•</span>
+
+        {{-- ================= GITHUB ICON ================= --}}
+        <a
+            href="https://github.com/oktovaaaaa"
+            target="_blank"
+            aria-label="GitHub"
+            title="GitHub"
+            class="group inline-flex items-center justify-center text-slate-400 transition"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="w-5 h-5 transition-all duration-200
+                       text-slate-400 group-hover:text-orange-400"
+                fill="currentColor"
+                aria-hidden="true"
+            >
+                <path d="M12 .5C5.73.5.75 5.7.75 12.2c0 5.2 3.44 9.6 8.2 11.16.6.12.82-.27.82-.6 0-.3-.01-1.1-.02-2.16-3.34.75-4.04-1.67-4.04-1.67-.55-1.42-1.35-1.8-1.35-1.8-1.1-.78.08-.77.08-.77 1.22.09 1.86 1.29 1.86 1.29 1.08 1.9 2.84 1.35 3.53 1.03.11-.82.42-1.35.76-1.66-2.66-.31-5.46-1.38-5.46-6.13 0-1.35.46-2.45 1.23-3.31-.12-.31-.54-1.57.12-3.27 0 0 1-.33 3.3 1.27.96-.28 1.99-.42 3.01-.42 1.02 0 2.05.14 3.01.42 2.3-1.6 3.3-1.27 3.3-1.27.66 1.7.24 2.96.12 3.27.76.86 1.23 1.96 1.23 3.31 0 4.77-2.8 5.81-5.47 6.12.43.39.81 1.14.81 2.31 0 1.67-.02 3.01-.02 3.42 0 .33.22.72.83.6 4.75-1.56 8.18-5.96 8.18-11.16C23.25 5.7 18.27.5 12 .5Z"/>
+            </svg>
+        </a>
+
+        <span class="text-slate-600">•</span>
+
+        {{-- ================= INSTAGRAM ICON ================= --}}
+        <a
+            href="https://www.instagram.com/oktovaaaaa/"
+            target="_blank"
+            aria-label="Instagram"
+            title="Instagram"
+            class="group inline-flex items-center justify-center text-slate-400 transition"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="w-5 h-5 transition-all duration-200
+                       text-slate-400 group-hover:text-orange-400"
+                fill="currentColor"
+                aria-hidden="true"
+            >
+                <path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9A5.5 5.5 0 0 1 16.5 22h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9Zm4.5 4a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Zm5.2-2.6a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2Z"/>
+            </svg>
+        </a>
+
+    </div>
+
+</div>
+
+
+    {{-- ================= GAMBAR LENTARA FULL (TIDAK DIUBAH BENTUKNYA) ================= --}}
+    <img
+        src="{{ asset('images/icon/footer.PNG') }}"
+        alt="Lentara Footer"
+        class="w-full h-24 object-cover block opacity-90"
+        loading="lazy"
+    />
+
+</footer>
+
+
+    </div>
+
+        {{-- === MUSIC FLOATING BUTTON === --}}
+@include('components.music-toggle')
 
     {{-- === CHATBOT FLOATING NUSANTARA AI (di luar container utama) === --}}
     @include('components.nusantara-chatbot')
+
+
+
 
     {{-- scripts tambahan dari child view --}}
     @stack('scripts')

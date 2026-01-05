@@ -22,6 +22,7 @@ use App\Models\IslandAboutItem;
 use App\Models\TribeFoodRecommendation;
 use Illuminate\Support\Carbon;
 
+use App\Models\Destination;
 
 
 use Illuminate\Http\Request;
@@ -263,6 +264,19 @@ if ($tribeKey !== '') {
         ->first();
 }
 
+// untuk destination:
+$tribeDestinations = collect();
+if ($tribeKey !== '') {
+    $tribeDestinations = Destination::query()
+        ->where('island_id', $island->id)
+        ->where('tribe_key', $tribeKey)
+        ->where('is_active', true)
+        ->orderBy('sort_order')
+        ->orderBy('id')
+        ->get();
+}
+
+
 
 
         // =========================================================
@@ -299,6 +313,10 @@ if ($tribeKey !== '') {
 
 
             'aiFoodRecommendation' => $aiFoodRecommendation,
+
+            //destination
+            'tribeDestinations' => $tribeDestinations,
+
 
 
         ]);

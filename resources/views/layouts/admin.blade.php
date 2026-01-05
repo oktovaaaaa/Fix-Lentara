@@ -41,6 +41,15 @@
     <span class="tooltip">About Pulau + Statistik</span>
 </li>
 
+<li>
+    <a href="{{ route('admin.destinations.index') }}">
+        <i class="bx bx-map-alt"></i>
+        <span class="links_name">Destinasi</span>
+    </a>
+    <span class="tooltip">Destinasi</span>
+</li>
+
+
             <li>
     <a href="{{ route('admin.abouts.index') }}">
         <i class='bx bx-info-circle'></i>

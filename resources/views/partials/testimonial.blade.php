@@ -296,6 +296,7 @@
         }
     </style>
 
+<div class="max-w-6xl mx-auto px-4">
     <div class="t-wrap">
         <h2 class="neon-title">
             Testimoni Pengunjung
@@ -491,6 +492,7 @@
             </div>
         </div>
     </div>
+</div>
 
     {{-- ================= MODAL REPORT ================= --}}
     <div id="reportModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 px-4" style="backdrop-filter: blur(4px);">

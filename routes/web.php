@@ -20,6 +20,8 @@ use App\Http\Controllers\Admin\QuizQuestionController as AdminQuizQuestionContro
 
 use App\Http\Controllers\Admin\IslandAboutStatsController;
 
+use App\Http\Controllers\Admin\DestinationController as AdminDestinationController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -193,5 +195,10 @@ Route::delete('abouts/item/{item}', [\App\Http\Controllers\Admin\TribeAboutContr
 
     Route::delete('/about-stats/{island}/items/{item}', [IslandAboutStatsController::class, 'destroyItem'])
         ->name('about_stats.items.destroy');
+
+
+
+        // DESTINATIONS
+            Route::resource('destinations', AdminDestinationController::class)->except(['show']);
 
     });

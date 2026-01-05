@@ -20,7 +20,7 @@ class NusantaraChatController extends Controller
 
         // 1) System instruction: ketat hanya topik Indonesia/Nusantara + paksa plain text (tanpa markdown)
         $systemInstruction = <<<TXT
-Kamu adalah "Nusantara AI", asisten digital khusus untuk website yang membahas Indonesia dan Nusantara.
+Kamu adalah "Lentara AI", asisten digital khusus untuk website yang membahas Indonesia dan Nusantara.
 
 CAKUPAN TOPIK YANG BOLEH DIJAWAB (HANYA INI):
 1) Budaya Nusantara/Indonesia:
@@ -45,7 +45,7 @@ C) Jika pertanyaan DI LUAR topik Indonesia/Nusantara (misalnya:
    maka kamu WAJIB menolak dan JANGAN menjawab isi pertanyaan.
    Balas dengan template ini (boleh sedikit variasi tapi maknanya harus sama):
 
-   "Maaf ya, Nusantara AI hanya bisa menjawab seputar Nusantara/Indonesia (budaya, suku, kuliner, pariwisata, dan ekonomi Indonesia). Coba tanya hal lain yang masih dalam topik itu ya 🙂"
+   "Maaf ya, Lentara AI hanya bisa menjawab seputar Nusantara/Indonesia (budaya, suku, kuliner, pariwisata, dan ekonomi Indonesia). Coba tanya hal lain yang masih dalam topik itu ya 🙂"
 
 D) Jika user memaksa, tetap ulangi penolakan dengan sopan.
 
@@ -62,7 +62,7 @@ TXT;
         // 2) Gabungkan riwayat chat menjadi teks (sederhana untuk Gemini)
         $historyText = '';
         foreach ($messages as $msg) {
-            $role = $msg['role'] === 'user' ? 'Pengguna' : 'Nusantara AI';
+            $role = $msg['role'] === 'user' ? 'Pengguna' : 'Lentara AI';
             $historyText .= "{$role}: {$msg['content']}\n";
         }
 
@@ -115,7 +115,7 @@ TXT;
             $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
 
             if (!$reply) {
-                $reply = 'Maaf, Nusantara AI belum bisa menjawab. Coba lagi sebentar lagi ya.';
+                $reply = 'Maaf, Lentara AI belum bisa menjawab. Coba lagi sebentar lagi ya.';
             }
 
             // 3) Bersihkan output supaya tidak ada *** / markdown / poin berantakan
@@ -131,7 +131,7 @@ TXT;
 
             // Pesan ramah ke user
             return response()->json([
-                'reply' => 'Maaf, server Nusantara AI sedang bermasalah atau kuota gratis hari ini sudah habis. Coba lagi nanti ya 🙏',
+                'reply' => 'Maaf, server Lentara AI sedang bermasalah atau kuota gratis hari ini sudah habis. Coba lagi nanti ya 🙏',
                 // 'debug' => $e->getMessage(), // boleh aktifkan sementara kalau mau lihat errornya
             ], 500);
         }

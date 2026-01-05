@@ -1384,32 +1384,11 @@
                 {{-- ===================================================
                    DESTINASI SUKU
                    =================================================== --}}
-<section id="destinations" class="py-12">
-    <h2 class="neon-title">
-        Destinasi Budaya Suku {{ $tribeKey !== '' ? $tribeKey : '—' }}
-    </h2>
-    <div class="title-decoration"></div>
-    <p class="neon-subtitle">
-        Rekomendasi tempat dan pengalaman budaya yang berkaitan dengan Suku {{ $tribeKey !== '' ? $tribeKey : '—' }}.
-    </p>
+@include('islands.partials.destinations', [
+    'tribeKey' => $tribeKey,
+    'tribeDestinations' => $tribeDestinations ?? collect(),
+])
 
-    @if($destinationFeatures->count())
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            @foreach($destinationFeatures as $f)
-                <div class="border border-[var(--line)] rounded-2xl p-4 bg-[var(--card)] shadow-sm">
-                    <h3 class="text-sm sm:text-base font-semibold mb-1">{{ $f->title }}</h3>
-                    <p class="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-1">
-                        {{ $f->content }}
-                    </p>
-                </div>
-            @endforeach
-        </div>
-    @else
-        <p class="text-sm text-[var(--muted)]">
-            Konten destinasi untuk {{ $tribeKey }} belum diinput dari admin.
-        </p>
-    @endif
-</section>
 
 
                 {{-- ===================================================

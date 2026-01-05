@@ -91,7 +91,10 @@
                     $rating = $it['rating_estimate'] ?? null;
                     $region = $it['region_hint'] ?? null;
                     $where  = $it['where_to_find'] ?? [];
+
                     $sources = $it['sources'] ?? [];
+                    $wikiUrl = $it['wiki_url'] ?? null;
+                    $wikiSummary = $it['wiki_summary'] ?? null;
 
                     // themes rotation (background boleh variasi, glow NEON tetap orange)
                     $themes = ['sunset','orange','mint','violet','sky','rose'];
@@ -115,10 +118,21 @@
                     $dataWhere  = e((string)($whereText ?? ''));
                     $dataRatingText = e((string)($ratingText ?? ''));
                     $dataRatingRaw  = e((string)($ratingVal ?? ''));
+
+                    // ✅ sumber spesifik per item: PRIORITAS wiki_url, baru sources[0]
                     $dataSource = '';
-                    if (is_array($sources) && count($sources)) {
+                    if (!empty($wikiUrl)) {
+                        $dataSource = e((string)$wikiUrl);
+                    } elseif (is_array($sources) && count($sources)) {
                         $dataSource = e((string)$sources[0]);
                     }
+
+                    // ✅ NEW: data untuk modal asal-usul
+                    $dataWikiUrl = e((string)($wikiUrl ?? ''));
+                    $dataWikiSummary = e((string)($wikiSummary ?? ''));
+
+                    // ✅ URL sumber untuk tombol di card
+                    $sourceUrl = $wikiUrl ?: (is_array($sources) && count($sources) ? $sources[0] : null);
                 @endphp
 
                 <article
@@ -135,6 +149,8 @@
                     data-rating="{{ $dataRatingText }}"
                     data-ratingraw="{{ $dataRatingRaw }}"
                     data-source="{{ $dataSource }}"
+                    data-wikiurl="{{ $dataWikiUrl }}"
+                    data-wikisummary="{{ $dataWikiSummary }}"
                     data-fullstars="{{ $fullStars }}"
                     data-halfstars="{{ $halfStars }}"
                     data-emptystars="{{ $emptyStars }}"
@@ -232,8 +248,8 @@
                             </svg>
                         </button>
 
-                        @if(is_array($sources) && count($sources))
-                            <a class="food-src" href="{{ $sources[0] }}" target="_blank" rel="noopener">
+                        @if($sourceUrl)
+                            <a class="food-src" href="{{ $sourceUrl }}" target="_blank" rel="noopener">
                                 Sumber
                             </a>
                         @endif
@@ -299,6 +315,12 @@
                     </div>
 
                     <p id="foodModalDesc" class="food-modal-desc"></p>
+
+                    {{-- ✅ ASAL-USUL / SEJARAH SINGKAT (dari wiki_summary) --}}
+                    <div id="foodModalOriginWrap" class="food-modal-origin food-hidden">
+                        <h4 class="food-modal-originTitle">Asal-usul / Sejarah singkat</h4>
+                        <p id="foodModalOrigin" class="food-modal-originText"></p>
+                    </div>
 
                     <div class="food-modal-pills">
                         <span id="foodModalPrice" class="food-modal-pill food-modal-pill-price food-hidden"></span>
@@ -885,6 +907,32 @@ html[data-theme="dark"] #foods .food-modal-rating{
     font-size: .95rem;
 }
 
+/* ✅ ASAL-USUL / SEJARAH SINGKAT */
+#foods .food-modal-origin{
+    margin-top: 10px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+    background: linear-gradient(135deg, rgba(255,107,0,.08), rgba(148,163,184,.08));
+}
+html[data-theme="dark"] #foods .food-modal-origin{
+    background: rgba(255,107,0,.08);
+}
+
+#foods .food-modal-originTitle{
+    margin: 0 0 6px;
+    font-size: .95rem;
+    font-weight: 900;
+    color: var(--txt-body);
+}
+
+#foods .food-modal-originText{
+    margin: 0;
+    font-size: .9rem;
+    line-height: 1.65;
+    color: var(--muted);
+}
+
 #foods .food-modal-pills{
     display:flex;
     flex-wrap:wrap;
@@ -1005,8 +1053,6 @@ html[data-theme="dark"] #foods .food-modal-source{
     #foods .food-card-top{ align-items:flex-start; }
     #foods .food-thumb-ring{ width: 110px; height: 110px; }
 }
-
-
 </style>
 
 {{-- =========================================================
@@ -1023,6 +1069,10 @@ html[data-theme="dark"] #foods .food-modal-source{
     const imgEl    = document.getElementById('foodModalImg');
     const titleEl  = document.getElementById('foodModalTitle');
     const descEl   = document.getElementById('foodModalDesc');
+
+    // ✅ asal-usul
+    const originWrap = document.getElementById('foodModalOriginWrap');
+    const originEl   = document.getElementById('foodModalOrigin');
 
     const starsEl  = document.getElementById('foodModalStars');
     const rateTxt  = document.getElementById('foodModalRatingText');
@@ -1145,7 +1195,13 @@ html[data-theme="dark"] #foods .food-modal-source{
         const region = card.getAttribute('data-region') || '';
         const where  = card.getAttribute('data-where') || '';
         const ratingText = card.getAttribute('data-rating') || '';
-        const source = card.getAttribute('data-source') || '';
+
+        // ✅ ambil wiki data (asal-usul + url)
+        const wikiUrlAttr = card.getAttribute('data-wikiurl') || '';
+        const wikiSummary = card.getAttribute('data-wikisummary') || '';
+
+        // ✅ sumber: prioritas wikiUrl, fallback data-source
+        const source = wikiUrlAttr || (card.getAttribute('data-source') || '');
 
         const fullStars  = card.getAttribute('data-fullstars') || '0';
         const halfStars  = card.getAttribute('data-halfstars') || '0';
@@ -1159,6 +1215,17 @@ html[data-theme="dark"] #foods .food-modal-source{
 
         renderStars(starsEl, fullStars, halfStars, emptyStars);
         rateTxt.textContent = ratingText ? (ratingText + ' / 5') : '—';
+
+        // ✅ asal-usul
+        if (originWrap && originEl) {
+            if (wikiSummary && wikiSummary.trim() !== '') {
+                originEl.textContent = wikiSummary.trim();
+                originWrap.classList.remove('food-hidden');
+            } else {
+                originEl.textContent = '';
+                originWrap.classList.add('food-hidden');
+            }
+        }
 
         if (price) {
             priceEl.textContent = 'Harga: ' + price;
@@ -1281,4 +1348,3 @@ html[data-theme="dark"] #foods .food-modal-source{
     });
 })();
 </script>
-

@@ -38,7 +38,6 @@ class GenerateWeeklyTribeFoodRecommendations implements ShouldQueue
             // 2) Ambil tribes sesuai config/tribes.php
             $tribes = config('tribes.' . $regionSlug, []);
 
-            // fallback kalau kosong (harusnya tidak kosong di case kamu)
             if (empty($tribes)) {
                 continue;
             }
@@ -47,10 +46,10 @@ class GenerateWeeklyTribeFoodRecommendations implements ShouldQueue
                 $tribeKey = trim((string) $tribeKey);
                 if ($tribeKey === '') continue;
 
-                // 3) Generate dari Gemini (10 item)
+                // 3) Generate dari Gemini
                 $items = $gemini->generateFoodsForTribe($tribeKey, $regionSlug);
 
-                // 4) Resolve image + sources (gratis)
+                // 4) Resolve image + wiki_url + summary
                 $finalItems = [];
                 foreach ($items as $it) {
                     $name = trim((string)($it['name'] ?? ''));
@@ -60,12 +59,28 @@ class GenerateWeeklyTribeFoodRecommendations implements ShouldQueue
 
                     $imageUrl = $resolved['image_url'] ?? null;
                     $sources  = $resolved['sources'] ?? [];
+                    $wikiUrl  = $resolved['wiki_url'] ?? null;
 
+                    // ✅ FIX UTAMA: summary key bisa beda-beda tergantung service
+                    // - kamu simpan ke payload sebagai 'wiki_summary'
+                    // - jadi ambil dari beberapa kemungkinan key supaya tidak null
+                    $summary = $resolved['wiki_summary']
+                        ?? $resolved['summary']
+                        ?? $resolved['extract']
+                        ?? null;
+
+                    // fallback image saja boleh (biar UI tetap cakep)
                     if (!$imageUrl) {
                         $imageUrl = 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&q=80&w=1200';
                     }
-                    if (empty($sources)) {
-                        $sources = ['https://id.wikipedia.org/'];
+
+                    // IMPORTANT: kalau sources kosong, BIARKAN kosong (jangan samain semua)
+                    $sources = is_array($sources) ? array_values(array_filter($sources)) : [];
+
+                    // ✅ pastikan wikiUrl jadi sumber pertama (spesifik per makanan)
+                    if ($wikiUrl && is_string($wikiUrl)) {
+                        array_unshift($sources, $wikiUrl);
+                        $sources = array_values(array_unique(array_filter($sources)));
                     }
 
                     $finalItems[] = [
@@ -77,8 +92,13 @@ class GenerateWeeklyTribeFoodRecommendations implements ShouldQueue
                         'where_to_find' => array_values(array_filter((array)($it['where_to_find'] ?? []))),
                         'tags' => array_values(array_filter((array)($it['tags'] ?? []))),
                         'category' => $it['category'] ?? null,
+
                         'image_url' => $imageUrl,
                         'sources' => $sources,
+
+                        // ✅ NEW: info sejarah/asal usul dari Wikipedia intro
+                        'wiki_url' => $wikiUrl,
+                        'wiki_summary' => $summary,
                     ];
                 }
 
