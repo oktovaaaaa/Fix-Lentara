@@ -182,6 +182,11 @@ class HeritageController extends Controller
 
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+
+            // ✅ BARU (opsional)
+            'location' => ['nullable', 'string', 'max:255'],
+            'detail_url' => ['nullable', 'string', 'max:2048', 'url'],
+
             'image' => ['nullable', 'image', 'max:3072'], // 3MB
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:999999'],
         ]);
@@ -201,6 +206,11 @@ class HeritageController extends Controller
         $item->category = $data['category'];
         $item->title = $data['title'];
         $item->description = $data['description'] ?? null;
+
+        // ✅ BARU
+        $item->location = $data['location'] ?? null;
+        $item->detail_url = $data['detail_url'] ?? null;
+
         $item->sort_order = (int)($data['sort_order'] ?? 0);
 
         if ($request->hasFile('image')) {
@@ -221,12 +231,21 @@ class HeritageController extends Controller
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+
+            // ✅ BARU (opsional)
+            'location' => ['nullable', 'string', 'max:255'],
+            'detail_url' => ['nullable', 'string', 'max:2048', 'url'],
+
             'image' => ['nullable', 'image', 'max:3072'],
             'sort_order' => ['nullable', 'integer', 'min:0', 'max:999999'],
         ]);
 
         $item->title = $data['title'];
         $item->description = $data['description'] ?? null;
+
+        // ✅ BARU
+        $item->location = $data['location'] ?? null;
+        $item->detail_url = $data['detail_url'] ?? null;
 
         if (array_key_exists('sort_order', $data)) {
             $item->sort_order = (int)$data['sort_order'];

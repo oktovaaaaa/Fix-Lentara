@@ -36,6 +36,7 @@
            - Empty category: tidak dirender (handled di blade)
            - Modal: selaras + navbar ditimpa (non-interaktif saat modal)
            - Reveal animation saat masuk viewport (atas/bawah)
+           - ✅ NEW: lokasi + url detail opsional
         ========================================================= */
 
         #warisan{
@@ -236,6 +237,34 @@
             overflow: hidden;
         }
 
+        /* ✅ NEW: lokasi di card (opsional) */
+        #warisan .wf-loc{
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 850;
+            font-size: .92rem;
+            line-height: 1.2;
+            color: rgba(255,255,255,.96);
+            max-width: 100%;
+        }
+
+        #warisan .wf-loc svg{
+            width: 16px;
+            height: 16px;
+            flex: 0 0 auto;
+            opacity: .98;
+            filter: drop-shadow(0 8px 18px rgba(0,0,0,.28));
+        }
+
+        #warisan .wf-loc span{
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+        }
+
         /* CTA button */
         #warisan .wf-cta{
             position: absolute;
@@ -357,18 +386,17 @@
         }
 
         /* ================= REVEAL ANIMATION (section enter) ================= */
-#warisan .wf-reveal{
-  opacity: 0;
-  transform: translateY(26px);
-  transition: opacity .65s ease, transform .65s cubic-bezier(.2,.9,.2,1);
-}
+        #warisan .wf-reveal{
+            opacity: 0;
+            transform: translateY(26px);
+            transition: opacity .65s ease, transform .65s cubic-bezier(.2,.9,.2,1);
+        }
 
-/* ✅ FIX: wf-inview nempel di element yang sama */
-#warisan .wf-reveal.wf-inview{
-  opacity: 1;
-  transform: translateY(0);
-}
-
+        /* ✅ FIX: wf-inview nempel di element yang sama */
+        #warisan .wf-reveal.wf-inview{
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         /* ================= MODAL ================= */
         #warisan .wf-modal-overlay{
@@ -457,18 +485,10 @@
             background-repeat: no-repeat;
         }
 
-        #warisan .wf-modal-image::after{
-            content:"";
-            position:absolute;
-            inset:0;
-            background: linear-gradient(
-                to top,
-                rgba(249,115,22,.55),
-                rgba(249,115,22,.12),
-                transparent
-            );
-            pointer-events:none;
-        }
+#warisan .wf-modal-image::after{
+    content: none !important;
+}
+
 
         #warisan .wf-modal-image-fallback{
             display:flex;
@@ -520,6 +540,36 @@
             opacity: .9;
         }
 
+        /* ✅ NEW: lokasi di modal (opsional) */
+        #warisan .wf-modal-meta{
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 10px 0 2px;
+        }
+
+        #warisan .wf-meta-row{
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 100%;
+            color: color-mix(in oklab, var(--wf-txt) 86%, transparent);
+            font-weight: 850;
+            font-size: .95rem;
+        }
+
+        #warisan .wf-meta-row svg{
+            width: 18px;
+            height: 18px;
+            flex: 0 0 auto;
+            color: var(--wf-accent);
+        }
+
+        #warisan .wf-meta-row span{
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
         #warisan .wf-modal-desc{
             margin: 0;
             color: var(--wf-muted);
@@ -550,12 +600,45 @@
             align-items: center;
             gap: 10px;
             transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+            text-decoration: none;
         }
 
         #warisan .wf-modal-btn:hover{
             transform: translateY(-2px);
             box-shadow: 0 24px 50px rgba(0,0,0,.25), 0 0 28px rgba(249,115,22,.18);
             filter: saturate(1.05);
+        }
+
+        /* ✅ NEW: tombol link detail (opsional) */
+        #warisan .wf-modal-link{
+            border: 0;
+            cursor: pointer;
+            font-weight: 950;
+            font-size: .95rem;
+            color: var(--wf-accent);
+            padding: 11px 14px;
+            border-radius: 14px;
+            background: rgba(255,255,255,.92);
+            border: 1px solid rgba(249,115,22,.35);
+            box-shadow: 0 18px 40px rgba(0,0,0,.14);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+            text-decoration: none;
+        }
+
+        html[data-theme="dark"] #warisan .wf-modal-link{
+            background: rgba(2,6,23,.60);
+            color: #ff8c42;
+            border-color: rgba(249,115,22,.28);
+            box-shadow: 0 18px 40px rgba(0,0,0,.35);
+        }
+
+        #warisan .wf-modal-link:hover{
+            transform: translateY(-2px);
+            box-shadow: 0 24px 50px rgba(0,0,0,.22), 0 0 28px rgba(249,115,22,.12);
+            filter: saturate(1.03);
         }
 
         #warisan .wf-modal-note{
@@ -610,6 +693,11 @@
 
             #warisan .wf-caption p{
                 display: none !important; /* biar clean di mobile */
+            }
+
+            /* lokasi tetap tampil kalau ada, tapi ringkas */
+            #warisan .wf-loc{
+                font-size: .92rem;
             }
 
             /* CTA fix biar gak kepanjangan & aman di layar kecil */
@@ -696,7 +784,12 @@
                                 if ($item->image_path) {
                                     $img = asset('storage/'.$item->image_path);
                                 }
+
                                 $desc = $item->description ? Str::limit($item->description, 110) : null;
+
+                                // ✅ opsional baru
+                                $loc = $item->location ? trim((string) $item->location) : '';
+                                $url = $item->detail_url ? trim((string) $item->detail_url) : '';
                             @endphp
 
                             <article
@@ -706,6 +799,8 @@
                                 data-item-description="{{ e($item->description ?? '') }}"
                                 data-item-image="{{ e($img ?? '') }}"
                                 data-item-category="{{ e($label) }}"
+                                data-item-location="{{ e($loc) }}"
+                                data-item-url="{{ e($url) }}"
                                 tabindex="0"
                                 role="button"
                                 aria-label="Baca selengkapnya: {{ $item->title }}"
@@ -718,8 +813,21 @@
 
                                 <div class="wf-caption">
                                     <h4>{{ $item->title }}</h4>
+
                                     @if($desc)
                                         <p>{{ $desc }}</p>
+                                    @endif
+
+                                    {{-- ✅ Lokasi (opsional) --}}
+                                    @if($loc !== '')
+                                        <div class="wf-loc" title="{{ $loc }}">
+                                            {{-- icon location (bukan emoji) --}}
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                <path d="M12 22s7-4.35 7-11a7 7 0 10-14 0c0 6.65 7 11 7 11z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                                                <path d="M12 11.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" stroke="currentColor" stroke-width="2"/>
+                                            </svg>
+                                            <span>{{ $loc }}</span>
+                                        </div>
                                     @endif
                                 </div>
 
@@ -790,6 +898,19 @@
         return txt.value;
     }
 
+    // ✅ allow only http/https URL (prevent weird schemes)
+    function safeHttpUrl(raw) {
+        const s = (raw || '').trim();
+        if (!s) return '';
+        try {
+            const u = new URL(s, window.location.origin);
+            if (u.protocol === 'http:' || u.protocol === 'https:') return u.href;
+            return '';
+        } catch {
+            return '';
+        }
+    }
+
     let lastFocus = null;
 
     function lockScroll(){
@@ -821,6 +942,9 @@
         const imageUrl = decodeHtmlEntities(card.dataset.itemImage || '');
         const category = card.dataset.itemCategory || 'Kategori';
 
+        const location = decodeHtmlEntities(card.dataset.itemLocation || '').trim();
+        const detailUrl = safeHttpUrl(decodeHtmlEntities(card.dataset.itemUrl || ''));
+
         let leftHtml = '';
         if (imageUrl && imageUrl.trim() !== '') {
             leftHtml = `
@@ -832,20 +956,48 @@
             `;
         }
 
+        // lokasi row (opsional)
+        const locHtml = location
+            ? `
+                <div class="wf-modal-meta">
+                    <div class="wf-meta-row">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 22s7-4.35 7-11a7 7 0 10-14 0c0 6.65 7 11 7 11z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                            <path d="M12 11.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <span>${location}</span>
+                    </div>
+                </div>
+            `
+            : '';
+
+        // tombol link (opsional)
+        const linkBtnHtml = detailUrl
+            ? `
+                <a class="wf-modal-link" href="${detailUrl}" target="_blank" rel="noopener noreferrer">
+                    Lihat selengkapnya
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 6H18m0 0v4.5M18 6l-9 9"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 7.5H7.8A2.3 2.3 0 005.5 9.8v6.4A2.3 2.3 0 007.8 18.5h6.4a2.3 2.3 0 002.3-2.3V13.5"/>
+                    </svg>
+                </a>
+            `
+            : '';
+
         const rightHtml = `
             <div class="wf-modal-body">
                 <div class="wf-modal-pill">🏷️ <span>${category}</span></div>
                 <h3 class="wf-modal-title" id="wfModalTitle">${title}</h3>
                 <div class="wf-modal-divider"></div>
+
+                ${locHtml}
+
                 <p class="wf-modal-desc">${description ? description : '—'}</p>
 
                 <div class="wf-modal-actions">
-                    <button type="button" class="wf-modal-btn" data-wf-close-btn>
-                        Tutup
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
+                    ${linkBtnHtml}
+
+
                 </div>
 
                 <div class="wf-modal-note">Tip: klik area gelap atau tekan ESC untuk menutup.</div>

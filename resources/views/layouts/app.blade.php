@@ -27,10 +27,7 @@
           var s = sessionStorage.getItem(KEY_START);
 
           if (s) {
-            // show loader sejak first paint
             document.documentElement.classList.add("nav-loading");
-
-            // set resume progress sejak first paint (agar tidak pernah terlihat 0%)
             var p = sessionStorage.getItem(KEY_PCT);
             if (!p) p = "99";
             document.documentElement.style.setProperty("--loader-resume", p);
@@ -48,15 +45,12 @@
 <style>
 /* ==========================================
    THEME AWARE LOADER
-   - Anti kedip via html.nav-loading
-   - Anti ulang 0% via --loader-resume
 ========================================== */
 
-/* saat navigasi: paksa loader ON sebelum JS body jalan */
 html.nav-loading .page-loader{
   opacity: 1;
   pointer-events: auto;
-  transition: none; /* cegah flicker */
+  transition: none;
 }
 
 .page-loader{
@@ -79,17 +73,15 @@ html.nav-loading .page-loader{
   pointer-events: auto;
 }
 
-/* LOGO/IMAGE */
 .page-loader__img{
   width: 100vw;
   height: 100vh;
-  object-fit: contain; /* aman, tidak terpotong */
+  object-fit: contain;
   object-position: center;
   user-select: none;
   pointer-events: none;
 }
 
-/* BOTTOM PROGRESS */
 .page-loader__bottom{
   position: absolute;
   left: 0;
@@ -108,7 +100,6 @@ html.nav-loading .page-loader{
 
 .page-loader__barFill{
   height: 100%;
-  /* ✅ INI KUNCI: first paint pakai resume, bukan 0% */
   width: calc(var(--loader-resume, 0) * 1%);
   border-radius: 999px;
   background: linear-gradient(
@@ -120,7 +111,6 @@ html.nav-loading .page-loader{
   transition: width .1s linear;
 }
 
-/* kalau sedang nav-loading, jangan animasi dari 0 (biar gak terlihat "mulai ulang") */
 html.nav-loading .page-loader__barFill{
   transition: none;
 }
@@ -133,10 +123,149 @@ html.nav-loading .page-loader__barFill{
   font-weight: 700;
   color: var(--muted);
 }
+
+/* ===== Neon Brand Scrollbar (Global) ===== */
+:root{
+  --brand: #f97316;
+  --sb-track: rgba(255,255,255,.06);
+  --sb-thumb-a: color-mix(in oklab, var(--brand) 85%, #fff 15%);
+  --sb-thumb-b: color-mix(in oklab, var(--brand) 75%, #ff3d00 25%);
+}
+
+/* Firefox */
+html{
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand) rgba(255,255,255,.08);
+}
+
+/* WebKit (Chrome/Edge/Safari) */
+::-webkit-scrollbar{
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track{
+  background: var(--sb-track);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+}
+
+::-webkit-scrollbar-thumb{
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--sb-thumb-a), var(--sb-thumb-b));
+  border: 2px solid rgba(0,0,0,.15);
+  box-shadow:
+    0 0 10px color-mix(in oklab, var(--brand) 55%, transparent),
+    0 0 18px color-mix(in oklab, var(--brand) 35%, transparent);
+  animation: neonScroll 1.8s ease-in-out infinite alternate;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  box-shadow:
+    0 0 14px color-mix(in oklab, var(--brand) 70%, transparent),
+    0 0 26px color-mix(in oklab, var(--brand) 45%, transparent);
+  filter: saturate(1.15) brightness(1.05);
+}
+
+::-webkit-scrollbar-corner{
+  background: transparent;
+}
+
+@keyframes neonScroll{
+  from{
+    filter: brightness(1) saturate(1);
+    box-shadow:
+      0 0 8px  color-mix(in oklab, var(--brand) 45%, transparent),
+      0 0 16px color-mix(in oklab, var(--brand) 28%, transparent);
+  }
+  to{
+    filter: brightness(1.15) saturate(1.25);
+    box-shadow:
+      0 0 14px color-mix(in oklab, var(--brand) 65%, transparent),
+      0 0 28px color-mix(in oklab, var(--brand) 40%, transparent);
+  }
+}
+
+/* ==========================================
+   GARUDA CURSOR + PARTICLES (DESKTOP ONLY)
+========================================== */
+@media (pointer: fine) {
+  body { cursor: none; }
+
+  .garuda-cursor{
+    position: fixed;
+    top: 0; left: 0;
+    width: 44px;
+    height: 44px;
+    pointer-events: none;
+    z-index: 999999;
+    transform: translate(-50%, -50%);
+    will-change: transform, left, top;
+
+    background: #ff7a00;
+
+    -webkit-mask-image: url("{{ asset('images/cursor/garuda-head.PNG') }}");
+    mask-image: url("{{ asset('images/cursor/garuda-head.PNG') }}");
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+
+    filter:
+      drop-shadow(0 0 10px rgba(255,122,0,.35))
+      drop-shadow(0 0 18px rgba(255,122,0,.18));
+  }
+
+  .garuda-cursor.is-down{
+    transform: translate(-50%, -50%) scale(0.92);
+    filter:
+      drop-shadow(0 0 14px rgba(255,122,0,.45))
+      drop-shadow(0 0 28px rgba(255,122,0,.22));
+  }
+
+  .garuda-particles{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999998;
+  }
+
+  .garuda-particle{
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    pointer-events: none;
+
+    background: rgba(255, 122, 0, .95);
+    box-shadow:
+      0 0 10px rgba(255, 122, 0, .45),
+      0 0 18px rgba(255, 122, 0, .22);
+
+    transform: translate(-50%, -50%);
+    animation: garudaParticleFade 520ms ease-out forwards;
+    will-change: transform, opacity;
+  }
+
+  @keyframes garudaParticleFade{
+    0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.1); }
+  }
+}
+
+@media (pointer: coarse) {
+  .garuda-cursor,
+  .garuda-particles{ display: none !important; }
+}
 </style>
 
 </head>
 <body class="antialiased">
+    <div id="garudaCursor" class="garuda-cursor" aria-hidden="true"></div>
+    <div id="garudaParticles" class="garuda-particles" aria-hidden="true"></div>
+
     <div class="min-h-screen flex flex-col">
 
         {{-- NAVBAR UTAMA --}}
@@ -342,24 +471,18 @@ html.nav-loading .page-loader__barFill{
         let messages = []; // riwayat chat
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-        // === FUNGSI BUKA/TUTUP DENGAN ANIMASI + HIDE/SHOW BUTTON ===
         function openPanel() {
-            // sembunyikan tombol floating
             toggleBtn.classList.add('hidden');
-
-            // tampilkan panel dengan animasi
             panel.classList.remove('pointer-events-none');
             panel.classList.add('opacity-100', 'translate-y-0', 'scale-100');
             panel.classList.remove('opacity-0', 'translate-y-2', 'scale-95');
         }
 
         function closePanel() {
-            // animasi keluar dulu
             panel.classList.add('opacity-0', 'translate-y-2', 'scale-95');
             panel.classList.remove('opacity-100', 'translate-y-0', 'scale-100');
             panel.classList.add('pointer-events-none');
 
-            // setelah animasi, munculkan tombol floating lagi
             setTimeout(() => {
                 toggleBtn.classList.remove('hidden');
             }, 200);
@@ -391,29 +514,24 @@ html.nav-loading .page-loader__barFill{
             messagesBox.scrollTop = messagesBox.scrollHeight;
         }
 
-        // event tombol buka
         toggleBtn.addEventListener('click', () => {
             openPanel();
             setTimeout(() => input?.focus(), 220);
         });
 
-        // event tombol close (X)
         closeBtn.addEventListener('click', () => {
             closePanel();
         });
 
-        // submit form
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const text = input.value.trim();
             if (!text) return;
 
-            // tampilkan pesan user
             addMessage('user', text);
             messages.push({ role: 'user', content: text });
             input.value = '';
 
-            // tampilkan "sedang mengetik..."
             const loadingId = 'nusantara-loading-' + Date.now();
             const loadingWrapper = document.createElement('div');
             loadingWrapper.id = loadingId;
@@ -493,7 +611,6 @@ html.nav-loading .page-loader__barFill{
     document.documentElement.style.removeProperty("--loader-resume");
   }
 
-  // ✅ Hard reset saat back/forward supaya gak nyangkut
   function hardReset() {
     finished = true;
     running = false;
@@ -512,10 +629,8 @@ html.nav-loading .page-loader__barFill{
     bar.style.width = v + "%";
     pctEl.textContent = Math.round(v) + "%";
 
-    // sync css-var (buat first paint halaman tujuan)
     syncResumeVar(v);
 
-    // simpan (throttle)
     const now = Date.now();
     const rounded = Math.round(v);
     if (rounded !== lastSavedPct && (now - lastSaveAt) > 120) {
@@ -595,9 +710,6 @@ html.nav-loading .page-loader__barFill{
     }, delay);
   }
 
-// =====================================================
-// INTERCEPT CLICK (support <a>, button[data-url], DIV[data-url], dll)
-// =====================================================
 document.addEventListener("click", function (e) {
   const el =
     e.target.closest("a[href]") ||
@@ -622,9 +734,6 @@ document.addEventListener("click", function (e) {
 }, true);
 
 
-  // =====================================================
-  // RESUME DI HALAMAN TUJUAN
-  // =====================================================
   let navStart = null;
   try { navStart = sessionStorage.getItem(KEY_START); } catch(e) { navStart = null; }
 
@@ -648,17 +757,10 @@ document.addEventListener("click", function (e) {
     loop();
   }
 
-  // =====================================================
-  // FINISH NORMAL
-  // =====================================================
   window.addEventListener("DOMContentLoaded", finish, { once: true });
   window.addEventListener("load", finish, { once: true });
 
-  // =====================================================
-  // ✅ FIX BACK/FORWARD (BFCache)
-  // =====================================================
   window.addEventListener("pageshow", function (e) {
-    // Kalau halaman di-restore dari bfcache / back-forward, paksa reset
     const navEntry = performance.getEntriesByType?.("navigation")?.[0];
     const isBackForward = (navEntry && navEntry.type === "back_forward");
     if (e.persisted || isBackForward) {
@@ -666,13 +768,70 @@ document.addEventListener("click", function (e) {
     }
   });
 
-  // Jaga-jaga: kalau page dibekukan (BFCache), stop animasinya
   window.addEventListener("pagehide", function () {
     if (raf) cancelAnimationFrame(raf);
     raf = null;
     running = false;
   });
 
+})();
+</script>
+
+<script>
+(function () {
+  const finePointer = window.matchMedia && window.matchMedia("(pointer: fine)").matches;
+  if (!finePointer) return;
+
+  const cursor = document.getElementById("garudaCursor");
+  const holder = document.getElementById("garudaParticles");
+  if (!cursor || !holder) return;
+
+  let x = window.innerWidth / 2;
+  let y = window.innerHeight / 2;
+
+  let lastParticleAt = 0;
+
+  function moveCursor(nx, ny){
+    cursor.style.left = nx + "px";
+    cursor.style.top  = ny + "px";
+  }
+
+  function spawnParticle(px, py){
+    const now = performance.now();
+    if (now - lastParticleAt < 18) return;
+    lastParticleAt = now;
+
+    const p = document.createElement("div");
+    p.className = "garuda-particle";
+
+    const size = 3 + Math.random() * 5;
+    p.style.width  = size + "px";
+    p.style.height = size + "px";
+
+    const ox = (Math.random() - 0.5) * 10;
+    const oy = (Math.random() - 0.5) * 10;
+
+    p.style.left = (px + ox) + "px";
+    p.style.top  = (py + oy) + "px";
+
+    holder.appendChild(p);
+
+    p.addEventListener("animationend", () => p.remove());
+  }
+
+  moveCursor(x, y);
+
+  window.addEventListener("mousemove", (e) => {
+    x = e.clientX; y = e.clientY;
+    moveCursor(x, y);
+    spawnParticle(x, y);
+  }, { passive: true });
+
+  document.addEventListener("mousedown", () => cursor.classList.add("is-down"), true);
+  document.addEventListener("mouseup",   () => cursor.classList.remove("is-down"), true);
+
+  document.addEventListener("mouseleave", () => cursor.style.opacity = "0", true);
+  document.addEventListener("mouseenter", () => cursor.style.opacity = "", true);
 })();
 </script>
 

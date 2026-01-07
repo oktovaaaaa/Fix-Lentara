@@ -20,9 +20,17 @@ return new class extends Migration {
 
             $table->string('title');
             $table->text('description')->nullable();
+
+            // ✅ BARU (opsional)
+            // lokasi singkat (contoh: "Banda Aceh", "Toraja, Sulawesi Selatan")
+            $table->string('location')->nullable();
+
+            // url untuk detail (wiki/artikel), opsional
+            $table->string('detail_url', 2048)->nullable();
+
             $table->string('image_path')->nullable();
 
-            // opsional untuk urut (kalau kamu bener-bener ga mau, bisa diabaikan)
+            // opsional untuk urut
             $table->unsignedInteger('sort_order')->default(0);
 
             $table->timestamps();

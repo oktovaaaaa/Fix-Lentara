@@ -123,6 +123,15 @@
                 <span class="tooltip">Quiz</span>
             </li>
 
+            <li>
+  <a href="{{ route('admin.game-levels.index') }}">
+    <i class='bx bx-joystick'></i>
+    <span class="links_name">Game Levels</span>
+  </a>
+  <span class="tooltip">Game Levels</span>
+</li>
+
+
             {{-- Warisan --}}
 <li>
     <a href="{{ route('admin.heritages.index') }}">

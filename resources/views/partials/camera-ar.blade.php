@@ -197,35 +197,7 @@
             color: #b7410e;
         }
 
-        #camera-ar .watermark {
-            position: absolute;
-            right: 16px;
-            bottom: 16px;
-            font-size: 12px;
-            font-weight: 900;
-            letter-spacing: 0.04em;
-            padding: 10px 14px;
-            border-radius: 999px;
-            background: color-mix(in oklab, var(--card) 85%, transparent);
-            border: 1px solid rgba(249, 115, 22, 0.3);
-            color: #f97316;
-            backdrop-filter: blur(12px);
-            z-index: 5;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Dark/Light mode adjustment */
-        html[data-theme="dark"] #camera-ar .watermark {
-            background: rgba(17, 24, 39, 0.85);
-            color: #f97316;
-        }
-
-        html[data-theme="light"] #camera-ar .watermark {
-            background: rgba(255, 255, 255, 0.85);
-            border: 1px solid rgba(183, 65, 14, 0.3);
-            color: #b7410e;
-        }
-
+        /* ================= WATERMARK TOP RIGHT (RESPONSIVE) ================= */
         /* Watermark Image Top Right */
         #camera-ar .wm-topright {
             position: absolute;
@@ -241,6 +213,7 @@
             border: 1px solid rgba(249, 115, 22, 0.3);
             backdrop-filter: blur(12px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            max-width: calc(100% - 24px);
         }
 
         /* Dark/Light mode adjustment */
@@ -258,6 +231,7 @@
             height: 36px;
             object-fit: contain;
             filter: drop-shadow(0 4px 10px rgba(249, 115, 22, 0.4));
+            flex: 0 0 auto;
         }
 
         #camera-ar .wm-topright span {
@@ -271,6 +245,35 @@
         /* Dark/Light mode adjustment */
         html[data-theme="light"] #camera-ar .wm-topright span {
             color: #b7410e;
+        }
+
+        /* ✅ MOBILE: hanya icon (tanpa tulisan), dan diperkecil supaya tidak menutupi konten */
+        @media (max-width: 640px) {
+            #camera-ar .wm-topright {
+                right: 12px;
+                top: 12px;
+                padding: 8px 10px;
+                gap: 8px;
+            }
+            #camera-ar .wm-topright img {
+                width: 30px;
+                height: 30px;
+            }
+            #camera-ar .wm-topright span {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #camera-ar .wm-topright {
+                right: 10px;
+                top: 10px;
+                padding: 7px 9px;
+            }
+            #camera-ar .wm-topright img {
+                width: 28px;
+                height: 28px;
+            }
         }
 
         /* ================= BUTTONS ================= */
@@ -326,39 +329,38 @@
         }
 
         /* ================= FILTER BAR ================= */
-#camera-ar .filter-bar {
-    display: flex;
-    gap: 14px;
-    overflow: auto;
-    padding: 12px 6px;
-    scroll-snap-type: x mandatory;
+        #camera-ar .filter-bar {
+            display: flex;
+            gap: 14px;
+            overflow: auto;
+            padding: 12px 6px;
+            scroll-snap-type: x mandatory;
 
-    /* ===== Scrollbar ORANGE (Firefox) ===== */
-    scrollbar-color: #f97316 rgba(249,115,22,.12);
-    scrollbar-width: auto;
-}
+            /* ===== Scrollbar ORANGE (Firefox) ===== */
+            scrollbar-color: #f97316 rgba(249,115,22,.12);
+            scrollbar-width: auto;
+        }
 
-/* ===== Scrollbar ORANGE (Chrome/Edge/Safari) ===== */
-#camera-ar .filter-bar::-webkit-scrollbar {
-    height: 12px; /* karena scroll horizontal */
-}
+        /* ===== Scrollbar ORANGE (Chrome/Edge/Safari) ===== */
+        #camera-ar .filter-bar::-webkit-scrollbar {
+            height: 12px; /* karena scroll horizontal */
+        }
 
-#camera-ar .filter-bar::-webkit-scrollbar-track {
-    background: rgba(249,115,22,.12);
-    border-radius: 999px;
-    border: 1px solid rgba(249,115,22,.18);
-}
+        #camera-ar .filter-bar::-webkit-scrollbar-track {
+            background: rgba(249,115,22,.12);
+            border-radius: 999px;
+            border: 1px solid rgba(249,115,22,.18);
+        }
 
-#camera-ar .filter-bar::-webkit-scrollbar-thumb {
-    background: linear-gradient(90deg, #f97316, #fb923c);
-    border-radius: 999px;
-    border: 2px solid rgba(0,0,0,.18);
-}
+        #camera-ar .filter-bar::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #f97316, #fb923c);
+            border-radius: 999px;
+            border: 2px solid rgba(0,0,0,.18);
+        }
 
-#camera-ar .filter-bar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(90deg, #fb923c, #f97316);
-}
-
+        #camera-ar .filter-bar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, #fb923c, #f97316);
+        }
 
         #camera-ar .filter-pill {
             scroll-snap-align: start;
@@ -506,11 +508,6 @@
                 top: 12px;
             }
 
-            #camera-ar .watermark,
-            #camera-ar .wm-topright {
-                right: 12px;
-            }
-
             #camera-ar .filter-pill {
                 min-width: 88px;
                 padding: 10px;
@@ -544,7 +541,7 @@
     </style>
 
     <div class="ar-wrap">
-        {{-- LEFT: CAMERA VIEW --}}
+        {{-- LEFT: CAMERA VIEW + (FILTER + FLIP DIPINDAH KE SINI) --}}
         <div class="ar-card">
             <div class="stage" id="arStage">
                 <video id="arVideo" playsinline muted autoplay></video>
@@ -563,7 +560,9 @@
                     <span>LENTARA AR</span>
                 </div>
 
-                <div class="watermark">LENTARA • AR NUSANTARA</div>
+                {{-- ✅ DIHAPUS sesuai request:
+                     <div class="watermark">LENTARA • AR NUSANTARA</div>
+                --}}
             </div>
 
             <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -584,7 +583,30 @@
                     Izinkan akses kamera saat diminta oleh browser.
                 </p>
             </div>
+
+            {{-- ✅ FILTER + FLIP DIPINDAH KE BAWAH CATATAN / AREA TIPS --}}
             <div class="mt-6 pt-4 border-t border-gray-800">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="section-title mb-0">Pilih Filter</div>
+                    <button class="btn-secondary !w-auto !px-4 !py-2" id="btnClearFilter" type="button">
+                        Clear
+                    </button>
+                </div>
+
+                <div class="filter-bar mt-2" id="filterBar"></div>
+
+                <div class="mt-4">
+                    <button class="btn btn-secondary" id="btnFlip" type="button" disabled>
+                        🔄 Flip Kamera
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {{-- RIGHT: (TIPS & TRIK DIPINDAH KE SINI) + HASIL CAPTURE --}}
+        <div class="ar-card">
+            {{-- ✅ TIPS & TRIK PINDAH KE POSISI FILTER SEBELUMNYA --}}
+            <div>
                 <div class="section-title mb-2">Tips & Trik</div>
                 <ul class="muted text-sm space-y-1">
                     <li>• Pilih filter sebelum mulai kamera</li>
@@ -593,20 +615,8 @@
                     <li>• Download hasil capture untuk dibagikan</li>
                 </ul>
             </div>
-        </div>
 
-        {{-- RIGHT: FILTERS & CONTROLS --}}
-        <div class="ar-card">
-            <div class="flex items-center justify-between mb-4">
-                <div class="section-title">Pilih Filter</div>
-                <button class="btn-secondary !w-auto !px-4 !py-2" id="btnClearFilter" type="button">
-                    Clear
-                </button>
-            </div>
-
-            <div class="filter-bar mt-2" id="filterBar"></div>
-
-            <div class="mt-6">
+            <div class="mt-6 pt-4 border-t border-gray-800">
                 <div class="section-title mb-3">Hasil Capture</div>
                 <div class="preview">
                     <img id="capturePreview" alt="Preview capture" src="" style="display:none;">
@@ -617,14 +627,11 @@
                     </div>
                 </div>
 
-                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="mt-4">
                     <a class="btn btn-secondary text-center" id="btnDownload" href="#" download="lentara-ar.png"
                        style="display:none; text-decoration: none;">
                         ⬇ Download
                     </a>
-                    <button class="btn btn-secondary" id="btnFlip" type="button" disabled>
-                        🔄 Flip Kamera
-                    </button>
                 </div>
             </div>
         </div>
@@ -1242,6 +1249,27 @@
   setStatus("Siap");
   observeThemeChanges();
 })();
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('#testimoni .t-mini-quote-wrapper').forEach(w => {
+    w.style.display = 'flex';
+    w.style.flexDirection = 'column';
+    w.style.alignItems = 'flex-start';
+    w.style.textAlign = 'left';
+    w.style.width = '100%';
+  });
+
+  document.querySelectorAll('#testimoni .t-mini-quote').forEach(q => {
+    q.style.textAlign = 'left';
+    q.style.marginLeft = '0';
+    q.style.marginRight = '0';
+    q.style.width = '100%';
+    q.style.maxWidth = '100%';
+    q.style.alignSelf = 'flex-start';
+  });
+});
+
 </script>
 
 </section>

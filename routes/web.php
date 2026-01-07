@@ -23,6 +23,17 @@ use App\Http\Controllers\Admin\IslandAboutStatsController;
 use App\Http\Controllers\Admin\DestinationController as AdminDestinationController;
 
 
+
+// untuk controller game:
+use App\Http\Controllers\PlayerAuthController;
+use App\Http\Controllers\PlayerProfileController;
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\Admin\GameLevelController as AdminGameLevelController;
+use App\Http\Controllers\Admin\GameQuestionController as AdminGameQuestionController;
+
+Use App\Http\Controllers\PlayerLeaderboardController;
+
+
 /*
 |--------------------------------------------------------------------------
 | NUSANTARA AI (PUBLIC)
@@ -201,4 +212,62 @@ Route::delete('abouts/item/{item}', [\App\Http\Controllers\Admin\TribeAboutContr
         // DESTINATIONS
             Route::resource('destinations', AdminDestinationController::class)->except(['show']);
 
+
+        // GAME LEVELS + QUESTIONS admin
+        // GAME LEVELS
+Route::get('game-levels', [AdminGameLevelController::class, 'index'])->name('game-levels.index');
+Route::post('game-levels', [AdminGameLevelController::class, 'store'])->name('game-levels.store');
+Route::get('game-levels/{gameLevel}/edit', [AdminGameLevelController::class, 'edit'])->name('game-levels.edit');
+Route::put('game-levels/{gameLevel}', [AdminGameLevelController::class, 'update'])->name('game-levels.update');
+Route::delete('game-levels/{gameLevel}', [AdminGameLevelController::class, 'destroy'])->name('game-levels.destroy');
+
+// GAME QUESTIONS per level
+Route::get('game-levels/{level}/questions', [AdminGameQuestionController::class, 'index'])->name('game-questions.index');
+Route::post('game-levels/{level}/questions', [AdminGameQuestionController::class, 'store'])->name('game-questions.store');
+Route::delete('game-levels/{level}/questions/{question}', [AdminGameQuestionController::class, 'destroy'])->name('game-questions.destroy');
+
     });
+
+
+/*
+|--------------------------------------------------------------------------
+| PLAYER AUTH (GAME)
+|--------------------------------------------------------------------------
+*/
+Route::get('/daftar', [PlayerAuthController::class, 'showRegister'])->name('player.register');
+Route::post('/daftar', [PlayerAuthController::class, 'register'])->name('player.register.post');
+
+Route::get('/masuk', [PlayerAuthController::class, 'showLogin'])->name('player.login');
+Route::post('/masuk', [PlayerAuthController::class, 'login'])->name('player.login.post');
+
+Route::post('/keluar', [PlayerAuthController::class, 'logout'])->name('player.logout')->middleware('player');
+
+/*
+|--------------------------------------------------------------------------
+| GAME (PLAYER)
+|--------------------------------------------------------------------------
+*/
+Route::get('/belajar', [GameController::class, 'learn'])->name('game.learn')->middleware('player');
+Route::get('/belajar/level/{level}', [GameController::class, 'play'])->name('game.play')->middleware('player');
+
+// NOTE: submit batch tidak dipakai untuk flow baru, tapi aku biarkan biar gak nabrak.
+// Kamu bisa hapus nanti kalau sudah yakin tidak dipakai.
+Route::post('/belajar/level/{level}/submit', [GameController::class, 'submit'])->name('game.submit')->middleware('player');
+
+// cek per soal (AJAX)
+Route::post('/belajar/level/{level}/check', [GameController::class, 'check'])
+    ->name('game.check')
+    ->middleware('player');
+
+// refill hati (10 uang)
+Route::post('/hati/isi-ulang', [GameController::class, 'refillHearts'])
+    ->name('game.hearts.refill')
+    ->middleware('player');
+
+// leaderboard (XP)
+Route::get('/papan-peringkat', [PlayerLeaderboardController::class, 'index'])
+    ->name('game.leaderboard')
+    ->middleware('player');
+
+Route::get('/profil', [PlayerProfileController::class, 'edit'])->name('player.profile')->middleware('player');
+Route::post('/profil', [PlayerProfileController::class, 'update'])->name('player.profile.update')->middleware('player');

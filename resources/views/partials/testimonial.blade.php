@@ -40,6 +40,21 @@
             $role = $t->role ?? $t->occupation ?? $t->title ?? null;
             return $role ? (string)$role : 'Pengunjung';
         };
+
+        // Helper untuk truncate teks dan cek apakah perlu "Baca selengkapnya"
+        function needsReadMore($text, $maxLines = 3) {
+            $lines = substr_count($text, "\n") + 1;
+            $wordCount = str_word_count($text);
+            return $lines > $maxLines || $wordCount > 50;
+        }
+
+        // Helper untuk truncate teks
+        function truncateText($text, $maxLength = 150) {
+            if (strlen($text) <= $maxLength) {
+                return $text;
+            }
+            return substr($text, 0, $maxLength) . '...';
+        }
     @endphp
 
     <style>
@@ -333,10 +348,10 @@
         }
 
         .t-mini-card{
-            width: 420px;
+            width: 520px;
             max-width: 78vw;
             border-radius: 18px;
-            padding: 16px 16px 14px;
+            padding: 14px 14px 12px;
             border: 1px solid rgba(15, 23, 42, 0.06);
             box-shadow: 0 10px 26px rgba(0,0,0,.06);
             background: rgba(255,255,255,.92);
@@ -636,7 +651,7 @@
   width: 100% !important;
 }
 
-/* khusus card average (yang kanan) jangan “shrink” */
+/* khusus card average (yang kanan) jangan "shrink" */
 #testimoni .t-neon-inner.t-card{
   height: 100% !important;
 }
@@ -646,6 +661,235 @@
   min-height: 0 !important;
 }
 
+/* =========================================================
+   TOMBOL BACA SELENGKAPNYA
+========================================================= */
+.t-read-more-btn {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ff6b00;
+    background: rgba(255, 107, 0, 0.1);
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 107, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    user-select: none;
+    text-decoration: none;
+    text-align: left !important;
+    float: left !important;
+    clear: both !important;
+}
+
+.t-read-more-btn:hover {
+    background: rgba(255, 107, 0, 0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 107, 0, 0.15);
+}
+
+html[data-theme="dark"] .t-read-more-btn {
+    color: #ff8c42;
+    background: rgba(255, 107, 0, 0.15);
+    border-color: rgba(255, 107, 0, 0.3);
+}
+
+/* =========================================================
+   MODAL DETAIL TESTIMONI LENGKAP
+========================================================= */
+.t-detail-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.t-detail-modal.active {
+    display: flex;
+}
+
+.t-detail-content {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 107, 0, 0.2);
+    animation: slideUp 0.3s ease-out;
+    text-align: left;
+}
+
+html[data-theme="dark"] .t-detail-content {
+    background: rgba(17, 24, 39, 0.95);
+    border-color: rgba(255, 107, 0, 0.3);
+}
+
+.t-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 107, 0, 0.1);
+}
+
+.t-detail-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.t-detail-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.t-detail-info {
+    flex: 1;
+}
+
+.t-detail-name {
+    font-weight: 900;
+    font-size: 18px;
+    color: rgba(15, 23, 42, 0.95);
+    margin-bottom: 4px;
+}
+
+html[data-theme="dark"] .t-detail-name {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.t-detail-role {
+    font-size: 13px;
+    color: rgba(100, 116, 139, 0.9);
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+html[data-theme="dark"] .t-detail-role {
+    color: rgba(148, 163, 184, 0.9);
+}
+
+.t-detail-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.t-detail-quote {
+    font-size: 15px;
+    line-height: 1.6;
+    color: rgba(15, 23, 42, 0.85);
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    font-style: italic;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255, 107, 0, 0.1);
+    margin-bottom: 16px;
+    text-align: left !important;
+}
+
+html[data-theme="dark"] .t-detail-quote {
+    color: rgba(226, 232, 240, 0.85);
+}
+
+.t-detail-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.t-detail-date {
+    font-size: 13px;
+    color: rgba(100, 116, 139, 0.8);
+    font-weight: 700;
+}
+
+html[data-theme="dark"] .t-detail-date {
+    color: rgba(148, 163, 184, 0.8);
+}
+
+.t-detail-close {
+    background: rgba(255, 107, 0, 0.1);
+    color: #ff6b00;
+    border: 1px solid rgba(255, 107, 0, 0.2);
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.t-detail-close:hover {
+    background: rgba(255, 107, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+html[data-theme="dark"] .t-detail-close {
+    color: #ff8c42;
+    background: rgba(255, 107, 0, 0.15);
+    border-color: rgba(255, 107, 0, 0.3);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================================================
+   FIX: PAKSA RATA KIRI DESKRIPSI TESTIMONI
+========================================================= */
+#testimoni .t-mini-quote-wrapper {
+    display: block !important;
+    width: 100% !important;
+    text-align: left !important;
+    margin-top: 10px !important;
+}
+
+#testimoni .t-mini-quote {
+    text-align: left !important;
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    clear: both !important;
+}
 
     </style>
 
@@ -761,8 +1005,32 @@
                                                 </div>
                                             </div>
 
-                                            <div class="t-mini-quote">
-                                                {{ $t->message }}
+                                            {{-- Deskripsi testimoni dengan fitur read more --}}
+                                            <div class="t-mini-quote-wrapper">
+                                                <div class="t-mini-quote" id="quote-{{ $t->id }}">
+                                                    @php
+                                                        $needsReadMore = needsReadMore($t->message);
+                                                        $displayText = $needsReadMore ? truncateText($t->message, 120) : $t->message;
+                                                    @endphp
+                                                    {{ $displayText }}
+                                                </div>
+
+                                                @if($needsReadMore)
+                                                    <a href="javascript:void(0)"
+                                                       class="t-read-more-btn"
+                                                       onclick="showFullTestimonial({{ json_encode([
+                                                           'id' => $t->id,
+                                                           'name' => $t->name,
+                                                           'role' => $roleText($t),
+                                                           'rating' => $t->rating,
+                                                           'message' => $t->message,
+                                                           'created_at' => $t->created_at?->translatedFormat('d M Y'),
+                                                           'photo' => $t->photo,
+                                                           'initial' => $initial($t->name)
+                                                       ]) }})">
+                                                        Baca selengkapnya
+                                                    </a>
+                                                @endif
                                             </div>
 
                                             <div class="t-mini-foot">
@@ -812,8 +1080,32 @@
                                                 </div>
                                             </div>
 
-                                            <div class="t-mini-quote">
-                                                {{ $t->message }}
+                                            {{-- Deskripsi testimoni dengan fitur read more --}}
+                                            <div class="t-mini-quote-wrapper">
+                                                <div class="t-mini-quote" id="quote-{{ $t->id }}">
+                                                    @php
+                                                        $needsReadMore = needsReadMore($t->message);
+                                                        $displayText = $needsReadMore ? truncateText($t->message, 120) : $t->message;
+                                                    @endphp
+                                                    {{ $displayText }}
+                                                </div>
+
+                                                @if($needsReadMore)
+                                                    <a href="javascript:void(0)"
+                                                       class="t-read-more-btn"
+                                                       onclick="showFullTestimonial({{ json_encode([
+                                                           'id' => $t->id,
+                                                           'name' => $t->name,
+                                                           'role' => $roleText($t),
+                                                           'rating' => $t->rating,
+                                                           'message' => $t->message,
+                                                           'created_at' => $t->created_at?->translatedFormat('d M Y'),
+                                                           'photo' => $t->photo,
+                                                           'initial' => $initial($t->name)
+                                                       ]) }})">
+                                                        Baca selengkapnya
+                                                    </a>
+                                                @endif
                                             </div>
 
                                             <div class="t-mini-foot">
@@ -954,6 +1246,31 @@
         </div>
     </div>
 
+    {{-- ================= MODAL DETAIL TESTIMONI ================= --}}
+    <div class="t-detail-modal" id="testimonialDetailModal">
+        <div class="t-detail-content">
+            <div class="t-detail-header">
+                <div class="t-detail-avatar" id="detailAvatar">
+                    <!-- Avatar akan diisi oleh JavaScript -->
+                </div>
+                <div class="t-detail-info">
+                    <div class="t-detail-name" id="detailName"></div>
+                    <div class="t-detail-role" id="detailRole"></div>
+                    <div class="t-detail-stars" id="detailStars">
+                        <!-- Bintang rating akan diisi oleh JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="t-detail-quote" id="detailQuote"></div>
+
+            <div class="t-detail-footer">
+                <div class="t-detail-date" id="detailDate"></div>
+                <button class="t-detail-close" onclick="closeTestimonialDetail()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
     {{-- ================= MODAL REPORT ================= --}}
     <div id="reportModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 px-4" style="backdrop-filter: blur(4px);">
         <div class="t-card w-full max-w-md p-6"
@@ -1008,6 +1325,107 @@
         }
         document.getElementById('reportModal')?.addEventListener('click', (e) => {
             if (e.target.id === 'reportModal') closeReportModal();
+        });
+
+        // Fungsi untuk menampilkan detail lengkap testimoni
+        function showFullTestimonial(testimonial) {
+            const modal = document.getElementById('testimonialDetailModal');
+            const avatar = document.getElementById('detailAvatar');
+            const name = document.getElementById('detailName');
+            const role = document.getElementById('detailRole');
+            const stars = document.getElementById('detailStars');
+            const quote = document.getElementById('detailQuote');
+            const date = document.getElementById('detailDate');
+
+            // Isi data testimoni ke modal
+            name.textContent = testimonial.name;
+            role.textContent = testimonial.role;
+            quote.textContent = testimonial.message;
+            date.textContent = testimonial.created_at;
+
+            // Set avatar
+            if (testimonial.photo) {
+                avatar.innerHTML = `<img src="{{ asset('storage/') }}/${testimonial.photo}" alt="${testimonial.name}">`;
+            } else {
+                avatar.textContent = testimonial.initial;
+            }
+
+            // Set rating stars
+            stars.innerHTML = '';
+            const rating = parseInt(testimonial.rating);
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('span');
+                star.textContent = '★';
+                star.style.fontSize = '18px';
+                star.style.color = i <= rating ? '#f59e0b' : 'rgba(156, 163, 175, 0.35)';
+                stars.appendChild(star);
+            }
+
+            // Tampilkan modal
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Fungsi untuk menutup modal detail testimoni
+        function closeTestimonialDetail() {
+            const modal = document.getElementById('testimonialDetailModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Tutup modal ketika klik di luar konten
+        document.getElementById('testimonialDetailModal')?.addEventListener('click', (e) => {
+            if (e.target.id === 'testimonialDetailModal') {
+                closeTestimonialDetail();
+            }
+        });
+
+        // Tutup modal dengan tombol ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeTestimonialDetail();
+            }
+        });
+
+        // ============================================
+        // SCRIPT UNTUK PAKSA RATA KIRI DESKRIPSI TESTIMONI
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Paksa semua deskripsi testimoni rata kiri
+            document.querySelectorAll('.t-mini-quote').forEach(quote => {
+                quote.style.textAlign = 'left';
+                quote.style.marginLeft = '0';
+                quote.style.marginRight = '0';
+                quote.style.paddingLeft = '0';
+                quote.style.paddingRight = '0';
+                quote.style.float = 'none';
+                quote.style.clear = 'both';
+                quote.style.display = 'block';
+                quote.style.width = '100%';
+
+                // Hapus inline style center jika ada
+                const currentStyle = quote.getAttribute('style') || '';
+                if (currentStyle.includes('center')) {
+                    quote.setAttribute('style', currentStyle.replace(/text-align\s*:\s*center\s*[;!]?/gi, ''));
+                }
+            });
+
+            // Paksa semua wrapper quote rata kiri
+            document.querySelectorAll('.t-mini-quote-wrapper').forEach(wrapper => {
+                wrapper.style.textAlign = 'left';
+                wrapper.style.marginLeft = '0';
+                wrapper.style.marginRight = '0';
+                wrapper.style.paddingLeft = '0';
+                wrapper.style.paddingRight = '0';
+            });
+
+            // Paksa tombol baca selengkapnya rata kiri
+            document.querySelectorAll('.t-read-more-btn').forEach(btn => {
+                btn.style.textAlign = 'left';
+                btn.style.float = 'left';
+                btn.style.clear = 'both';
+                btn.style.marginLeft = '0';
+            });
         });
 
         (function () {
@@ -1095,7 +1513,14 @@
                 from { opacity:0; transform: scale(.94); }
                 to   { opacity:1; transform: scale(1); }
             }
+
+            /* CSS tambahan untuk override text-align center */
+            #testimoni .t-mini-quote,
+            #testimoni .t-mini-quote-wrapper {
+                text-align: left !important;
+            }
         `;
         document.head.appendChild(style);
     </script>
 </section>
+

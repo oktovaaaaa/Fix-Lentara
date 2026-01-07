@@ -13,6 +13,11 @@
         ->orderBy('order')
         ->orderBy('name')
         ->get();
+
+    // ===== GAME (PLAYER) =====
+    $playerLoggedIn = auth()->guard('player')->check();
+    $gameUrl = $playerLoggedIn ? route('game.learn') : route('player.login');
+    $gameLabel = $playerLoggedIn ? 'Belajar' : 'Masuk Game';
 @endphp
 
 <header class="site-header" id="top">
@@ -95,6 +100,11 @@
                     <span>Kuis</span>
                 </button>
 
+                {{-- ===== GAME / BELAJAR (SETELAH KUIS, SEBELUM TESTIMONI) ===== --}}
+                <button class="nav-btn" data-url="{{ $gameUrl }}">
+                    <span>{{ $gameLabel }}</span>
+                </button>
+
                 {{-- ================= TESTIMONI (HOME ONLY) ================= --}}
                 <button class="nav-btn" data-target="#testimoni">
                     <span>Testimoni</span>
@@ -165,6 +175,11 @@
                 <button class="nav-btn" data-target="#quiz">
                     <span>Kuis</span>
                 </button>
+
+                {{-- ===== GAME / BELAJAR (SETELAH KUIS) ===== --}}
+                <button class="nav-btn" data-url="{{ $gameUrl }}">
+                    <span>{{ $gameLabel }}</span>
+                </button>
             @endif
 
             {{-- indikator kapsul aktif (garis/shape bergerak di belakang tombol) --}}
@@ -173,9 +188,6 @@
 
         {{-- ================= KANAN: ADMIN + THEME ================= --}}
         <div class="flex items-center gap-2 ml-auto">
-
-
-
             {{-- Toggle Tema (DESKTOP ONLY) --}}
             <button class="theme-toggle hidden md:flex" id="themeToggle" aria-label="Ubah tema">
                 <span class="sun">☀️</span>
@@ -224,15 +236,16 @@
                     @endforeach
                 </div>
 
-                {{-- ✅ FITUR BARU: Kamera AR (HOME / GENERAL SAJA) --}}
+                {{-- Kamera AR --}}
                 <a href="#camera-ar" data-target="#camera-ar" class="drawer-link">Kamera AR</a>
 
                 <a href="#quiz" data-target="#quiz" class="drawer-link">Kuis</a>
 
-                {{-- TESTIMONI (MOBILE HOME) --}}
-                <a href="#testimoni" data-target="#testimoni" class="drawer-link">
-                    Testimoni
-                </a>
+                {{-- ===== GAME / BELAJAR (SETELAH KUIS, SEBELUM TESTIMONI) ===== --}}
+                <a href="{{ $gameUrl }}" class="drawer-link">{{ $gameLabel }}</a>
+
+                {{-- TESTIMONI --}}
+                <a href="#testimoni" data-target="#testimoni" class="drawer-link">Testimoni</a>
             @else
                 {{-- MODE ISLAND --}}
                 <a href="{{ route('home') }}" class="drawer-link">Home</a>
@@ -242,7 +255,7 @@
                 <a href="#destinations" data-target="#destinations" class="drawer-link">Destinasi</a>
                 <a href="#foods" data-target="#foods" class="drawer-link">Kuliner</a>
 
-                {{-- ✅ FIX: kasih parent "Pulau" dulu, biar list pulau tidak kelihatan nempel ke Kuis --}}
+                {{-- Pulau --}}
                 <a href="#islands" data-target="#islands" class="drawer-link">Pulau</a>
                 <div class="drawer-subgroup">
                     @foreach ($navbarIslands as $island)
@@ -260,6 +273,9 @@
                 </div>
 
                 <a href="#quiz" data-target="#quiz" class="drawer-link">Kuis</a>
+
+                {{-- ===== GAME / BELAJAR (SETELAH KUIS) ===== --}}
+                <a href="{{ $gameUrl }}" class="drawer-link">{{ $gameLabel }}</a>
             @endif
         </div>
 
@@ -269,8 +285,6 @@
                 <span class="drawer-theme-icon">🌓</span>
                 <span>Ganti Tema</span>
             </button>
-
-
         </div>
     </aside>
 

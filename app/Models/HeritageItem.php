@@ -12,6 +12,8 @@ class HeritageItem extends Model
         'category',
         'title',
         'description',
+        'location',     // ✅ baru
+        'detail_url',   // ✅ baru
         'image_path',
         'sort_order',
     ];

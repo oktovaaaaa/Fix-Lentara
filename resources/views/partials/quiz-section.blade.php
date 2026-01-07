@@ -19,21 +19,26 @@
      data-sfx-correct="{{ asset('audio/benar.M4A') }}"
      data-sfx-wrong="{{ asset('audio/salah.M4A') }}">
 
-
     {{-- ================= HEADER / HUD ================= --}}
     <div class="quiz-header">
-      <div>
+      <div class="quiz-header__center">
         <div class="quiz-title">{{ $quiz->title }}</div>
-        <div class="quiz-meta">
-          Mode: {{ $quiz->scope === 'global' ? 'Global' : ($quiz->scope === 'tribe' ? 'Suku' : 'Pulau') }}
-        </div>
-        <div class="quiz-meta">
-          Soal <span data-hud-q>1</span>/<span data-hud-total>{{ $questions->count() }}</span>
-          • Benar <span data-hud-correct>0</span>/<span data-hud-total2>{{ $questions->count() }}</span>
+
+        {{-- ✅ Mode DIHAPUS sesuai request --}}
+        <div class="quiz-hudline">
+          <span class="hud-chip">
+            Soal <b><span data-hud-q>1</span></b>/<span data-hud-total>{{ $questions->count() }}</span>
+          </span>
+
+          <span class="hud-dot" aria-hidden="true"></span>
+
+          <span class="hud-chip">
+            Benar <b><span data-hud-correct>0</span></b>/<span data-hud-total2>{{ $questions->count() }}</span>
+          </span>
         </div>
       </div>
 
-      <div class="quiz-score-badge">
+      <div class="quiz-score-badge" aria-label="Skor">
         <div class="quiz-score-label">Skor</div>
         <div class="quiz-score-value"><span data-mini-score>0</span>%</div>
       </div>
@@ -58,11 +63,11 @@
              data-qindex="{{ $idx }}"
              style="{{ $idx === 0 ? '' : 'display:none' }}">
 
-          <div class="flex items-center justify-between gap-3 mb-3">
+          <div class="q-toprow">
             <div class="q-pill">
               Soal {{ $idx + 1 }} / {{ $questions->count() }}
             </div>
-            <div class="text-xs text-[var(--muted)]">
+            <div class="q-status">
               <span data-status>Belum dijawab</span>
             </div>
           </div>
@@ -116,18 +121,18 @@
             </div>
           @endif
 
-          <div class="mt-5 flex items-center justify-between gap-3">
+          <div class="mt-5 q-actions">
             <button type="button"
                     class="q-btn q-btn-ghost"
                     data-prev {{ $idx === 0 ? 'disabled' : '' }}>
-              Prev
+              Sebelumnya
             </button>
 
             <button type="button"
                     class="q-btn q-btn-primary"
                     data-next
                     disabled>
-              {{ $idx === $questions->count() - 1 ? 'Finish' : 'Next' }}
+              {{ $idx === $questions->count() - 1 ? 'Selesai' : 'Berikutnya' }}
             </button>
           </div>
         </div>
@@ -156,7 +161,7 @@
           <div class="mt-2 text-xs text-[var(--muted)]" data-rank>—</div>
         </div>
 
-        <div class="mt-6 flex items-center justify-center gap-2 flex-wrap">
+        <div class="mt-6 q-actions q-actions--center">
           <button type="button" data-restart-2 class="q-btn q-btn-primary">
             Main Lagi
           </button>
@@ -186,8 +191,6 @@
       background:var(--card);
       box-shadow:0 0 0 1px rgba(255,255,255,.06),
                  0 30px 60px rgba(0,0,0,.45);
-
-      /* IMPORTANT: hilangkan kotak overlay/glow */
       overflow:hidden;
     }
 
@@ -224,23 +227,101 @@
     }
     @keyframes neon-spin { to { --neon-angle: 360deg; } }
 
-    /* pastikan semua konten di atas neon ring */
     .quiz-neon-card > *{ position:relative; z-index:1; }
 
     /* =========================================================
-       HEADER
+       HEADER (lebih rapi + pusat)
     ========================================================= */
-    .quiz-header{display:flex;justify-content:space-between;align-items:center;gap:12px}
-    .quiz-title{font-size:1.2rem;font-weight:800}
-    .quiz-meta{font-size:.8rem;color:var(--muted)}
+    .quiz-header{
+      display:grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items:center;
+      gap:12px;
+      padding-top: 2px;
+    }
+
+    .quiz-header__center{
+      grid-column: 2;
+      text-align:center;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+      min-width: 260px;
+    }
+
+    .quiz-title{
+      font-size:1.25rem;
+      font-weight:900;
+      letter-spacing:-.01em;
+      line-height:1.2;
+    }
+
+    .quiz-hudline{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      color: var(--muted);
+      font-size:.82rem;
+    }
+
+    .hud-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      background: color-mix(in oklab, var(--bg-body) 70%, var(--card) 30%);
+      border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+      color: color-mix(in oklab, var(--txt-body) 70%, var(--muted) 30%);
+    }
+    .hud-chip b{ color: var(--txt-body); font-weight: 900; }
+
+    .hud-dot{
+      width:6px;height:6px;border-radius:999px;
+      background: rgba(249,115,22,.55);
+      box-shadow: 0 0 0 4px rgba(249,115,22,.12);
+    }
+
     .quiz-score-badge{
-      border-radius:14px;padding:10px 14px;text-align:center;color:#fff;
+      grid-column: 3;
+      justify-self:end;
+      border-radius:14px;
+      padding:10px 14px;
+      text-align:center;
+      color:#fff;
       background: linear-gradient(135deg, #f97316, #fb923c);
       box-shadow: 0 18px 34px rgba(249,115,22,.22);
       border: 1px solid rgba(255,255,255,.06);
+      min-width: 92px;
     }
-    .quiz-score-value{font-weight:900}
-    .q-divider{height:1px;background:color-mix(in oklab, var(--line) 80%, transparent);margin:16px 0 0}
+    .quiz-score-label{ font-size:.78rem; opacity:.95; font-weight:800; }
+    .quiz-score-value{ font-weight:900; font-size: 1.05rem; }
+
+    .q-divider{
+      height:1px;
+      background:color-mix(in oklab, var(--line) 80%, transparent);
+      margin:16px 0 0;
+    }
+
+    @media (max-width: 640px){
+      .quiz-header{
+        grid-template-columns: 1fr auto;
+      }
+      .quiz-header__center{
+        grid-column: 1 / -1;
+        order: 1;
+        min-width: unset;
+      }
+      .quiz-score-badge{
+        grid-column: 2;
+        order: 0;
+        justify-self:end;
+      }
+    }
 
     /* =========================================================
        PROGRESS (TIDAK DIKURANGI) + NEON SHIMMER
@@ -293,6 +374,26 @@
     @keyframes quizShimmer{ to { transform: translateX(140%); } }
 
     /* =========================================================
+       TOP ROW (pill + status) rapih
+    ========================================================= */
+    .q-toprow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 10px;
+    }
+    .q-status{
+      font-size:12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+      background: color-mix(in oklab, var(--bg-body) 70%, var(--card) 30%);
+      white-space: nowrap;
+    }
+
+    /* =========================================================
        BUTTONS - ORANGE ONLY
     ========================================================= */
     .q-btn{
@@ -328,6 +429,17 @@
       box-shadow:
         0 20px 40px rgba(249,115,22,.30),
         0 0 0 1px rgba(255,255,255,.08);
+    }
+
+    .q-actions{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .q-actions--center{
+      justify-content:center;
+      flex-wrap:wrap;
     }
 
     /* =========================================================
@@ -402,128 +514,134 @@
     .q-opt.is-wrong .q-opt__mark-no{ display:inline; }
 
     /* =========================================================
-       TYPO + EXPLAIN + ANIM
+       TYPO + FEEDBACK
     ========================================================= */
     .q-pill{
       font-size:12px;font-weight:800;padding:6px 10px;border-radius:999px;
       border:1px solid color-mix(in oklab, var(--line) 85%, transparent);
       background: color-mix(in oklab, var(--bg-body) 70%, var(--card) 30%);
       color: var(--txt-body);
+      white-space:nowrap;
     }
     .q-title{ font-size:18px; line-height:1.35; font-weight:900; letter-spacing:-.01em; }
 
-    .q-feedback{ font-weight:900;font-size:14px;min-height:20px;margin-top:14px;display:flex;align-items:center;gap:10px; }
+    .q-feedback{
+      font-weight:900;
+      font-size:14px;
+      min-height:20px;
+      margin-top:14px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap: wrap;
+    }
     .q-feedback .ok{ color:#22c55e; }
     .q-feedback .no{ color:#ef4444; }
     .q-feedback .meta{ font-weight:700;color:var(--muted);font-size:12px; }
 
-/* ===================== EXPLANATION (lebih menarik) ===================== */
-@keyframes explainIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+    .q-ico{
+      width:18px;height:18px;
+      display:inline-block;
+      vertical-align:-3px;
+    }
 
-.q-explain{
-  margin-top: 14px;
-  border-radius: 18px;
-  padding: 14px 16px;
-  position: relative;
-  overflow: hidden;
+    /* ===================== EXPLANATION (lebih menarik) ===================== */
+    @keyframes explainIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-  /* base */
-  background: color-mix(in oklab, var(--bg-body) 68%, var(--card) 32%);
-  border: 1px solid color-mix(in oklab, var(--line) 80%, transparent);
-  box-shadow:
-    0 14px 30px rgba(0,0,0,.22),
-    0 0 0 1px rgba(255,255,255,.06);
+    .q-explain{
+      margin-top: 14px;
+      border-radius: 18px;
+      padding: 14px 16px;
+      position: relative;
+      overflow: hidden;
 
-  animation: explainIn .28s ease-out both;
-}
+      background: color-mix(in oklab, var(--bg-body) 68%, var(--card) 32%);
+      border: 1px solid color-mix(in oklab, var(--line) 80%, transparent);
+      box-shadow:
+        0 14px 30px rgba(0,0,0,.22),
+        0 0 0 1px rgba(255,255,255,.06);
 
-/* neon accent ring tipis (orange) */
-.q-explain::before{
-  content:"";
-  position:absolute;
-  inset:-2px;
-  border-radius: inherit;
-  padding: 2px;
-  pointer-events:none;
+      animation: explainIn .28s ease-out both;
+    }
 
-  background: linear-gradient(135deg,
-    rgba(249,115,22,.0) 0%,
-    rgba(249,115,22,.45) 35%,
-    rgba(34,211,238,.22) 55%,
-    rgba(249,115,22,.35) 75%,
-    rgba(249,115,22,.0) 100%
-  );
+    .q-explain::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      border-radius: inherit;
+      padding: 2px;
+      pointer-events:none;
 
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+      background: linear-gradient(135deg,
+        rgba(249,115,22,.0) 0%,
+        rgba(249,115,22,.45) 35%,
+        rgba(34,211,238,.22) 55%,
+        rgba(249,115,22,.35) 75%,
+        rgba(249,115,22,.0) 100%
+      );
 
-  filter: blur(.6px);
-  opacity: .9;
-}
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
 
-/* glow soft di pojok */
-.q-explain::after{
-  content:"";
-  position:absolute;
-  inset:-40px -60px auto -60px;
-  height: 140px;
-  background:
-    radial-gradient(circle at 30% 55%, rgba(249,115,22,.22), transparent 60%),
-    radial-gradient(circle at 70% 45%, rgba(34,211,238,.16), transparent 62%);
-  pointer-events:none;
-  opacity:.9;
-}
+      filter: blur(.6px);
+      opacity: .9;
+    }
 
-/* header: judul + icon */
-.q-explain__title{
-  display:flex;
-  align-items:center;
-  gap:10px;
+    .q-explain::after{
+      content:"";
+      position:absolute;
+      inset:-40px -60px auto -60px;
+      height: 140px;
+      background:
+        radial-gradient(circle at 30% 55%, rgba(249,115,22,.22), transparent 60%),
+        radial-gradient(circle at 70% 45%, rgba(34,211,238,.16), transparent 62%);
+      pointer-events:none;
+      opacity:.9;
+    }
 
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--txt-body) 85%, #fff 15%);
-  margin-bottom: 6px;
-  position: relative;
-  z-index: 1;
-}
+    .q-explain__title{
+      display:flex;
+      align-items:center;
+      gap:10px;
 
-/* icon bulat orange */
-.q-explain__title::before{
-  content:"i";
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  display:grid;
-  place-items:center;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: color-mix(in oklab, var(--txt-body) 85%, #fff 15%);
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
 
-  font-weight: 1000;
-  color: #0b1220;
-  background: linear-gradient(135deg, #f97316, #fb923c);
-  box-shadow: 0 12px 22px rgba(249,115,22,.22);
-}
+    .q-explain__title::before{
+      content:"i";
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      display:grid;
+      place-items:center;
 
-/* isi penjelasan */
-.q-explain__text{
-  font-size: 13px;
-  line-height: 1.65;
-  color: color-mix(in oklab, var(--muted) 92%, #fff 8%);
-  position: relative;
-  z-index: 1;
-}
+      font-weight: 1000;
+      color: #0b1220;
+      background: linear-gradient(135deg, #f97316, #fb923c);
+      box-shadow: 0 12px 22px rgba(249,115,22,.22);
+    }
 
-/* optional: highlight keyword (kalau ada <strong> di text) */
-.q-explain__text strong{
-  color: #fff;
-}
+    .q-explain__text{
+      font-size: 13px;
+      line-height: 1.65;
+      color: color-mix(in oklab, var(--muted) 92%, #fff 8%);
+      position: relative;
+      z-index: 1;
+    }
+    .q-explain__text strong{ color: #fff; }
 
     @keyframes quizIn { from{opacity:0; transform: translateY(10px);} to{opacity:1; transform: translateY(0);} }
     @keyframes pop { 0%{transform:scale(.98)} 60%{transform:scale(1.01)} 100%{transform:scale(1)} }
@@ -535,7 +653,7 @@
       padding: 22px 6px 6px;
       animation: quizIn .28s ease-out both;
       position:relative;
-      overflow:hidden;          /* FIX: supaya spark ga jadi kotak */
+      overflow:hidden;
       border-radius:18px;
     }
     .q-result__spark{
@@ -550,6 +668,36 @@
       opacity:.9;
       filter: blur(0px);
     }
+
+    /* progress result (kelas ini sudah dipakai di markup kamu) */
+    .q-progress{
+      margin: 0 auto;
+      height: 12px;
+      border-radius: 999px;
+      background: color-mix(in oklab, var(--bg-body) 78%, var(--card) 22%);
+      border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+      overflow:hidden;
+      position:relative;
+    }
+    .q-progress__bar{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background: linear-gradient(90deg, #f97316, #22d3ee, #34d399);
+      transition: width .45s ease;
+      position:relative;
+      overflow:hidden;
+    }
+    .q-progress__glow{
+      position:absolute; inset:0;
+      background:
+        radial-gradient(circle at 25% 50%, rgba(34,211,238,.22), transparent 55%),
+        radial-gradient(circle at 55% 50%, rgba(249,115,22,.20), transparent 58%),
+        radial-gradient(circle at 80% 50%, rgba(52,211,153,.16), transparent 55%);
+      pointer-events:none;
+      opacity:.75;
+    }
+    .q-progress--big{ height: 12px; }
   </style>
 
   <script>
@@ -557,27 +705,25 @@
     const wrap = document.getElementById('globalQuizWrap');
     if(!wrap) return;
 
-// ===================== SFX (Correct / Wrong) =====================
-const sfxCorrectUrl = wrap.getAttribute('data-sfx-correct') || '';
-const sfxWrongUrl   = wrap.getAttribute('data-sfx-wrong') || '';
+    // ===================== SFX (Correct / Wrong) =====================
+    const sfxCorrectUrl = wrap.getAttribute('data-sfx-correct') || '';
+    const sfxWrongUrl   = wrap.getAttribute('data-sfx-wrong') || '';
 
-const sfxCorrect = sfxCorrectUrl ? new Audio(sfxCorrectUrl) : null;
-const sfxWrong   = sfxWrongUrl ? new Audio(sfxWrongUrl) : null;
+    const sfxCorrect = sfxCorrectUrl ? new Audio(sfxCorrectUrl) : null;
+    const sfxWrong   = sfxWrongUrl ? new Audio(sfxWrongUrl) : null;
 
-// optional: kecilin volume
-if (sfxCorrect) sfxCorrect.volume = 0.9;
-if (sfxWrong)   sfxWrong.volume   = 0.9;
+    if (sfxCorrect) sfxCorrect.volume = 0.9;
+    if (sfxWrong)   sfxWrong.volume   = 0.9;
 
-// helper play (biar bisa dipencet berkali-kali)
-function playSfx(aud){
-  if(!aud) return;
-  try {
-    aud.pause();
-    aud.currentTime = 0;
-    const p = aud.play();
-    if (p && typeof p.catch === 'function') p.catch(()=>{});
-  } catch(e){}
-}
+    function playSfx(aud){
+      if(!aud) return;
+      try {
+        aud.pause();
+        aud.currentTime = 0;
+        const p = aud.play();
+        if (p && typeof p.catch === 'function') p.catch(()=>{});
+      } catch(e){}
+    }
 
     const total = parseInt(wrap.getAttribute('data-total') || '0', 10);
 
@@ -615,11 +761,31 @@ function playSfx(aud){
       return total ? Math.round((correctCount / total) * 100) : 0;
     }
 
+    // ====== ICON SVG (tanpa emoji) ======
+    const ICON = {
+      trophy: `<svg class="q-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M8 4h8v3a4 4 0 0 1-8 0V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M6 7H4a2 2 0 0 0 2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M18 7h2a2 2 0 0 1-2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M12 14v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M9 20h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>`,
+      spark: `<svg class="q-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 2l1.2 5.2L18 9l-4.8 1.8L12 16l-1.2-5.2L6 9l4.8-1.8L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>`,
+      check: `<svg class="q-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`,
+      x: `<svg class="q-ico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+      </svg>`
+    };
+
     function rankText(score){
-      if (score >= 90) return '🏆 Legendaris! Kamu jago banget.';
-      if (score >= 75) return '🔥 Keren! Tinggal sedikit lagi sempurna.';
-      if (score >= 50) return '✨ Lumayan! Ayo coba lagi biar makin tinggi.';
-      return '🌱 Santai, coba lagi—kamu pasti bisa.';
+      if (score >= 90) return `${ICON.trophy}<span><b>Hebat!</b> Kamu hampir sempurna.</span>`;
+      if (score >= 75) return `${ICON.spark}<span><b>Keren!</b> Tinggal sedikit lagi.</span>`;
+      if (score >= 50) return `${ICON.spark}<span><b>Bagus!</b> Coba ulang biar makin tinggi.</span>`;
+      return `${ICON.spark}<span><b>Semangat!</b> Coba lagi, kamu pasti bisa.</span>`;
     }
 
     function updateHud(){
@@ -663,7 +829,8 @@ function playSfx(aud){
       if (rScore) rScore.textContent = String(score);
       if (rCorrect) rCorrect.textContent = String(correctCount);
       if (rTotal) rTotal.textContent = String(total);
-      if (rRank) rRank.textContent = rankText(score);
+
+      if (rRank) rRank.innerHTML = rankText(score);
 
       if (scoreBar) scoreBar.style.width = score + '%';
 
@@ -716,9 +883,8 @@ function playSfx(aud){
           const isCorrect = btn.getAttribute('data-correct') === '1';
           answered[idx] = true;
           if (isCorrect) correctCount++;
-          
-          playSfx(isCorrect ? sfxCorrect : sfxWrong);
 
+          playSfx(isCorrect ? sfxCorrect : sfxWrong);
 
           opts.forEach(b => b.classList.remove('is-correct','is-wrong'));
           btn.classList.add(isCorrect ? 'is-correct' : 'is-wrong');
@@ -730,10 +896,10 @@ function playSfx(aud){
 
           if (feedback) {
             feedback.innerHTML = isCorrect
-              ? `<span class="ok">✅ Benar!</span> <span class="meta">+1 poin</span>`
-              : `<span class="no">❌ Salah.</span> <span class="meta">Cek penjelasan ya</span>`;
+              ? `<span class="ok">${ICON.check}<span>Benar</span></span> <span class="meta">+1 poin</span>`
+              : `<span class="no">${ICON.x}<span>Salah</span></span> <span class="meta">Baca penjelasan ya</span>`;
           }
-          if (status) status.textContent = isCorrect ? 'Benar ✅' : 'Salah ❌';
+          if (status) status.textContent = isCorrect ? 'Benar' : 'Salah';
           if (explain) explain.style.display = '';
 
           if (nextBtn) nextBtn.disabled = false;
