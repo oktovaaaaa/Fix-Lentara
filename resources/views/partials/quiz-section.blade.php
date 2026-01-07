@@ -13,9 +13,12 @@
     $questions = $quiz->questions->sortBy('order')->values();
   @endphp
 
-  <div id="globalQuizWrap"
-       class="quiz-neon-card"
-       data-total="{{ $questions->count() }}">
+<div id="globalQuizWrap"
+     class="quiz-neon-card"
+     data-total="{{ $questions->count() }}"
+     data-sfx-correct="{{ asset('audio/benar.M4A') }}"
+     data-sfx-wrong="{{ asset('audio/salah.M4A') }}">
+
 
     {{-- ================= HEADER / HUD ================= --}}
     <div class="quiz-header">
@@ -554,6 +557,28 @@
     const wrap = document.getElementById('globalQuizWrap');
     if(!wrap) return;
 
+// ===================== SFX (Correct / Wrong) =====================
+const sfxCorrectUrl = wrap.getAttribute('data-sfx-correct') || '';
+const sfxWrongUrl   = wrap.getAttribute('data-sfx-wrong') || '';
+
+const sfxCorrect = sfxCorrectUrl ? new Audio(sfxCorrectUrl) : null;
+const sfxWrong   = sfxWrongUrl ? new Audio(sfxWrongUrl) : null;
+
+// optional: kecilin volume
+if (sfxCorrect) sfxCorrect.volume = 0.9;
+if (sfxWrong)   sfxWrong.volume   = 0.9;
+
+// helper play (biar bisa dipencet berkali-kali)
+function playSfx(aud){
+  if(!aud) return;
+  try {
+    aud.pause();
+    aud.currentTime = 0;
+    const p = aud.play();
+    if (p && typeof p.catch === 'function') p.catch(()=>{});
+  } catch(e){}
+}
+
     const total = parseInt(wrap.getAttribute('data-total') || '0', 10);
 
     const questionsWrap = wrap.querySelector('[data-questions]');
@@ -691,6 +716,9 @@
           const isCorrect = btn.getAttribute('data-correct') === '1';
           answered[idx] = true;
           if (isCorrect) correctCount++;
+          
+          playSfx(isCorrect ? sfxCorrect : sfxWrong);
+
 
           opts.forEach(b => b.classList.remove('is-correct','is-wrong'));
           btn.classList.add(isCorrect ? 'is-correct' : 'is-wrong');

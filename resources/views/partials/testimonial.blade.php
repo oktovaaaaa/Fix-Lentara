@@ -12,15 +12,39 @@
         $pct = function($n) use ($total) {
             return $total > 0 ? round(($n / $total) * 100) : 0;
         };
+
+        // ===============================
+        // MARQUEE DATA (TIDAK UBAH LOGIKA INTI)
+        // Split selang-seling: index genap => atas, index ganjil => bawah
+        // ===============================
+        $items = $testimonials instanceof \Illuminate\Support\Collection
+            ? $testimonials->values()
+            : collect($testimonials)->values();
+
+        $topRow = $items->filter(fn($v, $i) => $i % 2 === 0)->values();
+        $botRow = $items->filter(fn($v, $i) => $i % 2 === 1)->values();
+
+        // Threshold: kalau < 3 => TIDAK jalan (static)
+        $shouldAnimate = $items->count() >= 3;
+
+        // helper initial letter
+        $initial = function($name) {
+            $name = trim((string)$name);
+            if ($name === '') return '?';
+            $first = mb_substr($name, 0, 1, 'UTF-8');
+            return mb_strtoupper($first, 'UTF-8');
+        };
+
+        // helper role (kalau field tidak ada, fallback)
+        $roleText = function($t) {
+            $role = $t->role ?? $t->occupation ?? $t->title ?? null;
+            return $role ? (string)$role : 'Pengunjung';
+        };
     @endphp
 
     <style>
         /* =========================================================
            TESTIMONI THEME SAFE (LIGHT/DARK) + FIX OVERFLOW + NO CIRCLE STAR
-           FIXES:
-           1) Bintang rating tanpa lingkaran / tanpa tombol bulat
-           2) Teks komentar tidak boleh keluar card: wrap panjang (wwww...)
-           3) Flex child tidak overflow: min-width:0
         ========================================================= */
 
         .t-wrap { color: var(--txt-body); }
@@ -33,7 +57,6 @@
             padding: 1.5rem;
         }
 
-        /* Dark/Light mode adjustment */
         html[data-theme="dark"] .t-card {
             background: linear-gradient(145deg, #111827, #020617);
         }
@@ -80,14 +103,13 @@
 
         /* ===============================
            RATING STARS (CLICK) - NO CIRCLE
-           =============================== */
+        =============================== */
         .star-row {
             display: inline-flex;
             gap: 10px;
             align-items: center;
         }
 
-        /* tombolnya tetap button biar aksesibel, tapi TANPA lingkaran/background */
         .star-btn {
             width: auto;
             height: auto;
@@ -137,18 +159,6 @@
             transition: width .5s ease;
         }
 
-        /* Scroll area */
-        .t-scroll {
-            max-height: 480px;
-            overflow: auto;
-            padding-right: 8px;
-        }
-        .t-scroll::-webkit-scrollbar { width: 10px; }
-        .t-scroll::-webkit-scrollbar-thumb {
-            background: rgba(255, 107, 0, 0.3);
-            border-radius: 999px;
-        }
-
         .t-file {
             width: 100%;
             border-radius: 12px;
@@ -181,7 +191,6 @@
         }
         .t-btn:active { transform: translateY(0px); }
 
-        /* small meta in card */
         .t-chip {
             font-size: 12px;
             padding: 6px 12px;
@@ -192,48 +201,25 @@
             font-weight: 600;
         }
 
-        /* Feedback items */
-        .feedback-item {
-            background: color-mix(in oklab, var(--card) 95%, transparent);
-            border: 1px solid rgba(255, 107, 0, 0.1);
-            overflow: hidden; /* jaga-jaga glow/teks panjang */
-        }
-        html[data-theme="dark"] .feedback-item { background: rgba(255, 255, 255, 0.03); }
-        html[data-theme="light"] .feedback-item { background: rgba(0, 0, 0, 0.01); }
-
-        /* ===============================
-           FIX OVERFLOW TEKS PANJANG (WWWW...)
-           =============================== */
-
-        /* Penting: flex child harus min-width:0 supaya wrap jalan */
-        .feedback-item .flex-1 { min-width: 0; }
-
-        /* Nama & teks: jangan overflow */
+        /* =========================================================
+           FIX OVERFLOW TEKS PANJANG
+        ========================================================= */
         .t-name,
         .t-comment,
         .t-anywhere {
-            overflow-wrap: anywhere; /* modern */
-            word-break: break-word;  /* fallback */
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
+        .t-comment { white-space: pre-wrap; }
 
-        /* Pesan: biar kalau ada enter tetap rapi, dan panjang menyambung ke bawah */
-        .t-comment {
-            white-space: pre-wrap;
-        }
-
-        /* ===============================
-           FIX: MODAL REPORT DARK MODE
-           (select & dropdown option list)
-        =============================== */
-
-        /* Modal card: pastikan benar-benar dark saat dark mode */
+        /* =========================================================
+           MODAL REPORT DARK MODE
+        ========================================================= */
         html[data-theme="dark"] #reportModal .t-card{
             background: linear-gradient(145deg, #0b1220, #020617) !important;
             border: 1px solid rgba(255,107,0,.22) !important;
             box-shadow: 0 26px 70px rgba(0,0,0,.55) !important;
         }
-
-        /* Teks di modal biar kontras */
         html[data-theme="dark"] #reportModal h3,
         html[data-theme="dark"] #reportModal label{
             color: rgba(255,255,255,.92) !important;
@@ -241,40 +227,30 @@
         html[data-theme="dark"] #reportModal .t-muted{
             color: rgba(255,255,255,.62) !important;
         }
-
-        /* Select di modal (field dropdown) */
         #reportModal select.t-input{
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
             background-clip: padding-box;
         }
-
-        /* Dark mode: paksa background & text untuk select */
         html[data-theme="dark"] #reportModal select.t-input{
             background-color: rgba(255,255,255,.06) !important;
             color: rgba(255,255,255,.92) !important;
             border-color: rgba(255,107,0,.28) !important;
         }
-
-        /* Dark mode: paksa background & text untuk OPTION LIST (dropdown) */
         html[data-theme="dark"] #reportModal select.t-input option{
             background-color: #0b1220 !important;
             color: rgba(255,255,255,.92) !important;
         }
-
         html[data-theme="dark"] #reportModal select.t-input option:checked,
         html[data-theme="dark"] #reportModal select.t-input option:hover{
             background-color: #111b2f !important;
             color: rgba(255,255,255,.95) !important;
         }
-
         html[data-theme="dark"] #reportModal select.t-input:focus{
             border-color: #ff6b00 !important;
             box-shadow: 0 0 0 4px rgba(255,107,0,.22) !important;
         }
-
-        /* Textarea di modal juga dipaksa dark biar konsisten */
         html[data-theme="dark"] #reportModal textarea.t-textarea{
             background-color: rgba(255,255,255,.06) !important;
             color: rgba(255,255,255,.92) !important;
@@ -283,8 +259,6 @@
         html[data-theme="dark"] #reportModal textarea.t-textarea::placeholder{
             color: rgba(255,255,255,.45) !important;
         }
-
-        /* Tombol Batal (yang pakai t-input) di modal biar gak kelihatan seperti input light */
         html[data-theme="dark"] #reportModal button.t-input{
             background-color: rgba(255,255,255,.06) !important;
             color: rgba(255,255,255,.88) !important;
@@ -294,226 +268,691 @@
             background-color: rgba(255,255,255,.09) !important;
             border-color: rgba(255,107,0,.28) !important;
         }
+
+        /* =========================================================
+           MARQUEE
+        ========================================================= */
+        .t-marquee-wrap {
+            margin-top: 10px;
+            padding-top: 8px;
+        }
+
+        .t-marquee {
+            position: relative;
+            overflow: hidden;
+            border-radius: 24px;
+            background: transparent;
+        }
+
+        .t-marquee::before,
+        .t-marquee::after{
+            content:"";
+            position:absolute;
+            top:0;
+            bottom:0;
+            width: 90px;
+            pointer-events:none;
+            z-index: 5;
+        }
+        .t-marquee::before{
+            left:0;
+            background: linear-gradient(to right,
+                color-mix(in oklab, var(--bg-body) 92%, transparent),
+                transparent
+            );
+        }
+        .t-marquee::after{
+            right:0;
+            background: linear-gradient(to left,
+                color-mix(in oklab, var(--bg-body) 92%, transparent),
+                transparent
+            );
+        }
+
+        .t-lane { display:block; padding: 14px 0; }
+
+        .t-track {
+            display:flex;
+            width:max-content;
+            gap: 16px;
+            padding: 0 12px;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        .t-track.is-left  { animation: tMarqueeLeft  var(--t-dur, 34s) linear infinite; }
+        .t-track.is-right { animation: tMarqueeRight var(--t-dur, 34s) linear infinite; }
+
+        @keyframes tMarqueeLeft {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+        @keyframes tMarqueeRight {
+            from { transform: translateX(-50%); }
+            to   { transform: translateX(0); }
+        }
+
+        .t-mini-card{
+            width: 420px;
+            max-width: 78vw;
+            border-radius: 18px;
+            padding: 16px 16px 14px;
+            border: 1px solid rgba(15, 23, 42, 0.06);
+            box-shadow: 0 10px 26px rgba(0,0,0,.06);
+            background: rgba(255,255,255,.92);
+            backdrop-filter: blur(10px);
+            text-align: left;
+        }
+        html[data-theme="dark"] .t-mini-card{
+            border: 1px solid rgba(255,255,255,.10);
+            box-shadow: 0 16px 36px rgba(0,0,0,.45);
+            background: rgba(17, 24, 39, .68);
+        }
+
+        .t-mini-head{
+            display:flex;
+            align-items:flex-start;
+            gap: 12px;
+            justify-content: flex-start;
+            text-align: left;
+        }
+
+        .t-avatar{
+          width: 56px;
+          height: 56px;
+          border-radius: 999px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-weight: 900;
+          background: var(--brand);
+          color: #ffffff;
+          flex: 0 0 auto;
+          box-shadow: 0 10px 22px rgba(249,115,22,.28);
+          overflow:hidden;
+        }
+
+        #testimoni{ --brand: #f97316; }
+        html[data-theme="dark"] #testimoni{ --brand: #f97316; }
+
+        .t-avatar img{
+            width: 100%;
+            height: 100%;
+            border-radius: 999px;
+            object-fit: cover;
+            display:block;
+        }
+
+        .t-mini-meta{ min-width:0; flex:1; text-align:left; }
+        .t-mini-name{
+            font-weight: 900;
+            font-size: 16px;
+            line-height: 1.15;
+            color: rgba(15,23,42,.92);
+            text-align:left;
+        }
+        html[data-theme="dark"] .t-mini-name{ color: rgba(255,255,255,.92); }
+
+        .t-mini-role{
+            margin-top: 2px;
+            font-size: 12px;
+            color: rgba(100,116,139,.9);
+            font-weight: 600;
+            text-align:left;
+        }
+        html[data-theme="dark"] .t-mini-role{ color: rgba(148,163,184,.9); }
+
+        .t-mini-stars{
+            margin-top: 6px;
+            display:flex;
+            gap: 2px;
+            font-size: 14px;
+            line-height: 1;
+            justify-content: flex-start;
+        }
+
+        /* ===============================
+   FIX FINAL: QUOTE FULL WIDTH & RATA KIRI
+=============================== */
+#testimoni .t-mini-quote{
+  /* PENTING: jangan shrink ke konten */
+  display: block !important;
+
+  /* paksa isi lebar card */
+  width: 100% !important;
+  max-width: 100% !important;
+
+  /* hilangkan efek "kotak di tengah" */
+  margin: 10px 0 0 0 !important;
+
+  /* teks */
+  text-align: left !important;
+  font-style: italic;
+  line-height: 1.55;
+
+  /* wrapping */
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+
+  /* clamp tetap jalan */
+  display: -webkit-box !important;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+        html[data-theme="dark"] .t-mini-quote{ color: rgba(226,232,240,.82); }
+
+        .t-mini-foot{
+            margin-top: 10px;
+            display:flex;
+            justify-content: space-between;
+            align-items:center;
+            gap: 10px;
+            text-align: left;
+        }
+        .t-mini-date{
+            font-size: 11px;
+            color: rgba(100,116,139,.85);
+            font-weight: 700;
+        }
+        html[data-theme="dark"] .t-mini-date{ color: rgba(148,163,184,.75); }
+
+        .t-mini-report{
+            display:inline-flex;
+            align-items:center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 900;
+            color: rgba(239,68,68,.95);
+            text-decoration: none;
+            user-select:none;
+        }
+        .t-mini-report:hover{ text-decoration: underline; }
+        .t-mini-report svg{
+            width: 16px;
+            height: 16px;
+            flex: 0 0 auto;
+        }
+
+        .t-track.is-static { animation: none !important; transform: translateX(0) !important; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .t-track.is-left, .t-track.is-right { animation: none !important; }
+        }
+
+        @media (max-width: 640px){
+            .t-marquee::before, .t-marquee::after{ width: 36px; }
+            .t-lane{ padding: 10px 0; }
+            .t-track{ gap: 12px; padding: 0 10px; }
+            .t-mini-card{
+                width: 88vw;
+                max-width: 88vw;
+                padding: 14px 14px 12px;
+            }
+            .t-avatar{ width: 52px; height: 52px; }
+        }
+
+        /* ===============================
+           FORM GRID
+        =============================== */
+        .t-form-grid{
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+        @media (min-width: 768px){
+            .t-form-grid{
+                grid-template-columns: 1fr 1fr;
+                gap: 14px;
+            }
+            .t-form-span-2{ grid-column: span 2 / span 2; }
+        }
+
+        /* ===============================
+           ALERTS
+        =============================== */
+        .t-alert {
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 1px solid transparent;
+            font-size: 14px;
+            font-weight: 900;
+        }
+        .t-alert-success{
+            background: rgba(34, 197, 94, 0.14);
+            border-color: rgba(34, 197, 94, 0.30);
+            color: rgba(34, 197, 94, 0.95);
+        }
+        .t-alert-error{
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.28);
+            color: rgba(239, 68, 68, 0.95);
+        }
+        .t-alert-client{ display:none; }
+
+        /* =========================================================
+           NEON WRAPPER
+        ========================================================= */
+        @property --t-neon-angle {
+            syntax: "<angle>";
+            inherits: false;
+            initial-value: 0deg;
+        }
+
+        .t-neon-shell{
+            position: relative;
+            border-radius: 22px;
+        }
+
+        .t-neon-glow{
+            position: absolute;
+            inset: -5px;
+            border-radius: inherit;
+            padding: 10px;
+            z-index: 0;
+            pointer-events: none;
+
+            background: conic-gradient(from var(--t-neon-angle),
+                    rgba(255, 107, 0, 0),
+                    rgba(255, 140, 66, 0.18) 30deg,
+                    rgba(255, 107, 0, 0.95) 80deg,
+                    rgba(255, 170, 107, 0.9) 120deg,
+                    rgba(255, 140, 66, 0.18) 180deg,
+                    rgba(255, 107, 0, 0) 240deg,
+                    rgba(255, 140, 66, 0.20) 300deg,
+                    rgba(255, 107, 0, 0.95) 330deg,
+                    rgba(255, 107, 0, 0) 360deg);
+
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+
+            filter: blur(4px);
+            opacity: .90;
+            animation: t-neon-spin 8s linear infinite;
+        }
+
+        @keyframes t-neon-spin{
+            to { --t-neon-angle: 360deg; }
+        }
+
+        .t-neon-inner{
+            position: relative;
+            z-index: 1;
+            border-radius: 20px;
+        }
+
+        @media (prefers-reduced-motion: reduce){
+            .t-neon-glow{ animation: none !important; }
+        }
+
+        /* =========================================================
+           ✅ FINAL OVERRIDE (INI YANG BENER)
+           Paksa lane & track START KIRI (ANTI CSS EXTERNAL / AUTO-CENTER)
+        ========================================================= */
+
+        /* lane jadi flex supaya kita bisa kontrol posisi track */
+        #testimoni .t-lane{
+            display: flex !important;
+            justify-content: flex-start !important;
+            align-items: stretch !important;
+        }
+
+        /* track jangan pernah auto-center */
+        #testimoni .t-track{
+            justify-content: flex-start !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        /* kalau ada global rule yang bikin max-width + auto margin, matikan */
+        #testimoni .t-track,
+        #testimoni .t-mini-card{
+            margin: 0 !important;
+        }
+
+        /* pastikan teks card tetap left */
+        #testimoni .t-mini-card,
+        #testimoni .t-mini-card *{
+            text-align: left !important;
+        }
+/* =========================================================
+   FIX: neon shell & card harus sama tinggi (no empty space)
+========================================================= */
+#testimoni .t-neon-shell{
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+}
+
+/* inner card ikut nge-fill shell */
+#testimoni .t-neon-inner{
+  flex: 1 1 auto !important;
+  width: 100% !important;
+}
+
+/* khusus card average (yang kanan) jangan “shrink” */
+#testimoni .t-neon-inner.t-card{
+  height: 100% !important;
+}
+
+/* kalau ada CSS luar yang bikin shell punya min-height, matiin */
+#testimoni .t-neon-shell{
+  min-height: 0 !important;
+}
+
+
     </style>
 
-<div class="max-w-6xl mx-auto px-4">
-    <div class="t-wrap">
-        <h2 class="neon-title">
-            Testimoni Pengunjung
-        </h2>
-        <div class="title-decoration"></div>
-        <p class="neon-subtitle">
-            Bagikan pengalamanmu, bantu kami jadi lebih baik.
-        </p>
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="t-wrap">
+            <h2 class="neon-title">
+                Testimoni Pengunjung
+            </h2>
+            <div class="title-decoration"></div>
+            <p class="neon-subtitle">
+                Bagikan pengalamanmu, bantu kami jadi lebih baik.
+            </p>
 
-        {{-- ===== SUMMARY (TOP) ===== --}}
-        <div class="grid gap-6 lg:grid-cols-3 mb-8">
-            {{-- Left: distribution --}}
-            <div class="t-card lg:col-span-2">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="font-bold text-lg">Ringkasan Rating</div>
-                    <div class="t-chip">{{ $total }} Rating</div>
-                </div>
+            {{-- ===== SUMMARY (TOP) ===== --}}
+            <div class="grid gap-6 lg:grid-cols-3 mb-8">
 
-                @for($r = 5; $r >= 1; $r--)
-                    @php $p = $pct($counts[$r]); @endphp
-                    <div class="flex items-center gap-4 mb-4">
-                        <div class="w-20 text-sm font-bold tracking-wide" style="color: #ff8c42;">
-                            {{ $r }} ★
+                {{-- Left: distribution (NEON) --}}
+                <div class="t-neon-shell lg:col-span-2">
+                    <div class="t-neon-glow"></div>
+                    <div class="t-neon-inner t-card">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="font-bold text-lg">Ringkasan Rating</div>
+                            <div class="t-chip">{{ $total }} Rating</div>
                         </div>
-                        <div class="flex-1 t-bar">
-                            <span style="width: {{ $p }}%"></span>
-                        </div>
-                        <div class="w-16 text-right text-sm font-semibold" style="color: #ff8c42;">
-                            {{ $counts[$r] }} ({{ $p }}%)
-                        </div>
-                    </div>
-                @endfor
-            </div>
 
-            {{-- Right: average --}}
-            <div class="t-card flex flex-col items-center justify-center text-center">
-                <div class="text-5xl font-extrabold" style="color: #ff6b00;">
-                    {{ number_format($avg, 1) }}
-                </div>
-
-                <div class="mt-3 flex items-center justify-center gap-1">
-    @php
-        // 4.5 => 4 full + 1 half
-        $full = (int) floor($avg);
-        $dec  = $avg - $full;
-        $half = $dec >= 0.5 ? 1 : 0;
-        $empty = 5 - $full - $half;
-        if ($empty < 0) $empty = 0;
-    @endphp
-
-    {{-- FULL STARS --}}
-    @for($i=0; $i < $full; $i++)
-        <span class="text-3xl" style="color:#f59e0b;">★</span>
-    @endfor
-
-    {{-- HALF STAR (pakai 2 layer: abu + emas setengah) --}}
-    @if($half === 1)
-        <span class="text-3xl relative inline-block" aria-hidden="true" style="line-height:1;">
-            <span style="color: rgba(156, 163, 175, 0.3);">★</span>
-            <span style="position:absolute; left:0; top:0; width:50%; overflow:hidden; color:#f59e0b;">★</span>
-        </span>
-    @endif
-
-    {{-- EMPTY STARS --}}
-    @for($i=0; $i < $empty; $i++)
-        <span class="text-3xl" style="color: rgba(156, 163, 175, 0.3);">★</span>
-    @endfor
-</div>
-
-
-                <div class="mt-2 t-muted text-sm">
-                    Dari {{ $total }} rating
-                </div>
-            </div>
-        </div>
-
-        {{-- ===== MAIN (BOTTOM): left list + right form ===== --}}
-        <div class="grid gap-6 lg:grid-cols-2">
-            {{-- LEFT: recent feedbacks --}}
-            <div class="t-card">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="font-bold text-xl">Recent Feedbacks</div>
-                    <div class="t-chip">Terbaru</div>
-                </div>
-
-                <div class="t-scroll space-y-4">
-                    @forelse($testimonials as $t)
-                        <div class="t-soft feedback-item">
-                            <div class="flex items-start gap-4">
-                                <img
-                                    class="w-16 h-16 rounded-full object-cover border border-[#ff6b00]"
-                                    src="{{ $t->photo ? asset('storage/'.$t->photo) : asset('images/avatar.png') }}"
-                                    alt="Avatar {{ $t->name }}"
-                                />
-
-                                <div class="flex-1">
-                                    <div class="flex items-start justify-between gap-3">
-                                        <div class="min-w-0">
-                                            <div class="font-extrabold text-lg t-name t-anywhere">{{ $t->name }}</div>
-                                            <div class="t-muted text-sm">
-                                                {{ $t->created_at->translatedFormat('d F Y') }}
-                                            </div>
-                                        </div>
-
-                                        <div class="text-right flex-shrink-0">
-                                            <div class="flex justify-end gap-0.5">
-                                                @for($i=1; $i<=5; $i++)
-                                                    <span style="color: {{ $i <= $t->rating ? '#f59e0b' : 'rgba(156, 163, 175, 0.3)' }};">★</span>
-                                                @endfor
-                                            </div>
-                                            <div class="t-muted text-xs mt-1">
-                                                {{ $t->created_at->format('d/m/Y') }}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <p class="mt-3 text-sm leading-relaxed t-muted t-comment">
-                                        {{ $t->message }}
-                                    </p>
-
-                                    <div class="mt-4 flex justify-end">
-                                        <button
-                                            type="button"
-                                            onclick="openReportModal('{{ route('testimonials.report', $t) }}')"
-                                            class="text-xs font-bold text-red-500 hover:underline">
-                                            Laporkan
-                                        </button>
-                                    </div>
+                        @for($r = 5; $r >= 1; $r--)
+                            @php $p = $pct($counts[$r]); @endphp
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-20 text-sm font-bold tracking-wide" style="color: #ff8c42;">
+                                    {{ $r }} ★
+                                </div>
+                                <div class="flex-1 t-bar">
+                                    <span style="width: {{ $p }}%"></span>
+                                </div>
+                                <div class="w-16 text-right text-sm font-semibold" style="color: #ff8c42;">
+                                    {{ $counts[$r] }} ({{ $p }}%)
                                 </div>
                             </div>
+                        @endfor
+                    </div>
+                </div>
+
+                {{-- Right: average (NEON) --}}
+                <div class="t-neon-shell">
+                    <div class="t-neon-glow"></div>
+                    <div class="t-neon-inner t-card flex flex-col items-center justify-center text-center">
+                        <div class="text-5xl font-extrabold" style="color: #ff6b00;">
+                            {{ number_format($avg, 1) }}
                         </div>
-                    @empty
-                        <div class="t-muted text-center py-8">Belum ada testimoni. Jadilah yang pertama 😊</div>
-                    @endforelse
+
+                        <div class="mt-3 flex items-center justify-center gap-1">
+                            @php
+                                $full = (int) floor($avg);
+                                $dec  = $avg - $full;
+                                $half = $dec >= 0.5 ? 1 : 0;
+                                $empty = 5 - $full - $half;
+                                if ($empty < 0) $empty = 0;
+                            @endphp
+
+                            @for($i=0; $i < $full; $i++)
+                                <span class="text-3xl" style="color:#f59e0b;">★</span>
+                            @endfor
+
+                            @if($half === 1)
+                                <span class="text-3xl relative inline-block" aria-hidden="true" style="line-height:1;">
+                                    <span style="color: rgba(156, 163, 175, 0.3);">★</span>
+                                    <span style="position:absolute; left:0; top:0; width:50%; overflow:hidden; color:#f59e0b;">★</span>
+                                </span>
+                            @endif
+
+                            @for($i=0; $i < $empty; $i++)
+                                <span class="text-3xl" style="color: rgba(156, 163, 175, 0.3);">★</span>
+                            @endfor
+                        </div>
+
+                        <div class="mt-2 t-muted text-sm">
+                            Dari {{ $total }} rating
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {{-- RIGHT: add a review --}}
-            <div class="t-card">
-                <div class="font-bold text-xl mb-4">Add a Review</div>
+            {{-- ===== MARQUEE ===== --}}
+            <div class="t-marquee-wrap mb-10">
+                <div class="t-marquee">
+                    @if($items->count() === 0)
+                        <div class="t-muted text-center py-10">Belum ada testimoni. Jadilah yang pertama</div>
+                    @else
+                        {{-- Lane TOP --}}
+                        <div class="t-lane">
+                            <div class="t-track {{ $shouldAnimate ? 'is-right' : 'is-static' }}" style="--t-dur: 34s;">
+                                @for($rep=0; $rep<2; $rep++)
+                                    @foreach($topRow as $t)
+                                        <div class="t-mini-card">
+                                            <div class="t-mini-head">
+                                                <div class="t-avatar" aria-hidden="true">
+                                                    @if(!empty($t->photo))
+                                                        <img src="{{ asset('storage/'.$t->photo) }}" alt="Avatar {{ $t->name }}">
+                                                    @else
+                                                        {{ $initial($t->name) }}
+                                                    @endif
+                                                </div>
 
-                {{-- flash message --}}
-                @if(session('success'))
-                    <div class="mb-4 t-soft p-4 text-sm" style="border-color: #ff6b00;">
-                        ✅ {{ session('success') }}
-                    </div>
-                @endif
+                                                <div class="t-mini-meta">
+                                                    <div class="t-mini-name t-anywhere">{{ $t->name }}</div>
+                                                    <div class="t-mini-role">{{ $roleText($t) }}</div>
 
-                {{-- error bag --}}
-                @if($errors->any())
-                    <div class="mb-4 t-soft p-4 text-sm" style="border-color: #ef4444;">
-                        <div class="font-bold mb-2">Gagal mengirim:</div>
-                        <ul class="list-disc list-inside t-muted space-y-1">
-                            @foreach($errors->all() as $e)
-                                <li>{{ $e }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+                                                    <div class="t-mini-stars" aria-label="Rating {{ $t->rating }} dari 5">
+                                                        @for($i=1; $i<=5; $i++)
+                                                            <span style="color: {{ $i <= (int)$t->rating ? '#f59e0b' : 'rgba(156, 163, 175, 0.35)' }};">★</span>
+                                                        @endfor
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                <form method="POST"
-                      action="{{ route('testimonials.store') }}"
-                      enctype="multipart/form-data"
-                      class="space-y-4"
-                      id="testimonialForm">
-                    @csrf
+                                            <div class="t-mini-quote">
+                                                {{ $t->message }}
+                                            </div>
 
-                    {{-- Honeypot --}}
-                    <input type="text" name="website" value="" autocomplete="off" tabindex="-1"
-                           style="position:absolute;left:-9999px;top:-9999px;height:1px;width:1px;opacity:0;">
+                                            <div class="t-mini-foot">
+                                                <div class="t-mini-date">{{ $t->created_at?->translatedFormat('d M Y') }}</div>
 
-                    {{-- Rating --}}
-                    <div>
-                        <label class="text-sm font-bold">Rating <span class="text-red-500">*</span></label>
-                        <input type="hidden" name="rating" id="ratingValue" value="{{ old('rating', 0) }}">
-
-                        <div class="mt-2 star-row" id="starRow" aria-label="Pilih rating bintang">
-                            @for($i=1; $i<=5; $i++)
-                                <button
-                                    type="button"
-                                    class="star-btn"
-                                    data-star="{{ $i }}"
-                                    aria-label="Pilih {{ $i }} bintang"
-                                    title="Pilih {{ $i }} bintang"
-                                >
-                                    <span class="star">★</span>
-                                </button>
-                            @endfor
+                                                <a href="javascript:void(0)"
+                                                   onclick="openReportModal('{{ route('testimonials.report', $t) }}')"
+                                                   class="t-mini-report">
+                                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                        <path d="M12 3.5L22 20.5H2L12 3.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                                                        <path d="M12 9V14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                        <path d="M12 17.5H12.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                                    </svg>
+                                                    <span>Laporkan</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endfor
+                            </div>
                         </div>
-                        <div class="t-muted text-xs mt-2">Klik bintang untuk memilih rating.</div>
-                    </div>
 
-                    {{-- Nama --}}
-                    <div>
-                        <label class="text-sm font-bold">Nama <span class="text-red-500">*</span></label>
-                        <input class="t-input" name="name" value="{{ old('name') }}" placeholder="Nama kamu">
-                    </div>
+                        {{-- Lane BOTTOM --}}
+                        <div class="t-lane">
+                            <div class="t-track {{ $shouldAnimate ? 'is-left' : 'is-static' }}" style="--t-dur: 36s;">
+                                @for($rep=0; $rep<2; $rep++)
+                                    @foreach($botRow as $t)
+                                        <div class="t-mini-card">
+                                            <div class="t-mini-head">
+                                                <div class="t-avatar" aria-hidden="true">
+                                                    @if(!empty($t->photo))
+                                                        <img src="{{ asset('storage/'.$t->photo) }}" alt="Avatar {{ $t->name }}">
+                                                    @else
+                                                        {{ $initial($t->name) }}
+                                                    @endif
+                                                </div>
 
-                    {{-- Pesan --}}
-                    <div>
-                        <label class="text-sm font-bold">Pesan <span class="text-red-500">*</span></label>
-                        <textarea class="t-textarea" name="message" rows="5" placeholder="Tulis pengalamanmu...">{{ old('message') }}</textarea>
-                    </div>
+                                                <div class="t-mini-meta">
+                                                    <div class="t-mini-name t-anywhere">{{ $t->name }}</div>
+                                                    <div class="t-mini-role">{{ $roleText($t) }}</div>
 
-                    {{-- Foto (opsional) --}}
-                    <div>
-                        <label class="text-sm font-bold">Foto Profil <span class="t-muted text-xs">(opsional, max 5MB)</span></label>
-                        <input class="t-file" type="file" name="photo" accept="image/png,image/jpeg,image/jpg">
-                        <div class="t-muted text-xs mt-2">Format: JPG / JPEG / PNG.</div>
-                    </div>
+                                                    <div class="t-mini-stars" aria-label="Rating {{ $t->rating }} dari 5">
+                                                        @for($i=1; $i<=5; $i++)
+                                                            <span style="color: {{ $i <= (int)$t->rating ? '#f59e0b' : 'rgba(156, 163, 175, 0.35)' }};">★</span>
+                                                        @endfor
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                    <button class="t-btn w-full mt-4">Kirim Testimoni</button>
-                </form>
+                                            <div class="t-mini-quote">
+                                                {{ $t->message }}
+                                            </div>
+
+                                            <div class="t-mini-foot">
+                                                <div class="t-mini-date">{{ $t->created_at?->translatedFormat('d M Y') }}</div>
+
+                                                <a href="javascript:void(0)"
+                                                   onclick="openReportModal('{{ route('testimonials.report', $t) }}')"
+                                                   class="t-mini-report">
+                                                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                                        <path d="M12 3.5L22 20.5H2L12 3.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                                                        <path d="M12 9V14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                        <path d="M12 17.5H12.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                                    </svg>
+                                                    <span>Laporkan</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @endfor
+                            </div>
+                        </div>
+                    @endif
+                </div>
             </div>
+
+            {{-- ===== MAIN (BOTTOM): Add a Review (NEON) ===== --}}
+            <div class="grid gap-6 lg:grid-cols-1">
+                <div class="t-neon-shell">
+                    <div class="t-neon-glow"></div>
+                    <div class="t-neon-inner t-card">
+                        <div class="font-bold text-xl mb-4">Add a Review</div>
+
+                        <div id="clientAlert" class="mb-4 t-alert t-alert-error t-alert-client" role="alert" aria-live="polite"></div>
+
+                        @if(session('testimonial_success'))
+                            <div class="mb-4 t-alert t-alert-success">
+                                {{ session('testimonial_success') }}
+                            </div>
+                        @endif
+
+                        @if(session('testimonial_error'))
+                            <div class="mb-4 t-alert t-alert-error">
+                                {{ session('testimonial_error') }}
+                            </div>
+                        @endif
+
+                        @if(session('report_success'))
+                            <div class="mb-4 t-alert t-alert-success">
+                                {{ session('report_success') }}
+                            </div>
+                        @endif
+
+                        @if(session('report_error'))
+                            <div class="mb-4 t-alert t-alert-error">
+                                {{ session('report_error') }}
+                            </div>
+                        @endif
+
+                        @if(session('success') && !session('testimonial_success') && !session('report_success'))
+                            <div class="mb-4 t-alert t-alert-success">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
+                        @if(session('error') && !session('testimonial_error') && !session('report_error'))
+                            <div class="mb-4 t-alert t-alert-error">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+
+                        @if($errors->any())
+                            <div class="mb-4 t-alert t-alert-error">
+                                <div class="font-bold mb-2">Gagal mengirim:</div>
+                                <ul class="list-disc list-inside space-y-1" style="font-weight: 700;">
+                                    @foreach($errors->all() as $e)
+                                        <li>{{ $e }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <form method="POST"
+                              action="{{ route('testimonials.store') }}"
+                              enctype="multipart/form-data"
+                              class="space-y-4"
+                              id="testimonialForm">
+                            @csrf
+
+                            <input type="text" name="website" value="" autocomplete="off" tabindex="-1"
+                                   style="position:absolute;left:-9999px;top:-9999px;height:1px;width:1px;opacity:0;">
+
+                            <div class="t-form-grid">
+                                <div class="t-form-span-2">
+                                    <label class="text-sm font-bold">Rating <span class="text-red-500">*</span></label>
+                                    <input type="hidden" name="rating" id="ratingValue" value="{{ old('rating', 0) }}">
+
+                                    <div class="mt-2 star-row" id="starRow" aria-label="Pilih rating bintang">
+                                        @for($i=1; $i<=5; $i++)
+                                            <button
+                                                type="button"
+                                                class="star-btn"
+                                                data-star="{{ $i }}"
+                                                aria-label="Pilih {{ $i }} bintang"
+                                                title="Pilih {{ $i }} bintang"
+                                            >
+                                                <span class="star">★</span>
+                                            </button>
+                                        @endfor
+                                    </div>
+                                    <div class="t-muted text-xs mt-2">Klik bintang untuk memilih rating.</div>
+                                </div>
+
+                                <div>
+                                    <label class="text-sm font-bold">Nama <span class="text-red-500">*</span></label>
+                                    <input class="t-input" name="name" value="{{ old('name') }}" placeholder="Nama kamu">
+                                </div>
+
+                                <div>
+                                    <label class="text-sm font-bold">Foto Profil <span class="t-muted text-xs">(opsional, max 5MB)</span></label>
+                                    <input class="t-file" type="file" name="photo" accept="image/png,image/jpeg,image/jpg">
+                                    <div class="t-muted text-xs mt-2">Format: JPG / JPEG / PNG.</div>
+                                </div>
+
+                                <div class="t-form-span-2">
+                                    <label class="text-sm font-bold">Pesan <span class="text-red-500">*</span></label>
+                                    <textarea class="t-textarea" name="message" rows="5" placeholder="Tulis pengalamanmu...">{{ old('message') }}</textarea>
+                                </div>
+
+                                <div class="t-form-span-2">
+                                    <button class="t-btn w-full mt-2">Kirim Testimoni</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
-</div>
 
     {{-- ================= MODAL REPORT ================= --}}
     <div id="reportModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 px-4" style="backdrop-filter: blur(4px);">
@@ -555,7 +994,6 @@
     </div>
 
     <script>
-        // ===== modal report =====
         function openReportModal(actionUrl) {
             const modal = document.getElementById('reportModal');
             const form  = document.getElementById('reportForm');
@@ -572,10 +1010,14 @@
             if (e.target.id === 'reportModal') closeReportModal();
         });
 
-        // ===== rating stars =====
         (function () {
             const row = document.getElementById('starRow');
             const input = document.getElementById('ratingValue');
+            const form = document.getElementById('testimonialForm');
+            const textarea = form?.querySelector('textarea[name="message"]');
+            const nameInput = form?.querySelector('input[name="name"]');
+            const alertBox = document.getElementById('clientAlert');
+
             if (!row || !input) return;
 
             function paint(v) {
@@ -586,7 +1028,19 @@
                 });
             }
 
-            // init (old value)
+            function showAlert(msg) {
+                if (!alertBox) return;
+                alertBox.textContent = msg;
+                alertBox.style.display = 'block';
+                alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            function hideAlert() {
+                if (!alertBox) return;
+                alertBox.textContent = '';
+                alertBox.style.display = 'none';
+            }
+
             const initial = parseInt(input.value || '0', 10);
             paint(initial);
 
@@ -595,32 +1049,46 @@
                     const v = parseInt(btn.dataset.star, 10);
                     input.value = v;
                     paint(v);
+                    hideAlert();
                 });
 
-                // optional: hover preview (tanpa ngubah value)
                 btn.addEventListener('mouseenter', () => {
                     const v = parseInt(btn.dataset.star, 10);
                     paint(v);
                 });
             });
 
-            // balik lagi ke value asli saat mouse keluar row
             row.addEventListener('mouseleave', () => {
                 const v = parseInt(input.value || '0', 10);
                 paint(v);
             });
 
-            // prevent submit rating=0
-            document.getElementById('testimonialForm')?.addEventListener('submit', (e) => {
+            textarea?.addEventListener('input', () => hideAlert());
+            nameInput?.addEventListener('input', () => hideAlert());
+
+            form?.addEventListener('submit', (e) => {
                 const v = parseInt(input.value || '0', 10);
+                const msg = (textarea?.value || '').trim();
+                const nm  = (nameInput?.value || '').trim();
+
                 if (!v || v < 1) {
                     e.preventDefault();
-                    alert('Silakan pilih rating bintang dulu.');
+                    showAlert('Silakan pilih rating bintang terlebih dahulu.');
+                    return;
+                }
+                if (!msg) {
+                    e.preventDefault();
+                    showAlert('Silakan isi deskripsi/pesan testimoni terlebih dahulu.');
+                    return;
+                }
+                if (!nm) {
+                    e.preventDefault();
+                    showAlert('Silakan isi nama terlebih dahulu.');
+                    return;
                 }
             });
         })();
 
-        // ===== anim keyframes =====
         const style = document.createElement('style');
         style.textContent = `
             @keyframes scaleIn {
