@@ -17,7 +17,7 @@
     // ===== GAME (PLAYER) =====
     $playerLoggedIn = auth()->guard('player')->check();
     $gameUrl = $playerLoggedIn ? route('game.learn') : route('player.login');
-    $gameLabel = $playerLoggedIn ? 'Belajar' : 'Masuk Game';
+    $gameLabel = $playerLoggedIn ? 'Game' : 'Game';
 @endphp
 
 <header class="site-header" id="top">
@@ -52,7 +52,7 @@
                 {{-- ================= MODE HOME ================= --}}
 
                 <button class="nav-btn is-active" data-target="#home">
-                    <span>Home</span>
+                    <span>Beranda</span>
                 </button>
 
                 {{-- Pulau + dropdown daftar pulau --}}
@@ -115,7 +115,7 @@
 
                 {{-- Home: balik ke Budaya Indonesia (landing) --}}
                 <button class="nav-btn" data-url="{{ route('home') }}">
-                    <span>Home</span>
+                    <span>Beranda</span>
                 </button>
 
                 {{-- Dropdown Pulau --}}
@@ -214,7 +214,7 @@
         <div class="drawer-links">
             @if (!$isIslandMode)
                 {{-- MODE HOME --}}
-                <a href="#home" data-target="#home" class="drawer-link">Home</a>
+                <a href="#home" data-target="#home" class="drawer-link">Beranda</a>
                 <a href="#about" data-target="#about" class="drawer-link">Tentang</a>
                 <a href="#history" data-target="#history" class="drawer-link">Sejarah</a>
                 <a href="#stats" data-target="#stats" class="drawer-link">Statistik</a>
@@ -248,7 +248,7 @@
                 <a href="#testimoni" data-target="#testimoni" class="drawer-link">Testimoni</a>
             @else
                 {{-- MODE ISLAND --}}
-                <a href="{{ route('home') }}" class="drawer-link">Home</a>
+                <a href="{{ route('home') }}" class="drawer-link">Beranda</a>
                 <a href="#about" data-target="#about" class="drawer-link">Tentang</a>
                 <a href="#history" data-target="#history" class="drawer-link">Warisan</a>
                 <a href="#stats" data-target="#stats" class="drawer-link">Statistik</a>

@@ -71,7 +71,7 @@ class IslandSeeder extends Seeder
                 'name'   => 'Pulau Papua & Maluku',
                 'slug'   => 'papua&maluku',
                 'place_label' => 'Raja Ampat',
-                'title'  => 'PAPUA',
+                'title'  => 'Pulau',
                 'subtitle' => 'PAPUA & MALUKU',
                 'short_description' => 'Pulau paling timur dengan Raja Ampat dan pegunungan tinggi.',
                 'image_url' => 'https://images.unsplash.com/photo-1703769605297-cc74106244d9?auto=format&fit=crop&q=80&w=1184',

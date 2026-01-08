@@ -1,130 +1,235 @@
+{{-- resources/views/admin/destinations/index.blade.php (REPLACE FULL) --}}
 @extends('layouts.admin')
 
 @section('title', 'Admin - Destinasi')
 
 @section('content')
-<div class="max-w-6xl mx-auto py-8 px-4 text-slate-100">
+<div class="a-wrap" data-page="admin-destinations-index">
 
-    <h1 class="text-2xl font-bold mb-4">Destinasi (CRUD per Pulau & Suku)</h1>
-
-    @if(session('status'))
-        <div class="mb-4 rounded bg-emerald-600/80 px-3 py-2 text-sm">
-            {{ session('status') }}
+    {{-- PAGE HEAD --}}
+    <div class="a-head">
+        <div class="a-head-left">
+            <div class="a-head-title">Destinasi (CRUD per Pulau &amp; Suku)</div>
+            <div class="a-head-desc">
+                Kelola destinasi berdasarkan <strong>Pulau</strong> dan <strong>Suku</strong>.
+                Pilih filter untuk melihat data, lalu tambah/edit/hapus destinasi.
+            </div>
         </div>
-    @endif
 
-    {{-- FILTER: Pulau + Suku --}}
-    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <form method="GET" action="{{ route('admin.destinations.index') }}" class="rounded-xl bg-slate-900/60 border border-slate-700 p-4">
-            <div class="mb-3">
-                <label class="block text-xs text-slate-400 mb-1">Pilih Pulau</label>
-                <select name="island" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm"
-                        onchange="this.form.submit()">
-                    @foreach($islands as $isl)
-                        <option value="{{ $isl->slug }}" {{ optional($selectedIsland)->slug === $isl->slug ? 'selected' : '' }}>
-                            {{ $isl->name }} ({{ $isl->slug }})
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+        <div class="a-head-right">
+            @if(session('status'))
+                <div class="a-alert a-alert-success">
+                    {{ session('status') }}
+                </div>
+            @endif
+        </div>
+    </div>
 
-            <div>
-                <label class="block text-xs text-slate-400 mb-1">Pilih Suku</label>
-                <select name="tribe" class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm"
-                        onchange="this.form.submit()">
-                    @forelse($tribes as $t)
-                        <option value="{{ $t }}" {{ $selectedTribe === $t ? 'selected' : '' }}>
-                            {{ $t }}
-                        </option>
-                    @empty
-                        <option value="">(Belum ada suku untuk pulau ini)</option>
-                    @endforelse
-                </select>
-            </div>
-        </form>
-
-        <div class="rounded-xl bg-slate-900/60 border border-slate-700 p-4 flex flex-col justify-between">
-            <div class="text-sm text-slate-300">
-                <div><span class="text-slate-400">Pulau:</span> <b>{{ optional($selectedIsland)->name ?? '-' }}</b></div>
-                <div><span class="text-slate-400">Suku:</span> <b>{{ $selectedTribe ?: '-' }}</b></div>
-            </div>
-
-            <div class="mt-4">
-                @if($selectedIsland && $selectedTribe)
-                    <a href="{{ route('admin.destinations.create', ['island' => $selectedIsland->slug, 'tribe' => $selectedTribe]) }}"
-                       class="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-semibold">
-                        + Tambah Destinasi
-                    </a>
-                @else
-                    <div class="text-xs text-slate-400">
-                        Pilih pulau & suku dulu untuk menambah destinasi.
+    {{-- FILTER + INFO --}}
+    <div class="a-grid">
+        <div class="a-col-6">
+            <div class="a-card" data-card data-card-key="admin_destinations_filter">
+                <div class="a-card-inner">
+                    <div class="a-card-head">
+                        <div>
+                            <div class="a-card-title">Filter Pulau + Suku</div>
+                            <div class="a-card-desc">Pilih pulau lalu pilih suku. Halaman akan auto-load.</div>
+                        </div>
+                        <div class="a-card-actions">
+                            <span class="a-badge"><i class="bx bx-filter-alt"></i> Filter</span>
+                        </div>
                     </div>
-                @endif
+
+                    <form method="GET" action="{{ route('admin.destinations.index') }}" class="a-form a-form-tight">
+                        <div class="a-grid">
+                            <div class="a-col-12">
+                                <label class="a-label" for="destIsland">Pilih Pulau</label>
+                                <select id="destIsland"
+                                        name="island"
+                                        class="a-select"
+                                        onchange="this.form.submit()">
+                                    @foreach($islands as $isl)
+                                        <option value="{{ $isl->slug }}" {{ optional($selectedIsland)->slug === $isl->slug ? 'selected' : '' }}>
+                                            {{ $isl->name }} ({{ $isl->slug }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="a-col-12">
+                                <label class="a-label" for="destTribe">Pilih Suku</label>
+                                <select id="destTribe"
+                                        name="tribe"
+                                        class="a-select"
+                                        onchange="this.form.submit()">
+                                    @forelse($tribes as $t)
+                                        <option value="{{ $t }}" {{ $selectedTribe === $t ? 'selected' : '' }}>
+                                            {{ $t }}
+                                        </option>
+                                    @empty
+                                        <option value="">(Belum ada suku untuk pulau ini)</option>
+                                    @endforelse
+                                </select>
+                                <div class="a-help">
+                                    Jika suku kosong, berarti di config <strong>tribes.php</strong> belum ada untuk pulau tersebut.
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="a-col-6">
+            <div class="a-card" data-card data-card-key="admin_destinations_summary">
+                <div class="a-card-inner">
+                    <div class="a-card-head">
+                        <div>
+                            <div class="a-card-title">Ringkasan Pilihan</div>
+                            <div class="a-card-desc">Konteks data yang sedang kamu kelola.</div>
+                        </div>
+                        <div class="a-card-actions">
+                            <span class="a-badge"><i class="bx bx-map"></i> Context</span>
+                        </div>
+                    </div>
+
+                    <div class="a-card-body">
+                        <div class="a-kv">
+                            <div class="k">Pulau</div>
+                            <div class="v">{{ optional($selectedIsland)->name ?? '-' }}</div>
+                        </div>
+                        <div class="a-kv">
+                            <div class="k">Suku</div>
+                            <div class="v">{{ $selectedTribe ?: '-' }}</div>
+                        </div>
+                        <div class="a-kv">
+                            <div class="k">Total Destinasi</div>
+                            <div class="v">{{ $rows->count() }}</div>
+                        </div>
+                    </div>
+
+                    <div class="a-actions">
+                        @if($selectedIsland && $selectedTribe)
+                            <a href="{{ route('admin.destinations.create', ['island' => $selectedIsland->slug, 'tribe' => $selectedTribe]) }}"
+                               class="a-btn a-btn-primary">
+                                <i class="bx bx-plus"></i> Tambah Destinasi
+                            </a>
+                        @else
+                            <div class="a-note">
+                                Pilih pulau &amp; suku dulu untuk menambah destinasi.
+                            </div>
+                        @endif
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- TABLE --}}
-    <div class="overflow-x-auto rounded-xl border border-slate-700 bg-slate-900/60">
-        <table class="min-w-full text-sm">
-            <thead class="bg-slate-950/70 text-slate-300">
-                <tr>
-                    <th class="text-left px-4 py-3">#</th>
-                    <th class="text-left px-4 py-3">Nama</th>
-                    <th class="text-left px-4 py-3">Lokasi</th>
-                    <th class="text-left px-4 py-3">Rating</th>
-                    <th class="text-left px-4 py-3">Gambar</th>
-                    <th class="text-left px-4 py-3">Aktif</th>
-                    <th class="text-right px-4 py-3">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="text-slate-200">
-                @forelse($rows as $i => $row)
-                    <tr class="border-t border-slate-800">
-                        <td class="px-4 py-3">{{ $i + 1 }}</td>
-                        <td class="px-4 py-3 font-semibold">{{ $row->name }}</td>
-                        <td class="px-4 py-3 text-slate-300">{{ $row->location ?? '—' }}</td>
-                        <td class="px-4 py-3">{{ number_format((float)$row->rating, 1) }}</td>
-                        <td class="px-4 py-3">
-                            @if($row->image_display_url)
-                                <a href="{{ $row->image_display_url }}" target="_blank" class="text-orange-400 underline">Lihat</a>
-                            @else
-                                <span class="text-slate-400">—</span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-3">
-                            @if($row->is_active)
-                                <span class="px-2 py-1 rounded bg-emerald-600/70 text-white text-xs">Aktif</span>
-                            @else
-                                <span class="px-2 py-1 rounded bg-slate-700 text-slate-200 text-xs">Off</span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-3 text-right">
-                            <a href="{{ route('admin.destinations.edit', $row) }}"
-                               class="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs font-semibold">
-                                Edit
-                            </a>
+    {{-- TABLE LIST --}}
+    <div class="a-card" data-card data-card-key="admin_destinations_table">
+        <div class="a-card-inner">
+            <div class="a-card-head">
+                <div>
+                    <div class="a-card-title">Daftar Destinasi</div>
+                    <div class="a-card-desc">
+                        Edit untuk mengubah data. Hapus untuk menghapus destinasi.
+                    </div>
+                </div>
+                <div class="a-card-actions">
+                    <span class="a-badge"><i class="bx bx-table"></i> Table</span>
+                </div>
+            </div>
 
-                            <form action="{{ route('admin.destinations.destroy', $row) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        onclick="return confirm('Hapus destinasi ini?')"
-                                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded bg-red-600/80 hover:bg-red-600 text-xs font-semibold text-white">
-                                    Hapus
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr class="border-t border-slate-800">
-                        <td colspan="7" class="px-4 py-6 text-slate-400">
-                            Belum ada destinasi untuk pulau & suku yang dipilih.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+            <div class="a-tableWrap">
+                <table class="a-table">
+                    <thead>
+                        <tr>
+                            <th class="col-num">#</th>
+                            <th>Nama</th>
+                            <th>Lokasi</th>
+                            <th class="col-rating">Rating</th>
+                            <th class="col-img">Gambar</th>
+                            <th class="col-active">Aktif</th>
+                            <th class="col-actions">Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @forelse($rows as $i => $row)
+                            <tr>
+                                <td class="col-num">{{ $i + 1 }}</td>
+
+                                <td>
+                                    <div class="a-tdMain">{{ $row->name }}</div>
+                                    <div class="a-tdSub">
+                                        ID: {{ $row->id ?? '—' }}
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="a-tdMain">{{ $row->location ?? '—' }}</div>
+                                </td>
+
+                                <td class="col-rating">
+                                    <span class="a-pillBadge">
+                                        <i class="bx bxs-star"></i>
+                                        {{ number_format((float)$row->rating, 1) }}
+                                    </span>
+                                </td>
+
+                                <td class="col-img">
+                                    @if($row->image_display_url)
+                                        <a href="{{ $row->image_display_url }}" target="_blank" class="a-link">
+                                            Lihat
+                                        </a>
+                                    @else
+                                        <span class="a-muted">—</span>
+                                    @endif
+                                </td>
+
+                                <td class="col-active">
+                                    @if($row->is_active)
+                                        <span class="a-status a-status-on">Aktif</span>
+                                    @else
+                                        <span class="a-status a-status-off">Off</span>
+                                    @endif
+                                </td>
+
+                                <td class="col-actions">
+                                    <div class="a-rowActions">
+                                        <a href="{{ route('admin.destinations.edit', $row) }}"
+                                           class="a-btn a-btn-sm">
+                                            <i class="bx bx-edit"></i> Edit
+                                        </a>
+
+                                        <form action="{{ route('admin.destinations.destroy', $row) }}" method="POST" class="a-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    onclick="return confirm('Hapus destinasi ini?')"
+                                                    class="a-btn a-btn-sm a-btn-danger">
+                                                <i class="bx bx-trash"></i> Hapus
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7">
+                                    <div class="a-empty">
+                                        Belum ada destinasi untuk pulau &amp; suku yang dipilih.
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
     </div>
 
 </div>

@@ -1,154 +1,209 @@
-{{-- resources/views/admin/histories/index.blade.php --}}
+{{-- resources/views/admin/histories/index.blade.php (REPLACE FULL) --}}
 @extends('layouts.admin')
 
 @section('title', 'History Pulau & Suku')
 
 @section('content')
-<div class="max-w-6xl mx-auto px-4 py-6">
+@php
+    // keep original variables behavior
+    $islandId = $islandId ?? request('island_id');
+    $tribe    = $tribe ?? request('tribe');
+@endphp
 
-    {{-- HEADER --}}
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-semibold">History Pulau &amp; Suku</h1>
-        <a href="{{ route('admin.histories.create') }}"
-           class="px-4 py-2 rounded-full bg-orange-500 hover:bg-orange-600 text-white text-sm shadow-lg shadow-orange-500/40">
-            + Tambah History
-        </a>
+<div class="a-wrap" data-page="admin-histories-index">
+
+    {{-- PAGE HEAD --}}
+    <div class="a-head">
+        <div class="a-head-left">
+            <div class="a-head-title">History Pulau &amp; Suku</div>
+            <div class="a-head-desc">
+                Kelola data history berdasarkan Pulau dan Suku. Kamu bisa filter, tambah, edit, dan hapus.
+                Tampilan mengikuti UI kit admin agar konsisten.
+            </div>
+        </div>
+
+        <div class="a-head-right" style="display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap;">
+            <a href="{{ route('admin.histories.create') }}" class="a-btn a-btn-primary">
+                <i class="bx bx-plus"></i> Tambah History
+            </a>
+        </div>
     </div>
 
     {{-- FLASH MESSAGE --}}
     @if(session('success'))
-        <div class="mb-4 px-4 py-3 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/40 text-sm">
+        <div class="a-alert a-alert-success" style="margin-bottom:12px;">
             {{ session('success') }}
         </div>
     @endif
 
-    {{-- FILTER --}}
-    <form method="GET" class="mb-5 flex flex-wrap gap-3 items-end">
-        {{-- Pulau --}}
-        <div>
-            <label class="text-xs font-medium block mb-1">Pulau</label>
-            <select name="island_id"
-                    class="rounded-lg border border-slate-700 bg-slate-900/60 text-sm px-3 py-2">
-                <option value="">Semua Pulau</option>
-                @foreach($islands as $island)
-                    <option value="{{ $island->id }}" @selected($islandId == $island->id)>
-                        {{ $island->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+    {{-- FILTER CARD --}}
+    <div class="a-card" data-card data-card-key="admin_histories_filter">
+        <div class="a-card-inner">
+            <div class="a-card-head">
+                <div>
+                    <div class="a-card-title">Filter</div>
+                    <div class="a-card-desc">Pilih Pulau dan/atau Suku untuk menyaring data.</div>
+                </div>
+                <div class="a-card-actions">
+                    <span class="a-badge"><i class="bx bx-filter-alt"></i> Filter</span>
+                </div>
+            </div>
 
-        {{-- Suku --}}
-        <div>
-            <label class="text-xs font-medium block mb-1">Suku</label>
-            <select name="tribe"
-                    class="rounded-lg border border-slate-700 bg-slate-900/60 text-sm px-3 py-2">
-                <option value="">Semua Suku</option>
-                @foreach($tribes as $t)
-                    <option value="{{ $t }}" @selected($tribe === $t)>
-                        {{ $t }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+            <form method="GET" class="a-form">
+                <div class="a-grid">
+                    {{-- Pulau --}}
+                    <div class="a-col-4">
+                        <label class="a-label">Pulau</label>
+                        <select name="island_id" class="a-select">
+                            <option value="">Semua Pulau</option>
+                            @foreach($islands as $island)
+                                <option value="{{ $island->id }}" @selected($islandId == $island->id)>
+                                    {{ $island->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-        <button type="submit"
-                class="px-4 py-2 rounded-lg bg-slate-800 text-sm border border-slate-700">
-            Filter
-        </button>
+                    {{-- Suku --}}
+                    <div class="a-col-4">
+                        <label class="a-label">Suku</label>
+                        <select name="tribe" class="a-select">
+                            <option value="">Semua Suku</option>
+                            @foreach($tribes as $t)
+                                <option value="{{ $t }}" @selected($tribe === $t)>
+                                    {{ $t }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-        @if($islandId || $tribe)
-            <a href="{{ route('admin.histories.index') }}"
-               class="px-4 py-2 rounded-lg bg-slate-900 text-sm border border-slate-700 text-slate-400">
-                Reset
-            </a>
-        @endif
-    </form>
+                    {{-- Actions --}}
+                    <div class="a-col-4">
+                        <div class="a-actions" style="margin-top:26px;">
+                            <button type="submit" class="a-btn a-btn-primary">
+                                <i class="bx bx-search"></i> Filter
+                            </button>
 
-    {{-- TABLE --}}
-    <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/40">
-        <table class="min-w-full text-sm">
-            <thead class="bg-slate-900/60">
-                <tr class="text-left">
-                    <th class="px-4 py-3">Pulau</th>
-                    <th class="px-4 py-3">Suku</th>
-                    <th class="px-4 py-3">Tahun / Waktu</th>
-                    <th class="px-4 py-3">Judul</th>
-                    <th class="px-4 py-3">Header?</th>
-                    <th class="px-4 py-3 text-right">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($histories as $history)
-                    <tr class="border-t border-slate-800/70">
-                        <td class="px-4 py-3">
-                            {{ $history->island->name ?? '-' }}
-                        </td>
-
-                        <td class="px-4 py-3">
-                            {{ $history->tribe }}
-                        </td>
-
-                        <td class="px-4 py-3">
-                            {{ $history->year_label }}
-                        </td>
-
-                        <td class="px-4 py-3">
-                            {{ \Illuminate\Support\Str::limit($history->title, 50) }}
-                        </td>
-
-                        {{-- INFO HEADER (TRIBE PAGE) --}}
-                        <td class="px-4 py-3">
-                            @php
-                                $hasHeader = \App\Models\TribePage::where('island_id', $history->island_id)
-                                    ->where('tribe_key', $history->tribe)
-                                    ->exists();
-                            @endphp
-
-                            @if($hasHeader)
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs">
-                                    Ada
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-400 text-xs">
-                                    Belum
-                                </span>
+                            @if($islandId || $tribe)
+                                <a href="{{ route('admin.histories.index') }}" class="a-btn">
+                                    <i class="bx bx-refresh"></i> Reset
+                                </a>
                             @endif
-                        </td>
+                        </div>
 
-                        <td class="px-4 py-3 text-right space-x-2">
-                            <a href="{{ route('admin.histories.edit', $history) }}"
-                               class="text-xs px-3 py-1 rounded-full border border-slate-700 hover:bg-slate-800">
-                                Edit
-                            </a>
+                        @if($islandId || $tribe)
+                            <div class="a-note">
+                                Filter aktif:
+                                @if($islandId) <strong>Pulau</strong> dipilih. @endif
+                                @if($tribe) <strong>Suku</strong> dipilih. @endif
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </form>
 
-                            <form action="{{ route('admin.histories.destroy', $history) }}"
-                                  method="POST"
-                                  class="inline-block"
-                                  onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit"
-                                        class="text-xs px-3 py-1 rounded-full border border-red-500/60 text-red-400 hover:bg-red-500/10">
-                                    Hapus
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="px-4 py-6 text-center text-slate-500">
-                            Belum ada data history.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+        </div>
     </div>
 
-    {{-- PAGINATION --}}
-    <div class="mt-4">
-        {{ $histories->withQueryString()->links() }}
+    {{-- TABLE CARD --}}
+    <div class="a-card" data-card data-card-key="admin_histories_table" style="margin-top:12px;">
+        <div class="a-card-inner">
+            <div class="a-card-head">
+                <div>
+                    <div class="a-card-title">Daftar History</div>
+                    <div class="a-card-desc">Klik Edit untuk mengubah data. Hapus untuk menghapus data.</div>
+                </div>
+                <div class="a-card-actions">
+                    <span class="a-badge"><i class="bx bx-table"></i> Table</span>
+                </div>
+            </div>
+
+            <div class="a-tableWrap">
+                <table class="a-table">
+                    <thead>
+                        <tr>
+                            <th>Pulau</th>
+                            <th>Suku</th>
+                            <th>Tahun / Waktu</th>
+                            <th>Judul</th>
+                            <th style="width:120px;">Header?</th>
+                            <th class="col-actions">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($histories as $history)
+                            <tr>
+                                <td>
+                                    <div class="a-tdMain">{{ $history->island->name ?? '-' }}</div>
+                                    <div class="a-tdSub">ID: {{ $history->island_id }}</div>
+                                </td>
+
+                                <td>
+                                    <div class="a-tdMain">{{ $history->tribe }}</div>
+                                </td>
+
+                                <td>
+                                    <div class="a-tdMain">{{ $history->year_label }}</div>
+                                </td>
+
+                                <td>
+                                    <div class="a-tdMain">{{ \Illuminate\Support\Str::limit($history->title, 50) }}</div>
+                                </td>
+
+                                {{-- INFO HEADER (TRIBE PAGE) --}}
+                                <td>
+                                    @php
+                                        $hasHeader = \App\Models\TribePage::where('island_id', $history->island_id)
+                                            ->where('tribe_key', $history->tribe)
+                                            ->exists();
+                                    @endphp
+
+                                    @if($hasHeader)
+                                        <span class="a-status a-status-on">Ada</span>
+                                    @else
+                                        <span class="a-status a-status-off">Belum</span>
+                                    @endif
+                                </td>
+
+                                <td class="col-actions">
+                                    <div class="a-rowActions">
+                                        <a href="{{ route('admin.histories.edit', $history) }}"
+                                           class="a-btn a-btn-sm">
+                                            <i class="bx bx-edit"></i> Edit
+                                        </a>
+
+                                        <form action="{{ route('admin.histories.destroy', $history) }}"
+                                              method="POST"
+                                              class="a-inline"
+                                              onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="a-btn a-btn-danger a-btn-sm">
+                                                <i class="bx bx-trash"></i> Hapus
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6">
+                                    <div class="a-empty" style="margin-top:0;">
+                                        Belum ada data history.
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- PAGINATION --}}
+            <div style="margin-top:12px;">
+                {{ $histories->withQueryString()->links() }}
+            </div>
+        </div>
     </div>
+
 </div>
 @endsection

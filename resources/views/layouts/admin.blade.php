@@ -27,46 +27,39 @@
         </div>
 
         <ul class="nav-list">
-            {{-- Search --}}
-            <li>
-                <i class="bx bx-search"></i>
-                <input type="text" placeholder="Search..." />
-                <span class="tooltip">Search</span>
+            {{-- THEME TOGGLE (REPLACE SEARCH) --}}
+            <li class="theme-toggle-item">
+                <button type="button" class="theme-toggle-btn" id="themeToggle" aria-label="Ganti tema">
+                    <i class="bx bx-moon" id="themeIcon"></i>
+                    <span class="links_name" id="themeText">Tema</span>
+                </button>
+                <span class="tooltip" id="themeTooltip">Tema: Light</span>
             </li>
-<li>
-    <a href="{{ route('admin.about_stats.index') }}">
-        <i class='bx bx-info-circle'></i>
-        <span class="links_name">About Pulau + Statistik</span>
-    </a>
-    <span class="tooltip">About Pulau + Statistik</span>
-</li>
-
-<li>
-    <a href="{{ route('admin.destinations.index') }}">
-        <i class="bx bx-map-alt"></i>
-        <span class="links_name">Destinasi</span>
-    </a>
-    <span class="tooltip">Destinasi</span>
-</li>
-
 
             <li>
-    <a href="{{ route('admin.abouts.index') }}">
-        <i class='bx bx-info-circle'></i>
-        <span class="links_name">About Suku</span>
-    </a>
-    <span class="tooltip">About Suku</span>
-</li>
-
-
-            {{-- Dashboard --}}
-            {{-- <li>
-                <a href="{{ route('admin.dashboard') }}">
-                    <i class="bx bx-grid-alt"></i>
-                    <span class="links_name">Dashboard</span>
+                <a href="{{ route('admin.about_stats.index') }}">
+                    <i class='bx bx-info-circle'></i>
+                    <span class="links_name">About Pulau + Statistik</span>
                 </a>
-                <span class="tooltip">Dashboard</span>
-            </li> --}}
+                <span class="tooltip">About Pulau + Statistik</span>
+            </li>
+
+            <li>
+                <a href="{{ route('admin.destinations.index') }}">
+                    <i class="bx bx-map-alt"></i>
+                    <span class="links_name">Destinasi</span>
+                </a>
+                <span class="tooltip">Destinasi</span>
+            </li>
+
+            <li>
+                <a href="{{ route('admin.abouts.index') }}">
+                    <i class='bx bx-info-circle'></i>
+                    <span class="links_name">About Suku</span>
+                </a>
+                <span class="tooltip">About Suku</span>
+            </li>
+
 
             {{-- History Pulau & Suku --}}
             <li>
@@ -78,27 +71,11 @@
                 <span class="tooltip">History Pulau &amp; Suku</span>
             </li>
 
-            {{-- Statistik Pulau --}}
-            {{-- <li>
-                <a href="{{ route('admin.stats.index') }}">
-                    <i class='bx bx-pie-chart-alt-2'></i>
-                    <span class="links_name">Statistik</span>
-                </a>
-                <span class="tooltip">Statistik</span>
-            </li> --}}
 
-            {{-- Destinasi --}}
-            <li>
-                <a href="#">
-                    {{-- nanti ganti ke route('admin.destinations.index') --}}
-                    <i class="bx bx-map-alt"></i>
-                    <span class="links_name">Destinasi</span>
-                </a>
-                <span class="tooltip">Destinasi</span>
-            </li>
+
+
 
             {{-- Makanan --}}
-
 
             <li>
                 <a href="{{ route('admin.testimonials.index') }}">
@@ -124,33 +101,22 @@
             </li>
 
             <li>
-  <a href="{{ route('admin.game-levels.index') }}">
-    <i class='bx bx-joystick'></i>
-    <span class="links_name">Game Levels</span>
-  </a>
-  <span class="tooltip">Game Levels</span>
-</li>
-
+                <a href="{{ route('admin.game-levels.index') }}">
+                    <i class='bx bx-joystick'></i>
+                    <span class="links_name">Game Levels</span>
+                </a>
+                <span class="tooltip">Game Levels</span>
+            </li>
 
             {{-- Warisan --}}
-<li>
-    <a href="{{ route('admin.heritages.index') }}">
-        <i class="bx bx-landmark"></i>
-        <span class="links_name">Warisan</span>
-    </a>
-    <span class="tooltip">Warisan</span>
-</li>
-
-
-
-            {{-- Pengaturan --}}
-            {{-- <li>
-                <a href="#">
-                    <i class="bx bx-cog"></i>
-                    <span class="links_name">Pengaturan</span>
+            <li>
+                <a href="{{ route('admin.heritages.index') }}">
+                    <i class="bx bx-landmark"></i>
+                    <span class="links_name">Warisan</span>
                 </a>
-                <span class="tooltip">Pengaturan</span>
-            </li> --}}
+                <span class="tooltip">Warisan</span>
+            </li>
+
 
             {{-- Profile + Logout --}}
             <li class="profile">

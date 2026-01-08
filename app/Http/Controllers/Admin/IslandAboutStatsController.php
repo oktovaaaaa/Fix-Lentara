@@ -8,6 +8,8 @@ use App\Models\IslandAboutPage;
 use App\Models\IslandAboutItem;
 use App\Models\IslandDemographic;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
 
 class IslandAboutStatsController extends Controller
 {
@@ -82,45 +84,87 @@ class IslandAboutStatsController extends Controller
         return back()->with('status', 'Header About Pulau disimpan.');
     }
 
-    public function storeItem(Request $request, Island $island)
-    {
-        $data = $request->validate([
-            'title' => ['nullable','string','max:255'],
-            'description' => ['required','string'],
-            'points' => ['nullable','string'],
-            'image' => ['nullable','string','max:2048'],
-            'more_link' => ['nullable','string','max:2048'],
-            'sort_order' => ['nullable','integer'],
-        ]);
+public function storeItem(Request $request, Island $island)
+{
+    $data = $request->validate([
+        'title'       => ['nullable','string','max:255'],
+        'description' => ['required','string'],
+        'points'      => ['nullable','string'],
 
-        $data['island_id'] = $island->id;
-        $data['sort_order'] = $data['sort_order'] ?? 0;
+        // baru:
+        'image_url'   => ['nullable','string','max:2048'],
+        'image_file'  => ['nullable','image','max:4096'], // 4MB
 
-        IslandAboutItem::create($data);
+        'more_link'   => ['nullable','string','max:2048'],
+        'sort_order'  => ['nullable','integer'],
+    ]);
 
-        return back()->with('status', 'Item About ditambahkan.');
+    // pilih image: upload > link
+    $image = null;
+
+    if ($request->hasFile('image_file')) {
+        $path  = $request->file('image_file')->store('about-items', 'public');
+        $image = '/storage/' . $path;
+    } else {
+        $url = trim((string)($data['image_url'] ?? ''));
+        $image = $url !== '' ? $url : null;
     }
 
-    public function updateItem(Request $request, Island $island, IslandAboutItem $item)
-    {
-        abort_unless($item->island_id === $island->id, 404);
+    IslandAboutItem::create([
+        'island_id'   => $island->id,
+        'title'       => $data['title'] ?? null,
+        'description' => $data['description'],
+        'points'      => $data['points'] ?? null,
+        'image'       => $image,
+        'more_link'   => $data['more_link'] ?? null,
+        'sort_order'  => $data['sort_order'] ?? 0,
+    ]);
 
-        $data = $request->validate([
-            'title' => ['nullable','string','max:255'],
-            'description' => ['required','string'],
-            'points' => ['nullable','string'],
-            'image' => ['nullable','string','max:2048'],
-            'more_link' => ['nullable','string','max:2048'],
-            'sort_order' => ['nullable','integer'],
-        ]);
+    return back()->with('status', 'Item About ditambahkan.');
+}
 
-        $item->update([
-            ...$data,
-            'sort_order' => $data['sort_order'] ?? $item->sort_order,
-        ]);
 
-        return back()->with('status', 'Item About diupdate.');
+public function updateItem(Request $request, Island $island, IslandAboutItem $item)
+{
+    abort_unless($item->island_id === $island->id, 404);
+
+    $data = $request->validate([
+        'title'       => ['nullable','string','max:255'],
+        'description' => ['required','string'],
+        'points'      => ['nullable','string'],
+
+        // baru:
+        'image_url'   => ['nullable','string','max:2048'],
+        'image_file'  => ['nullable','image','max:4096'],
+
+        'more_link'   => ['nullable','string','max:2048'],
+        'sort_order'  => ['nullable','integer'],
+    ]);
+
+    $payload = [
+        'title'       => $data['title'] ?? null,
+        'description' => $data['description'],
+        'points'      => $data['points'] ?? null,
+        'more_link'   => $data['more_link'] ?? null,
+        'sort_order'  => $data['sort_order'] ?? $item->sort_order,
+    ];
+
+    // hanya update image kalau user isi salah satu
+    if ($request->hasFile('image_file')) {
+        $path = $request->file('image_file')->store('about-items', 'public');
+        $payload['image'] = '/storage/' . $path;
+    } else {
+        $url = trim((string)($data['image_url'] ?? ''));
+        if ($url !== '') {
+            $payload['image'] = $url;
+        }
     }
+
+    $item->update($payload);
+
+    return back()->with('status', 'Item About diupdate.');
+}
+
 
     public function destroyItem(Request $request, Island $island, IslandAboutItem $item)
     {

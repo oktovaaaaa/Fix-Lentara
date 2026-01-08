@@ -15,7 +15,7 @@ class LoginController extends Controller
     {
         // Kalau sudah login, langsung lempar ke halaman admin (stats)
         if (Auth::check()) {
-            return redirect()->route('admin.stats.index');
+            return redirect()->route('admin.testimonials.index');
         }
 
         return view('auth.login');
@@ -36,8 +36,8 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            // Setelah login berhasil → ke halaman CRUD Statistik
-            return redirect()->route('admin.stats.index');
+
+            return redirect()->route('admin.testimonials.index');
         }
 
         // Kalau gagal

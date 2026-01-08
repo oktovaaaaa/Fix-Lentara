@@ -891,6 +891,50 @@ html[data-theme="dark"] .t-detail-close {
     clear: both !important;
 }
 
+/* sembunyikan input file bawaan */
+.t-file-native{
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+/* tombol custom */
+.t-file-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    width: 100%;
+    border-radius: 12px;
+    border: 2px dashed rgba(255, 107, 0, 0.35);
+    background: rgba(255, 107, 0, 0.06);
+    color: var(--txt-body);
+    padding: 12px 14px;
+
+    font-weight: 900;
+    cursor: pointer;
+    transition: all .18s ease;
+    user-select: none;
+}
+
+.t-file-btn:hover{
+    border-color: #ff6b00;
+    background: rgba(255, 107, 0, 0.12);
+    transform: translateY(-1px);
+}
+
+.t-file-name{
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--muted);
+    overflow-wrap: anywhere;
+}
+
+
     </style>
 
     <div class="max-w-6xl mx-auto px-4">
@@ -1131,12 +1175,12 @@ html[data-theme="dark"] .t-detail-close {
                 </div>
             </div>
 
-            {{-- ===== MAIN (BOTTOM): Add a Review (NEON) ===== --}}
+            {{-- ===== MAIN (BOTTOM): Tambahkan Testimoni (NEON) ===== --}}
             <div class="grid gap-6 lg:grid-cols-1">
                 <div class="t-neon-shell">
                     <div class="t-neon-glow"></div>
                     <div class="t-neon-inner t-card">
-                        <div class="font-bold text-xl mb-4">Add a Review</div>
+                        <div class="font-bold text-xl mb-4">Tambahkan Testimoni</div>
 
                         <div id="clientAlert" class="mb-4 t-alert t-alert-error t-alert-client" role="alert" aria-live="polite"></div>
 
@@ -1225,7 +1269,17 @@ html[data-theme="dark"] .t-detail-close {
 
                                 <div>
                                     <label class="text-sm font-bold">Foto Profil <span class="t-muted text-xs">(opsional, max 5MB)</span></label>
-                                    <input class="t-file" type="file" name="photo" accept="image/png,image/jpeg,image/jpg">
+{{-- INPUT FILE ASLI (DISEMBUNYIKAN) --}}
+<input id="photoInput" class="t-file t-file-native" type="file" name="photo" accept="image/png,image/jpeg,image/jpg">
+
+{{-- BUTTON CUSTOM --}}
+<label for="photoInput" class="t-file-btn">
+    Pilih Foto
+</label>
+
+{{-- NAMA FILE YANG DIPILIH --}}
+<div class="t-file-name" id="photoName">Belum ada foto dipilih</div>
+
                                     <div class="t-muted text-xs mt-2">Format: JPG / JPEG / PNG.</div>
                                 </div>
 
@@ -1521,6 +1575,19 @@ html[data-theme="dark"] .t-detail-close {
             }
         `;
         document.head.appendChild(style);
+
+
+        (function(){
+    const input = document.getElementById('photoInput');
+    const name  = document.getElementById('photoName');
+    if(!input || !name) return;
+
+    input.addEventListener('change', function(){
+        const file = input.files && input.files[0];
+        name.textContent = file ? file.name : 'Belum ada foto dipilih';
+    });
+})();
+
     </script>
 </section>
 

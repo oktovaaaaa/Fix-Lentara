@@ -1,3 +1,4 @@
+{{-- resources/views/admin/heritages/index.blade.php (REPLACE FULL) --}}
 @extends('layouts.admin')
 
 @section('title', 'Warisan')
@@ -14,177 +15,117 @@
     $selectedTribeForJs = $selectedTribeKey ? trim((string) $selectedTribeKey) : '';
 @endphp
 
-<div class="max-w-6xl mx-auto px-4 py-6 space-y-6" id="heritage-admin">
+<div class="a-wrap" id="heritage-admin" data-page="admin-heritage-index">
 
     <style>
         /* =========================================================
-           ADMIN WARISAN UI (LIGHT/DARK SAFE)
-           - Picker pulau/suku: auto populate
-           - CRUD 3 kategori
-           - Modal detail sebelum edit
-           - ✅ NEW: location + detail_url input + tampil di modal
-           - UI lebih enak: section header, action hint, spacing rapi
+           ADMIN WARISAN (SELARAS UI KIT a-*)
+           - Gunakan a-card, a-grid, a-btn agar konsisten admin
+           - CSS ini hanya untuk komponen khusus warisan: badge, item card, modal detail
+           - LOGIC TIDAK DIUBAH
         ========================================================= */
 
-        #heritage-admin { color: var(--txt-body); }
+        #heritage-admin{ color: var(--txt-body); }
 
-        /* ---------- cards ---------- */
-        .ha-card{
-            border-radius: 18px;
-            border: 1px solid rgba(148, 163, 184, 0.18);
-            background: rgba(2, 6, 23, 0.35);
-            background: color-mix(in oklab, var(--card) 55%, transparent);
-            backdrop-filter: blur(14px) saturate(140%);
-            -webkit-backdrop-filter: blur(14px) saturate(140%);
-            box-shadow: 0 16px 40px rgba(0,0,0,0.18);
-        }
-        html:not([data-theme="dark"]) .ha-card{
-            border: 1px solid rgba(15, 23, 42, 0.12);
-            background: rgba(255, 255, 255, 0.65);
-            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
-        }
-
-        .ha-title{
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-        }
-        .ha-sub{
-            color: color-mix(in oklab, var(--txt-body) 55%, transparent);
-            font-size: .92rem;
-            line-height: 1.6;
-        }
-
-        /* ---------- inputs ---------- */
-        .ha-label{
-            display:block;
-            font-size:12px;
-            font-weight:700;
-            margin-bottom:6px;
-            color: color-mix(in oklab, var(--txt-body) 78%, transparent);
-        }
-
-        .ha-input, .ha-select, .ha-textarea, .ha-file{
-            width:100%;
-            border-radius:12px;
-            border:1px solid rgba(148, 163, 184, 0.22);
-            background: rgba(2, 6, 23, 0.25);
-            background: color-mix(in oklab, var(--card) 35%, transparent);
-            color: var(--txt-body);
-            padding:10px 12px;
-            outline:none;
-            transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
-        }
-        html:not([data-theme="dark"]) .ha-input,
-        html:not([data-theme="dark"]) .ha-select,
-        html:not([data-theme="dark"]) .ha-textarea,
-        html:not([data-theme="dark"]) .ha-file{
-            background: rgba(255,255,255,0.7);
-            border:1px solid rgba(15, 23, 42, 0.14);
-        }
-
-        .ha-input:focus, .ha-select:focus, .ha-textarea:focus{
-            border-color: rgba(var(--brand-rgb, 249, 115, 22), 0.55);
-            box-shadow: 0 0 0 4px rgba(var(--brand-rgb, 249, 115, 22), 0.14);
-        }
-        .ha-select:disabled{ opacity:.6; cursor:not-allowed; }
-
-        .ha-help{
-            font-size: 11px;
-            margin-top: 8px;
-            color: color-mix(in oklab, var(--txt-body) 55%, transparent);
-            line-height: 1.55;
-        }
-
-        /* ---------- buttons ---------- */
-        .ha-btn{
-            border-radius:12px;
-            padding:10px 14px;
-            font-weight:800;
-            transition: transform .15s ease, box-shadow .2s ease, filter .2s ease, background .2s ease;
-            user-select:none;
-        }
-        .ha-btn:active{ transform: translateY(1px) scale(0.99); }
-
-        .ha-btn-primary{
-            background: linear-gradient(90deg, rgba(var(--brand-rgb, 249, 115, 22), .95), rgba(var(--brand-2-rgb, 251, 146, 60), .95));
-            color:white;
-            box-shadow: 0 14px 30px rgba(var(--brand-rgb, 249, 115, 22), 0.18);
-        }
-        .ha-btn-primary:hover{
-            filter: brightness(1.02);
-            box-shadow: 0 18px 40px rgba(var(--brand-rgb, 249, 115, 22), 0.24);
-        }
-
-        .ha-btn-soft{
-            background: rgba(148, 163, 184, 0.12);
-            border: 1px solid rgba(148, 163, 184, 0.18);
-            color: var(--txt-body);
-        }
-        .ha-btn-soft:hover{ background: rgba(148, 163, 184, 0.18); }
-
-        .ha-btn-danger{
-            background: rgba(239, 68, 68, 0.16);
-            border: 1px solid rgba(239, 68, 68, 0.25);
-            color: #fecaca;
-        }
-        html:not([data-theme="dark"]) .ha-btn-danger{ color: rgb(127, 29, 29); }
-        .ha-btn-danger:hover{ background: rgba(239, 68, 68, 0.22); }
-
+        /* ---- header chip (pulau/suku) ---- */
         .ha-chip{
             display:inline-flex;
             align-items:center;
-            gap:.5rem;
-            padding:6px 10px;
+            gap:10px;
+            padding:8px 12px;
             border-radius:999px;
-            font-size:12px;
-            font-weight:800;
-            border:1px solid rgba(var(--brand-rgb, 249, 115, 22), 0.22);
-            background: rgba(var(--brand-rgb, 249, 115, 22), 0.10);
-            color: var(--txt-body);
+            border:1px solid var(--line);
+            background: rgba(255,255,255,.02);
+            font-weight: 900;
+            font-size: 12px;
+            box-shadow: 0 14px 35px rgba(0,0,0,.08);
         }
 
+        .ha-chip .k{ color: var(--muted); font-weight: 900; }
+        .ha-chip .v{ color: var(--txt-body); font-weight: 1000; }
+
+        /* ---- helper text ---- */
+        .ha-help{
+            margin-top: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        /* ---- sections grid ---- */
         .ha-grid-3{
             display:grid;
-            grid-template-columns: 1fr;
-            gap: 14px;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .ha-col{
+            grid-column: span 12 / span 12;
         }
         @media (min-width: 1024px){
-            .ha-grid-3{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .ha-col{ grid-column: span 4 / span 4; }
         }
 
-        /* ---------- category header small separator ---------- */
-        .ha-cat-head{
+        /* ---- category small header ---- */
+        .ha-catHead{
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap: 10px;
             padding-bottom: 10px;
-            border-bottom: 1px dashed rgba(148, 163, 184, 0.20);
+            margin-bottom: 10px;
+            border-bottom: 1px dashed rgba(148,163,184,.28);
         }
-        html:not([data-theme="dark"]) .ha-cat-head{
-            border-bottom: 1px dashed rgba(15, 23, 42, 0.14);
+        html[data-theme="dark"] .ha-catHead{
+            border-bottom: 1px dashed rgba(255,255,255,.10);
         }
 
-        /* ---------- item card ---------- */
+        .ha-catTitle{
+            font-size: 14px;
+            font-weight: 1000;
+            color: var(--txt-body);
+        }
+        .ha-catDesc{
+            margin-top: 4px;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* ---- item cards ---- */
         .hi-card{
-            border-radius: 16px;
-            border: 1px solid rgba(148, 163, 184, 0.16);
-            background: rgba(2, 6, 23, 0.22);
-            background: color-mix(in oklab, var(--card) 42%, transparent);
+            border-radius: 18px;
+            border: 1px solid var(--line);
+            background: var(--card);
+            box-shadow: 0 18px 45px rgba(0,0,0,.10);
             padding: 12px;
         }
-        html:not([data-theme="dark"]) .hi-card{
-            background: rgba(255,255,255,0.75);
-            border: 1px solid rgba(15, 23, 42, 0.10);
+        html[data-theme="dark"] .hi-card{
+            background: rgba(2,6,23,.35);
+        }
+
+        .hi-top{
+            display:flex;
+            align-items:flex-start;
+            justify-content:space-between;
+            gap: 12px;
         }
 
         .hi-title{
-            font-weight: 900;
-            font-size: 14px;
+            font-weight: 1000;
+            font-size: 13px;
             line-height: 1.25;
             word-break: break-word;
+            color: var(--txt-body);
         }
+
         .hi-meta{
+            margin-top: 6px;
             font-size: 11px;
-            color: color-mix(in oklab, var(--txt-body) 55%, transparent);
-            line-height: 1.5;
+            font-weight: 800;
+            color: var(--muted);
+            line-height: 1.45;
         }
 
         .hi-badges{
@@ -194,19 +135,39 @@
             margin-top: 8px;
         }
         .hi-badge{
+            display:inline-flex;
+            align-items:center;
+            gap: 6px;
             font-size: 11px;
             font-weight: 900;
-            padding: 5px 8px;
+            padding: 6px 10px;
             border-radius: 999px;
-            border: 1px solid rgba(148, 163, 184, 0.18);
-            background: rgba(148, 163, 184, 0.10);
-        }
-        html:not([data-theme="dark"]) .hi-badge{
-            border: 1px solid rgba(15, 23, 42, 0.10);
-            background: rgba(15, 23, 42, 0.04);
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,.02);
+            color: var(--txt-body);
         }
 
-        /* ---------- modal detail ---------- */
+        /* ---- details accordion ---- */
+        .ha-details summary{
+            list-style:none;
+            cursor:pointer;
+            user-select:none;
+            padding: 10px 10px;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,.02);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap: 10px;
+            font-weight: 1000;
+            font-size: 12px;
+        }
+        .ha-details summary::-webkit-details-marker{ display:none; }
+        .ha-details summary .chev{ transition: transform .2s ease; }
+        .ha-details[open] summary .chev{ transform: rotate(180deg); }
+
+        /* ---- modal detail ---- */
         .hd-overlay{
             position: fixed;
             inset: 0;
@@ -214,14 +175,12 @@
             display: none;
             align-items: center;
             justify-content: center;
-            background: rgba(0,0,0,0.65);
+            background: rgba(0,0,0,0.62);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             padding: 18px;
         }
-        html:not([data-theme="dark"]) .hd-overlay{
-            background: rgba(255,255,255,0.72);
-        }
+        html:not([data-theme="dark"]) .hd-overlay{ background: rgba(255,255,255,0.70); }
         .hd-overlay.active{ display:flex; }
 
         .hd-modal{
@@ -229,12 +188,14 @@
             max-height: 90vh;
             overflow: hidden;
             border-radius: 22px;
-            border: 1px solid rgba(var(--brand-rgb, 249, 115, 22), 0.22);
-            background: rgba(2, 6, 23, 0.35);
-            background: color-mix(in oklab, var(--card) 55%, transparent);
+            border: 1px solid rgba(249,115,22,.25);
+            background: var(--card);
             box-shadow: 0 30px 80px rgba(0,0,0,0.25);
             display: grid;
             grid-template-columns: 1fr;
+        }
+        html[data-theme="dark"] .hd-modal{
+            background: rgba(2,6,23,.55);
         }
         @media (min-width: 900px){
             .hd-modal{ grid-template-columns: 1.1fr 1fr; }
@@ -256,15 +217,15 @@
             display:flex;
             align-items:center;
             justify-content:center;
-            font-size: 52px;
-            color: rgba(var(--brand-rgb, 249, 115, 22), 0.9);
+            font-size: 56px;
+            color: rgba(249,115,22,.95);
             background:
-                radial-gradient(60% 60% at 30% 20%, rgba(var(--brand-rgb, 249, 115, 22), .25), transparent 60%),
-                radial-gradient(60% 60% at 70% 40%, rgba(var(--brand-2-rgb, 251, 146, 60), .20), transparent 60%),
-                linear-gradient(135deg, rgba(2,6,23,.40), rgba(2,6,23,.20));
+                radial-gradient(60% 60% at 30% 20%, rgba(249,115,22,.22), transparent 60%),
+                radial-gradient(60% 60% at 70% 40%, rgba(251,146,60,.18), transparent 60%),
+                linear-gradient(135deg, rgba(2,6,23,.25), rgba(2,6,23,.10));
         }
 
-        .hd-body{ padding: 18px 18px 16px; overflow:auto; }
+        .hd-body{ padding: 18px; overflow:auto; }
 
         .hd-top{
             display:flex;
@@ -276,18 +237,19 @@
 
         .hd-h2{
             font-size: 18px;
-            font-weight: 900;
+            font-weight: 1000;
             line-height: 1.2;
-            word-break: break-word;
             margin: 0;
+            color: var(--txt-body);
+            word-break: break-word;
         }
 
         .hd-close{
             width: 44px;
             height: 44px;
             border-radius: 999px;
-            border: 1px solid rgba(148, 163, 184, 0.22);
-            background: rgba(148, 163, 184, 0.12);
+            border: 1px solid var(--line);
+            background: rgba(255,255,255,.02);
             display:inline-flex;
             align-items:center;
             justify-content:center;
@@ -295,14 +257,14 @@
             transition: transform .15s ease, background .2s ease;
             flex: 0 0 auto;
         }
-        .hd-close:hover{ background: rgba(148, 163, 184, 0.18); }
+        .hd-close:hover{ background: rgba(148,163,184,.12); }
         .hd-close:active{ transform: scale(0.98); }
 
         .hd-p{
             margin: 0;
             font-size: 13px;
             line-height: 1.7;
-            color: color-mix(in oklab, var(--txt-body) 85%, transparent);
+            color: color-mix(in oklab, var(--txt-body) 88%, transparent);
             white-space: pre-wrap;
             word-break: break-word;
         }
@@ -316,11 +278,12 @@
 
         .hd-pill{
             font-size: 12px;
-            font-weight: 800;
+            font-weight: 900;
             padding: 6px 10px;
             border-radius: 999px;
-            border: 1px solid rgba(var(--brand-rgb, 249, 115, 22), 0.20);
-            background: rgba(var(--brand-rgb, 249, 115, 22), 0.09);
+            border: 1px solid rgba(249,115,22,.22);
+            background: rgba(249,115,22,.08);
+            color: var(--txt-body);
         }
 
         .hd-links{
@@ -334,421 +297,401 @@
             display:inline-flex;
             align-items:center;
             gap: 10px;
-            border-radius: 12px;
-            padding: 10px 12px;
-            font-weight: 900;
+            border-radius: 999px;
+            padding: 10px 14px;
+            font-weight: 1000;
             font-size: 12px;
-            border: 1px solid rgba(var(--brand-rgb, 249, 115, 22), 0.28);
-            background: rgba(255,255,255,0.92);
-            color: rgba(var(--brand-rgb, 249, 115, 22), 1);
+            border: 1px solid rgba(249,115,22,.28);
+            background: rgba(249,115,22,.10);
+            color: var(--txt-body);
             text-decoration: none;
-            box-shadow: 0 14px 34px rgba(0,0,0,.14);
+            box-shadow: 0 14px 35px rgba(0,0,0,.10);
             transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
-        }
-        html[data-theme="dark"] .hd-link{
-            background: rgba(2,6,23,.62);
-            color: #ff8c42;
-            box-shadow: 0 18px 40px rgba(0,0,0,.35);
-            border-color: rgba(var(--brand-rgb, 249, 115, 22), 0.22);
         }
         .hd-link:hover{
             transform: translateY(-1px);
-            box-shadow: 0 18px 44px rgba(0,0,0,.18), 0 0 26px rgba(249,115,22,.12);
+            box-shadow: 0 18px 44px rgba(0,0,0,.16), 0 0 26px rgba(249,115,22,.12);
             filter: saturate(1.04);
         }
         .hd-link svg{ width: 16px; height: 16px; opacity: .95; }
-
-        /* ---------- accordion edit ---------- */
-        .ha-details summary{
-            list-style:none;
-            cursor:pointer;
-            user-select:none;
-        }
-        .ha-details summary::-webkit-details-marker{ display:none; }
-        .ha-details summary .chev{ transition: transform .2s ease; }
-        .ha-details[open] summary .chev{ transform: rotate(180deg); }
     </style>
 
-    <div class="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-            <h1 class="ha-title">Warisan (Per Pulau & Suku)</h1>
-            <p class="ha-sub mt-1">
-                Pilih pulau lalu pilih suku. Dalam 1 halaman ini kamu bisa CRUD 3 kategori warisan + header (title & deskripsi).
-            </p>
+    {{-- PAGE HEAD --}}
+    <div class="a-head">
+        <div class="a-head-left">
+            <div class="a-head-title">Warisan (Per Pulau &amp; Suku)</div>
+            <div class="a-head-desc">
+                Pilih pulau lalu pilih suku. Dalam 1 halaman ini kamu bisa CRUD 3 kategori warisan + header (title &amp; deskripsi).
+            </div>
         </div>
 
-        @if($selectedIsland && $selectedTribeKey)
-            <div class="ha-chip">
-                <span>Pulau:</span>
-                <span class="font-black">{{ $selectedIsland->name }}</span>
-                <span class="opacity-70">—</span>
-                <span>Suku:</span>
-                <span class="font-black">{{ $selectedTribeKey }}</span>
-            </div>
-        @endif
+        <div class="a-head-right" style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+            @if($selectedIsland && $selectedTribeKey)
+                <div class="ha-chip" title="Filter aktif">
+                    <span class="k">Pulau</span><span class="v">{{ $selectedIsland->name }}</span>
+                    <span style="opacity:.55;">•</span>
+                    <span class="k">Suku</span><span class="v">{{ $selectedTribeKey }}</span>
+                </div>
+            @endif
+        </div>
     </div>
 
+    {{-- FLASH --}}
     @if(session('success'))
-        <div class="ha-card px-4 py-3" style="border-color: rgba(16, 185, 129, 0.35); background: rgba(16, 185, 129, 0.08);">
-            <div class="text-sm" style="color: rgba(167, 243, 208, 0.95);">
-                {{ session('success') }}
-            </div>
+        <div class="a-alert a-alert-success" style="margin-top:10px;">
+            {{ session('success') }}
         </div>
     @endif
 
     @if($errors->any())
-        <div class="ha-card px-4 py-3" style="border-color: rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.08);">
-            <div class="text-sm" style="color: rgba(254, 202, 202, 0.95);">
-                <div class="font-black mb-1">Ada error:</div>
-                <ul class="list-disc pl-5 space-y-1">
-                    @foreach($errors->all() as $err)
-                        <li>{{ $err }}</li>
-                    @endforeach
-                </ul>
-            </div>
+        <div class="a-alert" style="margin-top:10px; border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.10);">
+            <div style="font-weight:1000; margin-bottom:6px; color: var(--txt-body);">Ada error:</div>
+            <ul style="margin-left: 18px; display:grid; gap:4px;">
+                @foreach($errors->all() as $err)
+                    <li style="color:#ef4444; font-weight:900;">{{ $err }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
     {{-- FILTER PULAU + SUKU --}}
-    <form method="GET"
-          action="{{ route('admin.heritages.index') }}"
-          class="ha-card p-4"
-          id="haFilterForm">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label class="ha-label">Pilih Pulau</label>
-                <select name="island_id" id="haIslandSelect" class="ha-select">
-                    <option value="">-- pilih --</option>
-                    @foreach($islands as $island)
-                        <option value="{{ $island->id }}" @selected($selectedIsland && $selectedIsland->id === $island->id)>
-                            {{ $island->name }}
-                        </option>
-                    @endforeach
-                </select>
-                <div class="ha-help">Saat pulau diganti, suku akan otomatis terisi & halaman akan auto submit.</div>
-            </div>
-
-            <div>
-                <label class="ha-label">Pilih Suku</label>
-                <select name="tribe" id="haTribeSelect" class="ha-select" @disabled(!$selectedIsland)>
-                    @if(!$selectedIsland)
-                        <option value="">Pilih pulau dulu</option>
-                    @else
-                        @foreach($tribes as $t)
-                            @php $val = is_string($t) ? trim($t) : (string)$t; @endphp
-                            <option value="{{ $val }}" @selected(trim((string)$selectedTribeKey) === $val)>{{ $val }}</option>
-                        @endforeach
-                    @endif
-                </select>
-                <div class="ha-help">Saat suku diganti, halaman juga auto submit.</div>
-            </div>
-
-            <div class="flex items-end gap-2">
-                <button class="ha-btn ha-btn-primary w-full md:w-auto" type="submit">
-                    Tampilkan
-                </button>
-
-                <a href="{{ route('admin.heritages.index') }}"
-                   class="ha-btn ha-btn-soft w-full md:w-auto text-center">
-                    Reset
-                </a>
-            </div>
-        </div>
-    </form>
-
-    @if($selectedIsland && $selectedTribeKey)
-
-        {{-- HEADER SUKU --}}
-        <div class="ha-card p-5 space-y-4">
-            <div class="flex items-start justify-between gap-3 flex-wrap">
+    <div class="a-card" data-card data-card-key="admin_heritage_picker" style="margin-top:12px;">
+        <div class="a-card-inner">
+            <div class="a-card-head">
                 <div>
-                    <h2 class="text-lg font-black">Header Suku</h2>
-                    <p class="ha-sub text-xs mt-1">
-                        Ini untuk title besar + deskripsi besar per suku (yang tampil di hero section Warisan).
-                    </p>
+                    <div class="a-card-title">Pilih Pulau + Suku</div>
+                    <div class="a-card-desc">Suku akan otomatis terisi dari config <strong>tribes.php</strong>, lalu auto submit.</div>
                 </div>
-                <div class="text-xs" style="color: color-mix(in oklab, var(--txt-body) 55%, transparent);">
-                    Disimpan berdasarkan:
-                    <span class="font-black">{{ $selectedIsland->name }}</span>
-                    —
-                    <span class="font-black">{{ $selectedTribeKey }}</span>
+                <div class="a-card-actions">
+                    <span class="a-badge"><i class="bx bx-filter-alt"></i> Filter</span>
                 </div>
             </div>
 
-            <form method="POST"
-                  action="{{ route('admin.heritages.page.save') }}"
-                  enctype="multipart/form-data"
-                  class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @csrf
+            <form method="GET" action="{{ route('admin.heritages.index') }}" id="haFilterForm" class="a-form">
+                <div class="a-grid">
+                    <div class="a-col-4">
+                        <label class="a-label">Pilih Pulau</label>
+                        <select name="island_id" id="haIslandSelect" class="a-select">
+                            <option value="">-- pilih --</option>
+                            @foreach($islands as $island)
+                                <option value="{{ $island->id }}" @selected($selectedIsland && $selectedIsland->id === $island->id)>
+                                    {{ $island->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <div class="ha-help">Saat pulau diganti, suku otomatis terisi & halaman auto submit.</div>
+                    </div>
 
-                <input type="hidden" name="island_id" value="{{ $selectedIsland->id }}">
-                <input type="hidden" name="tribe_key" value="{{ $selectedTribeKey }}">
+                    <div class="a-col-4">
+                        <label class="a-label">Pilih Suku</label>
+                        <select name="tribe" id="haTribeSelect" class="a-select" @disabled(!$selectedIsland)>
+                            @if(!$selectedIsland)
+                                <option value="">Pilih pulau dulu</option>
+                            @else
+                                @foreach($tribes as $t)
+                                    @php $val = is_string($t) ? trim($t) : (string)$t; @endphp
+                                    <option value="{{ $val }}" @selected(trim((string)$selectedTribeKey) === $val)>{{ $val }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                        <div class="ha-help">Saat suku diganti, halaman juga auto submit.</div>
+                    </div>
 
-                <div>
-                    <label class="ha-label">Title Besar</label>
-                    <input type="text"
-                           name="hero_title"
-                           value="{{ old('hero_title', $tribePage->hero_title ?? '') }}"
-                           class="ha-input"
-                           placeholder="Contoh: Warisan Suku Aceh">
-                </div>
-
-                <div>
-                    <label class="ha-label">Gambar Header (opsional)</label>
-                    <input type="file" name="hero_image" class="ha-file">
-                    @if(!empty($tribePage?->hero_image))
-                        <div class="text-xs mt-2" style="color: color-mix(in oklab, var(--txt-body) 60%, transparent);">
-                            Saat ini:
-                            <a class="underline font-bold" href="{{ asset('storage/'.$tribePage->hero_image) }}" target="_blank">lihat</a>
+                    <div class="a-col-4" style="display:flex; align-items:flex-end;">
+                        <div class="a-actions" style="margin-top:0;">
+                            <button class="a-btn a-btn-primary" type="submit">
+                                <i class="bx bx-show"></i> Tampilkan
+                            </button>
+                            <a href="{{ route('admin.heritages.index') }}" class="a-btn">
+                                <i class="bx bx-refresh"></i> Reset
+                            </a>
                         </div>
-                    @endif
-                </div>
-
-                <div class="md:col-span-2">
-                    <label class="ha-label">Deskripsi Besar</label>
-                    <textarea name="hero_description"
-                              rows="3"
-                              class="ha-textarea"
-                              placeholder="Deskripsi singkat yang tampil di bagian hero / section warisan...">{{ old('hero_description', $tribePage->hero_description ?? '') }}</textarea>
-                </div>
-
-                <div class="md:col-span-2 flex items-center gap-2">
-                    <button class="ha-btn ha-btn-primary" type="submit">
-                        Simpan Header
-                    </button>
-                    <div class="text-xs" style="color: color-mix(in oklab, var(--txt-body) 55%, transparent);">
-                        Tip: isi yang rapi dan sopan karena ini tampil ke publik.
                     </div>
                 </div>
             </form>
         </div>
+    </div>
+
+    @if($selectedIsland && $selectedTribeKey)
+
+        {{-- HEADER SUKU --}}
+        <div class="a-card" data-card data-card-key="admin_heritage_header" style="margin-top:12px;">
+            <div class="a-card-inner">
+                <div class="a-card-head">
+                    <div>
+                        <div class="a-card-title">Header Suku</div>
+                        <div class="a-card-desc">
+                            Ini untuk title besar + deskripsi besar per suku (tampil di hero Warisan).
+                            Disimpan berdasarkan <strong>{{ $selectedIsland->name }}</strong> — <strong>{{ $selectedTribeKey }}</strong>.
+                        </div>
+                    </div>
+                    <div class="a-card-actions">
+                        <span class="a-badge"><i class="bx bx-crown"></i> Header</span>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('admin.heritages.page.save') }}" enctype="multipart/form-data" class="a-form">
+                    @csrf
+
+                    <input type="hidden" name="island_id" value="{{ $selectedIsland->id }}">
+                    <input type="hidden" name="tribe_key" value="{{ $selectedTribeKey }}">
+
+                    <div class="a-grid">
+                        <div class="a-col-6">
+                            <label class="a-label">Title Besar</label>
+                            <input type="text"
+                                   name="hero_title"
+                                   value="{{ old('hero_title', $tribePage->hero_title ?? '') }}"
+                                   class="a-input"
+                                   placeholder="Contoh: Warisan Suku Aceh">
+                        </div>
+
+                        <div class="a-col-6">
+                            <label class="a-label">Gambar Header (opsional)</label>
+                            <input type="file" name="hero_image" class="a-file" accept="image/png,image/jpeg,image/webp">
+                            @if(!empty($tribePage?->hero_image))
+                                <div class="ha-help">
+                                    Saat ini:
+                                    <a class="a-link" href="{{ asset('storage/'.$tribePage->hero_image) }}" target="_blank">lihat</a>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="a-col-12">
+                            <label class="a-label">Deskripsi Besar</label>
+                            <textarea name="hero_description" rows="3" class="a-textarea"
+                                      placeholder="Deskripsi singkat yang tampil di bagian hero / section warisan...">{{ old('hero_description', $tribePage->hero_description ?? '') }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="a-actions">
+                        <button class="a-btn a-btn-primary" type="submit">
+                            <i class="bx bx-save"></i> Simpan Header
+                        </button>
+                        <div class="ha-help" style="margin-top:0;">
+                            Tip: isi yang rapi dan sopan karena ini tampil ke publik.
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         {{-- 3 CRUD DALAM 1 HALAMAN --}}
-        <div class="ha-grid-3">
+        <div class="ha-grid-3" style="margin-top:12px;">
             @foreach($categoryLabels as $catKey => $catLabel)
-                <div class="ha-card p-4 space-y-4">
+                <div class="ha-col">
+                    <div class="a-card" data-card data-card-key="admin_heritage_cat_{{ $catKey }}">
+                        <div class="a-card-inner">
 
-                    <div class="ha-cat-head flex items-start justify-between gap-3">
-                        <div>
-                            <h3 class="text-base font-black">{{ $catLabel }}</h3>
-                            <p class="ha-sub text-xs mt-1">
-                                Tambah / lihat detail / edit / hapus item untuk kategori ini.
-                            </p>
-                        </div>
-                        <span class="ha-chip" style="font-size: 11px;">{{ $catKey }}</span>
-                    </div>
-
-                    {{-- FORM TAMBAH ITEM --}}
-                    <form method="POST"
-                          action="{{ route('admin.heritages.item.store') }}"
-                          enctype="multipart/form-data"
-                          class="space-y-3">
-                        @csrf
-                        <input type="hidden" name="island_id" value="{{ $selectedIsland->id }}">
-                        <input type="hidden" name="tribe_key" value="{{ $selectedTribeKey }}">
-                        <input type="hidden" name="category" value="{{ $catKey }}">
-
-                        <div>
-                            <label class="ha-label">Judul</label>
-                            <input type="text" name="title" class="ha-input" placeholder="Contoh: Ulos / Rumah Bolon / Sasando ...">
-                        </div>
-
-                        <div>
-                            <label class="ha-label">Deskripsi (opsional)</label>
-                            <textarea name="description" rows="2" class="ha-textarea" placeholder="Deskripsi singkat..."></textarea>
-                        </div>
-
-                        {{-- ✅ NEW: lokasi + url --}}
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="ha-label">Lokasi (opsional)</label>
-                                <input type="text" name="location" class="ha-input" placeholder="Contoh: Banda Aceh / Toraja">
-                                <div class="ha-help">Muncul di card publik & modal jika diisi.</div>
-                            </div>
-                            <div>
-                                <label class="ha-label">URL Detail (opsional)</label>
-                                <input type="url" name="detail_url" class="ha-input" placeholder="https://... (wiki/artikel)">
-                                <div class="ha-help">Tombol “Lihat Selengkapnya” akan muncul jika URL valid.</div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="ha-label">Gambar (opsional)</label>
-                            <input type="file" name="image" class="ha-file">
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="ha-label">Urutan (opsional)</label>
-                                <input type="number" name="sort_order" min="0" value="0" class="ha-input">
-                            </div>
-                            <div class="flex items-end">
-                                <button class="ha-btn ha-btn-primary w-full" type="submit">
-                                    + Tambah Item
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
-                    {{-- LIST ITEM --}}
-                    <div class="space-y-3">
-                        @php
-                            $items = $itemsByCategory[$catKey] ?? collect();
-                        @endphp
-
-                        @if($items->count() === 0)
-                            <div class="hi-card">
-                                <div class="text-xs" style="color: color-mix(in oklab, var(--txt-body) 60%, transparent);">
-                                    Belum ada item di kategori ini.
+                            <div class="ha-catHead">
+                                <div>
+                                    <div class="ha-catTitle">{{ $catLabel }}</div>
+                                    <div class="ha-catDesc">Tambah / detail / edit / hapus item untuk kategori ini.</div>
                                 </div>
+                                <span class="a-badge"><i class="bx bx-tag-alt"></i> {{ $catKey }}</span>
                             </div>
-                        @else
-                            @foreach($items as $item)
-                                @php
-                                    $imgUrl = $item->image_path ? asset('storage/'.$item->image_path) : '';
-                                    $locVal = $item->location ? trim((string)$item->location) : '';
-                                    $urlVal = $item->detail_url ? trim((string)$item->detail_url) : '';
-                                @endphp
 
-                                <div class="hi-card"
-                                     data-ha-item
-                                     data-id="{{ $item->id }}"
-                                     data-title="{{ e($item->title) }}"
-                                     data-desc="{{ e($item->description ?? '') }}"
-                                     data-img="{{ e($imgUrl) }}"
-                                     data-cat="{{ e($catLabel) }}"
-                                     data-sort="{{ (int)$item->sort_order }}"
-                                     data-loc="{{ e($locVal) }}"
-                                     data-url="{{ e($urlVal) }}">
+                            {{-- FORM TAMBAH ITEM --}}
+                            <form method="POST" action="{{ route('admin.heritages.item.store') }}" enctype="multipart/form-data" class="a-form">
+                                @csrf
+                                <input type="hidden" name="island_id" value="{{ $selectedIsland->id }}">
+                                <input type="hidden" name="tribe_key" value="{{ $selectedTribeKey }}">
+                                <input type="hidden" name="category" value="{{ $catKey }}">
 
-                                    <div class="flex items-start justify-between gap-3">
-                                        <div class="min-w-0">
-                                            <div class="hi-title">{{ $item->title }}</div>
-
-                                            <div class="hi-meta mt-1">
-                                                sort: <span class="font-black">{{ $item->sort_order }}</span>
-
-                                                @if($item->image_path)
-                                                    <span class="opacity-60">•</span>
-                                                    <span class="font-bold">ada gambar</span>
-                                                @endif
-
-                                                @if($locVal !== '')
-                                                    <span class="opacity-60">•</span>
-                                                    <span class="font-bold">ada lokasi</span>
-                                                @endif
-
-                                                @if($urlVal !== '')
-                                                    <span class="opacity-60">•</span>
-                                                    <span class="font-bold">ada link</span>
-                                                @endif
-                                            </div>
-
-                                            <div class="hi-badges">
-                                                @if($locVal !== '')
-                                                    <span class="hi-badge" title="{{ $locVal }}">📍 {{ \Illuminate\Support\Str::limit($locVal, 18) }}</span>
-                                                @endif
-                                                @if($urlVal !== '')
-                                                    <span class="hi-badge" title="{{ $urlVal }}">🔗 link</span>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <div class="flex items-center gap-2">
-                                            <button type="button"
-                                                    class="ha-btn ha-btn-soft text-xs"
-                                                    data-ha-detail>
-                                                Detail
-                                            </button>
-
-                                            <form method="POST"
-                                                  action="{{ route('admin.heritages.item.destroy', $item) }}"
-                                                  onsubmit="return confirm('Hapus item ini?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="ha-btn ha-btn-danger text-xs" type="submit">
-                                                    Hapus
-                                                </button>
-                                            </form>
-                                        </div>
+                                <div class="a-grid">
+                                    <div class="a-col-12">
+                                        <label class="a-label">Judul</label>
+                                        <input type="text" name="title" class="a-input" placeholder="Contoh: Ulos / Rumah Bolon / Sasando ...">
                                     </div>
 
-                                    {{-- Edit accordion --}}
-                                    <details class="ha-details mt-3">
-                                        <summary class="flex items-center justify-between gap-2 text-xs font-black"
-                                                 style="color: color-mix(in oklab, var(--txt-body) 78%, transparent);">
-                                            <span>Edit item</span>
-                                            <svg class="chev" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                                 stroke-linecap="round" stroke-linejoin="round">
-                                                <polyline points="6 9 12 15 18 9"></polyline>
-                                            </svg>
-                                        </summary>
+                                    <div class="a-col-12">
+                                        <label class="a-label">Deskripsi (opsional)</label>
+                                        <textarea name="description" rows="2" class="a-textarea" placeholder="Deskripsi singkat..."></textarea>
+                                    </div>
 
-                                        <form method="POST"
-                                              action="{{ route('admin.heritages.item.update', $item) }}"
-                                              enctype="multipart/form-data"
-                                              class="mt-3 space-y-2">
-                                            @csrf
-                                            @method('PATCH')
+                                    {{-- ✅ NEW: lokasi + url --}}
+                                    <div class="a-col-6">
+                                        <label class="a-label">Lokasi (opsional)</label>
+                                        <input type="text" name="location" class="a-input" placeholder="Contoh: Banda Aceh / Toraja">
+                                        <div class="ha-help">Muncul di card publik & modal jika diisi.</div>
+                                    </div>
 
-                                            <div>
-                                                <label class="ha-label">Judul</label>
-                                                <input type="text" name="title" value="{{ $item->title }}" class="ha-input">
-                                            </div>
+                                    <div class="a-col-6">
+                                        <label class="a-label">URL Detail (opsional)</label>
+                                        <input type="url" name="detail_url" class="a-input" placeholder="https://... (wiki/artikel)">
+                                        <div class="ha-help">Tombol “Lihat Selengkapnya” muncul jika URL valid.</div>
+                                    </div>
 
-                                            <div>
-                                                <label class="ha-label">Deskripsi</label>
-                                                <textarea name="description" rows="2" class="ha-textarea">{{ $item->description }}</textarea>
-                                            </div>
+                                    <div class="a-col-12">
+                                        <label class="a-label">Gambar (opsional)</label>
+                                        <input type="file" name="image" class="a-file" accept="image/png,image/jpeg,image/webp">
+                                    </div>
 
-                                            {{-- ✅ NEW: lokasi + url --}}
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                <div>
-                                                    <label class="ha-label">Lokasi (opsional)</label>
-                                                    <input type="text" name="location" value="{{ $item->location }}" class="ha-input" placeholder="Contoh: Toraja / Bali">
-                                                </div>
-                                                <div>
-                                                    <label class="ha-label">URL Detail (opsional)</label>
-                                                    <input type="url" name="detail_url" value="{{ $item->detail_url }}" class="ha-input" placeholder="https://...">
-                                                </div>
-                                            </div>
+                                    <div class="a-col-6">
+                                        <label class="a-label">Urutan (opsional)</label>
+                                        <input type="number" name="sort_order" min="0" value="0" class="a-input a-input-sm">
+                                    </div>
 
-                                            <div>
-                                                <label class="ha-label">Ganti gambar (opsional)</label>
-                                                <input type="file" name="image" class="ha-file">
-                                                @if($item->image_path)
-                                                    <div class="text-xs mt-2" style="color: color-mix(in oklab, var(--txt-body) 60%, transparent);">
-                                                        Saat ini:
-                                                        <a class="underline font-bold" href="{{ asset('storage/'.$item->image_path) }}" target="_blank">lihat</a>
-                                                    </div>
-                                                @endif
-                                            </div>
-
-                                            <div>
-                                                <label class="ha-label">Urutan</label>
-                                                <input type="number" name="sort_order" min="0" value="{{ $item->sort_order }}" class="ha-input">
-                                            </div>
-
-                                            <button class="ha-btn ha-btn-primary w-full text-xs" type="submit">
-                                                Simpan Perubahan
-                                            </button>
-                                        </form>
-                                    </details>
-
+                                    <div class="a-col-6" style="display:flex; align-items:flex-end;">
+                                        <button class="a-btn a-btn-primary" type="submit" style="width:100%; justify-content:center;">
+                                            <i class="bx bx-plus"></i> Tambah Item
+                                        </button>
+                                    </div>
                                 </div>
-                            @endforeach
-                        @endif
-                    </div>
+                            </form>
 
+                            {{-- LIST ITEM --}}
+                            <div class="a-stack" style="margin-top:12px;">
+                                @php
+                                    $items = $itemsByCategory[$catKey] ?? collect();
+                                @endphp
+
+                                @if($items->count() === 0)
+                                    <div class="a-empty">Belum ada item di kategori ini.</div>
+                                @else
+                                    @foreach($items as $item)
+                                        @php
+                                            $imgUrl = $item->image_path ? asset('storage/'.$item->image_path) : '';
+                                            $locVal = $item->location ? trim((string)$item->location) : '';
+                                            $urlVal = $item->detail_url ? trim((string)$item->detail_url) : '';
+                                        @endphp
+
+                                        <div class="hi-card"
+                                             data-ha-item
+                                             data-id="{{ $item->id }}"
+                                             data-title="{{ e($item->title) }}"
+                                             data-desc="{{ e($item->description ?? '') }}"
+                                             data-img="{{ e($imgUrl) }}"
+                                             data-cat="{{ e($catLabel) }}"
+                                             data-sort="{{ (int)$item->sort_order }}"
+                                             data-loc="{{ e($locVal) }}"
+                                             data-url="{{ e($urlVal) }}">
+
+                                            <div class="hi-top">
+                                                <div style="min-width:0;">
+                                                    <div class="hi-title">{{ $item->title }}</div>
+
+                                                    <div class="hi-meta">
+                                                        sort: <span style="font-weight:1000; color: var(--txt-body);">{{ $item->sort_order }}</span>
+                                                        @if($item->image_path)
+                                                            <span style="opacity:.55;">•</span> ada gambar
+                                                        @endif
+                                                        @if($locVal !== '')
+                                                            <span style="opacity:.55;">•</span> ada lokasi
+                                                        @endif
+                                                        @if($urlVal !== '')
+                                                            <span style="opacity:.55;">•</span> ada link
+                                                        @endif
+                                                    </div>
+
+                                                    <div class="hi-badges">
+                                                        @if($locVal !== '')
+                                                            <span class="hi-badge" title="{{ $locVal }}">📍 {{ \Illuminate\Support\Str::limit($locVal, 18) }}</span>
+                                                        @endif
+                                                        @if($urlVal !== '')
+                                                            <span class="hi-badge" title="{{ $urlVal }}">🔗 link</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+
+                                                <div class="a-rowActions">
+                                                    <button type="button" class="a-btn a-btn-sm" data-ha-detail>
+                                                        <i class="bx bx-search-alt-2"></i> Detail
+                                                    </button>
+
+                                                    <form method="POST"
+                                                          action="{{ route('admin.heritages.item.destroy', $item) }}"
+                                                          onsubmit="return confirm('Hapus item ini?')"
+                                                          class="a-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="a-btn a-btn-danger a-btn-sm" type="submit">
+                                                            <i class="bx bx-trash"></i> Hapus
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+
+                                            {{-- Edit accordion --}}
+                                            <details class="ha-details" style="margin-top:10px;">
+                                                <summary>
+                                                    <span>Edit item</span>
+                                                    <svg class="chev" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                         stroke-linecap="round" stroke-linejoin="round">
+                                                        <polyline points="6 9 12 15 18 9"></polyline>
+                                                    </svg>
+                                                </summary>
+
+                                                <form method="POST"
+                                                      action="{{ route('admin.heritages.item.update', $item) }}"
+                                                      enctype="multipart/form-data"
+                                                      class="a-form a-form-tight"
+                                                      style="margin-top:10px;">
+                                                    @csrf
+                                                    @method('PATCH')
+
+                                                    <div class="a-grid">
+                                                        <div class="a-col-12">
+                                                            <label class="a-label a-label-sm">Judul</label>
+                                                            <input type="text" name="title" value="{{ $item->title }}" class="a-input">
+                                                        </div>
+
+                                                        <div class="a-col-12">
+                                                            <label class="a-label a-label-sm">Deskripsi</label>
+                                                            <textarea name="description" rows="2" class="a-textarea">{{ $item->description }}</textarea>
+                                                        </div>
+
+                                                        {{-- ✅ NEW: lokasi + url --}}
+                                                        <div class="a-col-6">
+                                                            <label class="a-label a-label-sm">Lokasi (opsional)</label>
+                                                            <input type="text" name="location" value="{{ $item->location }}" class="a-input" placeholder="Contoh: Toraja / Bali">
+                                                        </div>
+
+                                                        <div class="a-col-6">
+                                                            <label class="a-label a-label-sm">URL Detail (opsional)</label>
+                                                            <input type="url" name="detail_url" value="{{ $item->detail_url }}" class="a-input" placeholder="https://...">
+                                                        </div>
+
+                                                        <div class="a-col-12">
+                                                            <label class="a-label a-label-sm">Ganti gambar (opsional)</label>
+                                                            <input type="file" name="image" class="a-file" accept="image/png,image/jpeg,image/webp">
+                                                            @if($item->image_path)
+                                                                <div class="ha-help">
+                                                                    Saat ini:
+                                                                    <a class="a-link" href="{{ asset('storage/'.$item->image_path) }}" target="_blank">lihat</a>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+
+                                                        <div class="a-col-6">
+                                                            <label class="a-label a-label-sm">Urutan</label>
+                                                            <input type="number" name="sort_order" min="0" value="{{ $item->sort_order }}" class="a-input a-input-sm">
+                                                        </div>
+
+                                                        <div class="a-col-6" style="display:flex; align-items:flex-end;">
+                                                            <button class="a-btn a-btn-primary" type="submit" style="width:100%; justify-content:center;">
+                                                                <i class="bx bx-save"></i> Simpan Perubahan
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </details>
+                                        </div>
+                                    @endforeach
+                                @endif
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
             @endforeach
         </div>
 
     @else
-        <div class="ha-card p-6">
-            <div class="text-sm" style="color: color-mix(in oklab, var(--txt-body) 80%, transparent);">
-                Pilih pulau & suku dulu untuk mulai mengelola warisan.
+        <div class="a-card" style="margin-top:12px;">
+            <div class="a-card-inner">
+                <div class="a-empty">Pilih pulau &amp; suku dulu untuk mulai mengelola warisan.</div>
             </div>
         </div>
     @endif
@@ -790,7 +733,7 @@
                     </a>
                 </div>
 
-                <div class="mt-4 text-xs" style="color: color-mix(in oklab, var(--txt-body) 55%, transparent);">
+                <div class="ha-help" style="margin-top:14px;">
                     Ini hanya tampilan detail. Untuk mengubah, gunakan panel <b>Edit item</b> di bawah card.
                 </div>
             </div>
@@ -862,7 +805,7 @@
                     if (form) form.submit();
                 });
 
-                // optional: kalau user ganti suku -> auto submit juga
+                // kalau user ganti suku -> auto submit juga
                 tribeSelect.addEventListener('change', () => {
                     if (form) form.submit();
                 });

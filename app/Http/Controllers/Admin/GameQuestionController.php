@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\GameLevel;
 use App\Models\GameQuestion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class GameQuestionController extends Controller
 {
@@ -20,7 +21,10 @@ class GameQuestionController extends Controller
         $data = $request->validate([
             'type' => ['required','in:mcq,fill'],
             'question_text' => ['required','string'],
-            'image_path' => ['nullable','string','max:255'],
+// upload file dari input name="image"
+'image' => ['nullable','image','max:2048'], // max 2MB
+// optional fallback kalau kamu masih mau support path manual
+'image_path' => ['nullable','string','max:255'],
 
             'option_a' => ['nullable','string','max:255'],
             'option_b' => ['nullable','string','max:255'],
@@ -36,6 +40,13 @@ class GameQuestionController extends Controller
 
         $data['is_active'] = $request->boolean('is_active');
         $data['game_level_id'] = $level->id;
+
+        // kalau upload gambar, simpan ke storage/public dan set image_path = "storage/..."
+if ($request->hasFile('image')) {
+    $stored = $request->file('image')->store('game/questions', 'public');
+    $data['image_path'] = 'storage/' . $stored;
+}
+
 
         if ($data['type'] === 'mcq') {
             foreach (['option_a','option_b','option_c','option_d','correct_option'] as $k) {
@@ -73,7 +84,10 @@ class GameQuestionController extends Controller
         $data = $request->validate([
             'type' => ['required','in:mcq,fill'],
             'question_text' => ['required','string'],
-            'image_path' => ['nullable','string','max:255'],
+
+            'image' => ['nullable','image','max:2048'],
+'image_path' => ['nullable','string','max:255'],
+'remove_image' => ['nullable','boolean'],
 
             'option_a' => ['nullable','string','max:255'],
             'option_b' => ['nullable','string','max:255'],
@@ -88,6 +102,21 @@ class GameQuestionController extends Controller
         ]);
 
         $data['is_active'] = $request->boolean('is_active');
+
+        // hapus gambar jika user centang "remove_image"
+if ($request->boolean('remove_image')) {
+    $this->deletePublicImagePath($question->image_path);
+    $data['image_path'] = null;
+}
+
+// kalau upload gambar baru, hapus gambar lama lalu set image_path baru
+if ($request->hasFile('image')) {
+    $this->deletePublicImagePath($question->image_path);
+
+    $stored = $request->file('image')->store('game/questions', 'public');
+    $data['image_path'] = 'storage/' . $stored;
+}
+
 
         if ($data['type'] === 'mcq') {
             foreach (['option_a','option_b','option_c','option_d','correct_option'] as $k) {
@@ -117,4 +146,16 @@ class GameQuestionController extends Controller
         $question->delete();
         return back()->with('success', 'Soal dihapus.');
     }
+
+    private function deletePublicImagePath(?string $imagePath): void
+{
+    if (!$imagePath) return;
+
+    // kalau formatnya "storage/xxx", delete di disk public
+    if (str_starts_with($imagePath, 'storage/')) {
+        $relative = substr($imagePath, strlen('storage/'));
+        Storage::disk('public')->delete($relative);
+    }
+}
+
 }

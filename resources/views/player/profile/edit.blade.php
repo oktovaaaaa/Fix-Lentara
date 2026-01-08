@@ -103,7 +103,7 @@
                 <div class="auth-field">
                     <div class="auth-labelRow">
                         <label class="auth-label" style="margin:0;">Pilih Avatar</label>
-                        <span class="auth-hint">(file: <code>public/images/avatars/avatar-1.png</code> s/d <code>avatar-5.png</code>)</span>
+
                     </div>
 
                     <div class="avatar-grid" role="radiogroup" aria-label="Pilihan Avatar">
@@ -119,13 +119,12 @@
                                 />
                                 <span class="avatar-imgWrap" aria-hidden="true">
                                     <img
-                                        src="{{ asset('images/avatars/avatar-'.$i.'.png') }}"
+                                        src="{{ asset('images/avatars/avatar-'.$i.'.PNG') }}"
                                         alt="Avatar {{ $i }}"
                                         class="avatar-img"
                                         loading="lazy"
                                     />
                                 </span>
-                                <span class="avatar-name">Avatar {{ $i }}</span>
                                 <span class="avatar-check" aria-hidden="true">
                                     <svg viewBox="0 0 24 24" fill="none">
                                         <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -136,11 +135,7 @@
                     </div>
                 </div>
 
-                {{-- Row Links --}}
-                <div class="auth-row">
-                    <a href="{{ route('game.learn') }}" class="auth-back">← Kembali ke Belajar</a>
-                    <span class="auth-mini">Perubahan tersimpan pada akun kamu</span>
-                </div>
+
 
                 {{-- Button Save --}}
                 <button type="submit" class="auth-btn">
@@ -157,20 +152,18 @@
 
             </form>
 
-            {{-- FORM LOGOUT (FUNGSI TETAP) --}}
-            <form method="POST" action="{{ route('player.logout') }}" class="logout-form">
-                @csrf
-                <button type="submit" class="logout-btn">
-                    <span class="logout-ico" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M10 17l-1 0a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4h1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <path d="M16 17l5-5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M21 12H10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        </svg>
-                    </span>
-                    <span>Keluar</span>
-                </button>
-            </form>
+{{-- ✅ Tombol bawah: Kembali Belajar --}}
+<div class="logout-form">
+    <a href="{{ route('game.learn') }}" class="logout-btn" style="text-decoration:none;">
+        <span class="logout-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+                <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </span>
+        <span>Kembali Belajar</span>
+    </a>
+</div>
+
 
         </div>
     </div>
@@ -612,18 +605,25 @@ html[data-theme="light"]{
 
 .avatar-item{
   position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* ✅ kotak sempurna */
   border-radius: 18px;
   border: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
   background: color-mix(in oklab, var(--bg-body) 86%, transparent);
-  padding: 10px;
+  padding: 20px;
   cursor: pointer;
-  display: grid;
-  justify-items: center;
-  gap: 8px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* ✅ CENTER VERTIKAL */
+
+  gap: 6px;
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
   user-select: none;
   overflow: hidden;
 }
+
 
 .avatar-item:hover{
   transform: translateY(-2px);
@@ -639,30 +639,39 @@ html[data-theme="light"]{
 }
 
 .avatar-imgWrap{
-  width: 86px;
-  height: 86px;
+  width: 140%;
+  max-width: 86px;
+  aspect-ratio: 1 / 1;
   border-radius: 16px;
-  display: grid;
-  place-items: center;
+
+  display: flex;
+  align-items: center;
+  justify-content: center; /* ✅ CENTER MATEMATIS */
+
   background: rgba(255,107,0,.06);
   border: 1px solid rgba(255,107,0,.14);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
 }
+
 
 .avatar-img{
   width: 72px;
   height: 72px;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 14px 20px rgba(0,0,0,.18));
+  margin: 0 auto;
+  transform: translateZ(0); /* anti blur */
 }
+
 
 .avatar-name{
   font-size: .82rem;
   font-weight: 900;
   color: color-mix(in oklab, var(--txt-body) 92%, transparent);
-  opacity: .92;
+  text-align: center;
+  line-height: 1.1;
+  margin-top: 4px;
 }
+
 
 /* Check badge */
 .avatar-check{
@@ -687,9 +696,9 @@ html[data-theme="light"]{
 .avatar-item:has(.avatar-radio:checked){
   border-color: rgba(255,107,0,.62);
   background: color-mix(in oklab, rgba(255,107,0,.10) 35%, var(--bg-body));
-  box-shadow: 0 22px 70px rgba(0,0,0,.26), 0 0 26px rgba(255,107,0,.16);
-  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px rgba(255,107,0,.22);
 }
+
 .avatar-item:has(.avatar-radio:checked) .avatar-check{
   opacity: 1;
   transform: scale(1);
@@ -764,5 +773,8 @@ html[data-theme="light"]{
   .auth-title{ font-size: 1.42rem; }
   .avatar-imgWrap{ width: 84px; height: 84px; }
 }
+.avatar-name{ display:none !important; }
+.avatar-item{ gap: 0; }
+
 </style>
 @endsection

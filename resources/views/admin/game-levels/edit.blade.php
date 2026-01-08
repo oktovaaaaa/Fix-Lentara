@@ -16,12 +16,57 @@
 <style>
     /* =========================================================
        ADMIN GAME LEVEL EDIT (MANUAL CSS, INDONESIA)
+       - UI ONLY (logika/route/field tetap)
+       - Selaras dengan tema admin orange-neon & light/dark safe
     ========================================================= */
 
     .gl-wrap{
         max-width: 1200px;
         margin: 0 auto;
+        padding: 6px 0 18px;
+        color: var(--txt-body);
     }
+
+    .gl-head{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:12px;
+        flex-wrap:wrap;
+        margin: 4px 0 14px;
+    }
+    .gl-head h1{
+        margin:0;
+        font-size: 20px;
+        font-weight: 1000;
+        letter-spacing: -0.02em;
+        color: var(--txt-body);
+    }
+    .gl-head .sub{
+        margin:6px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1.55;
+    }
+
+    .gl-chip{
+        display:inline-flex;
+        align-items:center;
+        gap:10px;
+        padding:8px 12px;
+        border-radius:999px;
+        border:1px solid var(--line);
+        background: rgba(255,255,255,.02);
+        color: var(--txt-body);
+        font-weight: 1000;
+        font-size: 12px;
+        box-shadow: 0 14px 35px rgba(0,0,0,.08);
+        user-select:none;
+        white-space:nowrap;
+    }
+    .gl-chip .k{ color: var(--muted); }
+    .gl-chip .v{ color: var(--txt-body); }
 
     .gl-grid{
         display: grid;
@@ -35,26 +80,36 @@
     }
 
     .gl-card{
-        background: #0b1020;
-        border: 1px solid rgba(148,163,184,.18);
         border-radius: 18px;
+        border: 1px solid rgba(148,163,184,.18);
+        background: rgba(2,6,23,.35);
+        background: color-mix(in oklab, var(--card) 55%, transparent);
+        backdrop-filter: blur(14px) saturate(140%);
+        -webkit-backdrop-filter: blur(14px) saturate(140%);
+        box-shadow: 0 18px 45px rgba(0,0,0,.10);
         padding: 16px;
-        box-shadow: 0 18px 60px rgba(0,0,0,.25);
-        color: rgba(226,232,240,.92);
+        color: var(--txt-body);
+    }
+    html:not([data-theme="dark"]) .gl-card{
+        background: rgba(255,255,255,.65);
+        border: 1px solid rgba(15,23,42,.12);
+        box-shadow: 0 12px 32px rgba(15,23,42,.08);
     }
 
     .gl-card h2{
-        margin: 0 0 10px;
-        font-size: 18px;
-        font-weight: 900;
-        letter-spacing: .2px;
+        margin: 0 0 8px;
+        font-size: 16px;
+        font-weight: 1000;
+        letter-spacing: -0.01em;
+        color: var(--txt-body);
     }
 
     .gl-sub{
         margin: 0 0 12px;
-        color: rgba(148,163,184,.9);
-        font-weight: 600;
-        font-size: 13px;
+        color: var(--muted);
+        font-weight: 800;
+        font-size: 12px;
+        line-height: 1.55;
     }
 
     .gl-row{
@@ -74,32 +129,53 @@
     }
 
     .gl-label{
-        font-size: 13px;
-        font-weight: 800;
-        color: rgba(226,232,240,.92);
+        font-size: 12px;
+        font-weight: 1000;
+        color: color-mix(in oklab, var(--txt-body) 82%, transparent);
+        margin-left: 2px;
     }
 
     .gl-input, .gl-select, .gl-textarea{
         width: 100%;
         border-radius: 14px;
         border: 1px solid rgba(148,163,184,.22);
-        background: rgba(2,6,23,.35);
-        color: rgba(226,232,240,.95);
+        background: rgba(2,6,23,.22);
+        background: color-mix(in oklab, var(--card) 35%, transparent);
+        color: var(--txt-body);
         padding: 10px 12px;
         outline: none;
-        transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
-        font-weight: 650;
+        transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease, background .15s ease;
+        font-weight: 750;
+    }
+    html:not([data-theme="dark"]) .gl-input,
+    html:not([data-theme="dark"]) .gl-select,
+    html:not([data-theme="dark"]) .gl-textarea{
+        background: rgba(255,255,255,.70);
+        border: 1px solid rgba(15,23,42,.14);
     }
 
     .gl-textarea{
         min-height: 96px;
         resize: vertical;
-        line-height: 1.35;
+        line-height: 1.45;
+    }
+
+    .gl-input::placeholder, .gl-textarea::placeholder{
+        color: color-mix(in oklab, var(--txt-body) 45%, transparent);
     }
 
     .gl-input:focus, .gl-select:focus, .gl-textarea:focus{
-        border-color: rgba(249,115,22,.65);
-        box-shadow: 0 0 0 3px rgba(249,115,22,.18);
+        border-color: rgba(249,115,22,.60);
+        box-shadow: 0 0 0 4px rgba(249,115,22,.14);
+    }
+
+    .gl-select option{
+        background:#0b1220;
+        color: rgba(255,255,255,.92);
+    }
+    html:not([data-theme="dark"]) .gl-select option{
+        background:#fff;
+        color:#0f172a;
     }
 
     .gl-actions{
@@ -111,48 +187,65 @@
     }
 
     .gl-btn{
-        border: none;
+        border: 1px solid rgba(148,163,184,.20);
+        background: rgba(255,255,255,.03);
         cursor: pointer;
-        border-radius: 14px;
+        border-radius: 999px;
         padding: 10px 14px;
-        font-weight: 900;
+        font-weight: 1000;
         letter-spacing: .2px;
-        transition: transform .12s ease, filter .12s ease;
-    }
-
-    .gl-btn:hover{ transform: translateY(-1px); filter: saturate(1.05); }
-
-    .gl-btn.primary{
-        background: #f97316;
-        color: #111827;
-        box-shadow: 0 16px 40px rgba(249,115,22,.18);
-    }
-
-    .gl-btn.ghost{
-        background: rgba(255,255,255,.06);
-        color: rgba(226,232,240,.92);
-        border: 1px solid rgba(148,163,184,.22);
-    }
-
-    .gl-btn.danger{
-        background: rgba(239,68,68,.12);
-        color: rgba(254,202,202,.95);
-        border: 1px solid rgba(239,68,68,.35);
-    }
-
-    /* ✅ NEW: tombol edit (styling mirip ghost tapi aksen orange) */
-    .gl-btn.edit{
-        background: rgba(249,115,22,.10);
-        color: rgba(255,237,213,.95);
-        border: 1px solid rgba(249,115,22,.35);
+        transition: transform .12s ease, filter .12s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+        color: var(--txt-body);
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 10px 12px;
+        line-height: 1;
+        white-space: nowrap;
+        user-select: none;
+    }
+    .gl-btn:active{ transform: translateY(1px) scale(.99); }
+
+    .gl-btn.primary{
+        border-color: rgba(249,115,22,.30);
+        background: linear-gradient(90deg, rgba(249,115,22,.95), rgba(251,146,60,.95));
+        color: #0b1020;
+        box-shadow: 0 16px 38px rgba(249,115,22,.18);
+    }
+    .gl-btn.primary:hover{
+        filter: brightness(1.03);
+        box-shadow: 0 20px 48px rgba(249,115,22,.24);
+    }
+
+    .gl-btn.ghost:hover{
+        border-color: rgba(249,115,22,.38);
+        box-shadow: 0 0 0 4px rgba(249,115,22,.12);
+        background: rgba(249,115,22,.08);
+    }
+
+    .gl-btn.danger{
+        border-color: rgba(239,68,68,.32);
+        background: rgba(239,68,68,.10);
+        color: rgba(254,202,202,.95);
+    }
+    html:not([data-theme="dark"]) .gl-btn.danger{
+        color: rgb(127,29,29);
+        background: rgba(239,68,68,.08);
+    }
+    .gl-btn.danger:hover{
+        background: rgba(239,68,68,.14);
+        box-shadow: 0 0 0 4px rgba(239,68,68,.10);
+    }
+
+    /* tombol edit soal (aksen orange) */
+    .gl-btn.edit{
+        border-color: rgba(249,115,22,.35);
+        background: rgba(249,115,22,.10);
+        color: color-mix(in oklab, #ffedd5 95%, transparent);
     }
     .gl-btn.edit:hover{
-        box-shadow: 0 0 0 3px rgba(249,115,22,.14);
+        box-shadow: 0 0 0 4px rgba(249,115,22,.12);
+        background: rgba(249,115,22,.14);
     }
 
     .gl-check{
@@ -161,10 +254,11 @@
         gap: 10px;
         padding: 10px 12px;
         border-radius: 14px;
-        background: rgba(255,255,255,.04);
+        background: rgba(255,255,255,.02);
         border: 1px solid rgba(148,163,184,.18);
-        font-weight: 850;
-        color: rgba(226,232,240,.92);
+        font-weight: 1000;
+        color: var(--txt-body);
+        user-select: none;
     }
 
     .gl-check input{
@@ -182,8 +276,9 @@
 
     .gl-note{
         font-size: 12px;
-        color: rgba(148,163,184,.92);
-        font-weight: 700;
+        color: var(--muted);
+        font-weight: 800;
+        line-height: 1.55;
     }
 
     /* Questions list */
@@ -195,9 +290,14 @@
 
     .q-item{
         border-radius: 16px;
-        border: 1px solid rgba(148,163,184,.18);
-        background: rgba(255,255,255,.03);
+        border: 1px solid rgba(148,163,184,.16);
+        background: rgba(2,6,23,.18);
+        background: color-mix(in oklab, var(--card) 38%, transparent);
         padding: 12px;
+    }
+    html:not([data-theme="dark"]) .q-item{
+        background: rgba(255,255,255,.75);
+        border: 1px solid rgba(15,23,42,.10);
     }
 
     .q-top{
@@ -209,10 +309,11 @@
     }
 
     .q-title{
-        font-weight: 950;
+        font-weight: 1000;
         margin: 0;
         font-size: 14px;
-        color: rgba(226,232,240,.95);
+        color: var(--txt-body);
+        line-height: 1.25;
     }
 
     .q-meta{
@@ -220,9 +321,10 @@
         gap: 8px;
         flex-wrap: wrap;
         margin-top: 6px;
-        color: rgba(148,163,184,.92);
-        font-weight: 750;
+        color: var(--muted);
+        font-weight: 900;
         font-size: 12px;
+        line-height: 1.4;
     }
 
     .q-badge{
@@ -232,29 +334,41 @@
         padding: 6px 10px;
         border-radius: 999px;
         border: 1px solid rgba(148,163,184,.18);
-        background: rgba(2,6,23,.35);
-        font-weight: 900;
+        background: rgba(255,255,255,.02);
+        font-weight: 1000;
         font-size: 12px;
+        color: var(--txt-body);
+    }
+    html:not([data-theme="dark"]) .q-badge{
+        border: 1px solid rgba(15,23,42,.10);
+        background: rgba(15,23,42,.04);
     }
 
     .q-badge.ok{
         border-color: rgba(34,197,94,.35);
         background: rgba(34,197,94,.10);
+        color: rgba(16,185,129,.95);
+    }
+    html[data-theme="dark"] .q-badge.ok{
         color: rgba(167,243,208,.95);
     }
 
     .q-badge.off{
         border-color: rgba(239,68,68,.35);
         background: rgba(239,68,68,.10);
+        color: rgba(239,68,68,.95);
+    }
+    html[data-theme="dark"] .q-badge.off{
         color: rgba(254,202,202,.95);
     }
 
     .q-body{
         margin-top: 10px;
         font-size: 13px;
-        line-height: 1.45;
-        color: rgba(226,232,240,.92);
+        line-height: 1.55;
+        color: color-mix(in oklab, var(--txt-body) 92%, transparent);
         white-space: pre-wrap;
+        word-break: break-word;
     }
 
     .q-img{
@@ -274,18 +388,22 @@
     .q-opt{
         padding: 10px 12px;
         border-radius: 14px;
-        border: 1px solid rgba(148,163,184,.18);
-        background: rgba(2,6,23,.25);
+        border: 1px solid rgba(148,163,184,.16);
+        background: rgba(2,6,23,.18);
+        background: color-mix(in oklab, var(--card) 30%, transparent);
         font-size: 13px;
-        font-weight: 750;
-        color: rgba(226,232,240,.92);
+        font-weight: 900;
+        color: color-mix(in oklab, var(--txt-body) 92%, transparent);
+        word-break: break-word;
+    }
+    html:not([data-theme="dark"]) .q-opt{
+        background: rgba(255,255,255,.70);
+        border: 1px solid rgba(15,23,42,.10);
     }
 
-    .q-opt b{
-        color: rgba(226,232,240,.95);
-    }
+    .q-opt b{ color: var(--txt-body); }
 
-    /* ✅ NEW: action buttons in question top-right */
+    /* action buttons on question top-right */
     .q-actions{
         display:flex;
         gap:10px;
@@ -306,40 +424,92 @@
         .q-form-grid{ grid-template-columns: 1fr; }
     }
 
-    .q-hide{
-        display: none !important;
-    }
+    .q-hide{ display: none !important; }
 
     .gl-alert{
         border-radius: 16px;
         padding: 10px 12px;
         border: 1px solid rgba(148,163,184,.18);
-        background: rgba(255,255,255,.03);
-        color: rgba(226,232,240,.92);
-        font-weight: 800;
+        background: rgba(255,255,255,.02);
+        color: var(--txt-body);
+        font-weight: 900;
         margin-bottom: 12px;
     }
 
     .gl-alert.ok{
         border-color: rgba(34,197,94,.35);
         background: rgba(34,197,94,.10);
+        color: rgba(16,185,129,.95);
+    }
+    html[data-theme="dark"] .gl-alert.ok{
         color: rgba(167,243,208,.95);
     }
 
     .gl-alert.err{
         border-color: rgba(239,68,68,.35);
         background: rgba(239,68,68,.10);
+        color: rgba(239,68,68,.95);
+    }
+    html[data-theme="dark"] .gl-alert.err{
         color: rgba(254,202,202,.95);
     }
 
     .gl-errors{
         margin: 0;
         padding-left: 18px;
-        font-weight: 750;
+        font-weight: 800;
+        color: color-mix(in oklab, var(--txt-body) 92%, transparent);
     }
+
+    .gl-minirow{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        align-items:center;
+        justify-content:space-between;
+        margin: 0 0 10px;
+    }
+
+    .gl-minirow .count{
+        font-size: 12px;
+        font-weight: 1000;
+        color: var(--muted);
+    }
+
+    .gl-input[type="file"]{
+    padding: 9px 12px;
+}
+.gl-input[type="file"]::file-selector-button{
+    border: 1px solid rgba(148,163,184,.20);
+    background: rgba(255,255,255,.04);
+    color: var(--txt-body);
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-weight: 1000;
+    cursor: pointer;
+    margin-right: 10px;
+}
+.gl-input[type="file"]::file-selector-button:hover{
+    border-color: rgba(249,115,22,.38);
+    box-shadow: 0 0 0 4px rgba(249,115,22,.10);
+}
+
 </style>
 
 <div class="gl-wrap">
+
+    <div class="gl-head">
+        <div>
+            <h1>Edit Game Level</h1>
+            <div class="sub">Ubah data level & kelola soal. (UI diperbaiki, logika tetap)</div>
+        </div>
+        <div class="gl-chip" title="Ringkasan level">
+            <span class="k">Level</span>
+            <span class="v">#{{ $gameLevel->id }}</span>
+            <span class="k">• Soal</span>
+            <span class="v">{{ $questions->count() }}</span>
+        </div>
+    </div>
 
     {{-- FLASH --}}
     @if(session('success'))
@@ -351,7 +521,7 @@
 
     @if($errors->any())
         <div class="gl-alert err">
-            <div style="font-weight:950;margin-bottom:6px;">Ada error validasi:</div>
+            <div style="font-weight:1000;margin-bottom:6px;">Ada error validasi:</div>
             <ul class="gl-errors">
                 @foreach($errors->all() as $e)
                     <li>{{ $e }}</li>
@@ -422,11 +592,12 @@
                 <div class="gl-actions">
                     <button type="submit" class="gl-btn primary">Simpan Perubahan</button>
 
-                    <a href="{{ route('admin.game-levels.index') }}" class="gl-btn ghost" style="text-decoration:none;display:inline-flex;align-items:center;">
+                    <a href="{{ route('admin.game-levels.index') }}" class="gl-btn ghost">
                         Kembali
                     </a>
 
-                    <form method="POST" action="{{ route('admin.game-levels.destroy', $gameLevel->id) }}"
+                    <form method="POST"
+                          action="{{ route('admin.game-levels.destroy', $gameLevel->id) }}"
                           onsubmit="return confirm('Yakin hapus level ini? Semua soal di level ini juga akan ikut terhapus.');"
                           style="display:inline;">
                         @csrf
@@ -445,11 +616,17 @@
            RIGHT: QUESTIONS (LIST + ADD)
         ========================================================= --}}
         <section class="gl-card">
-            <h2>Kelola Soal Level</h2>
-            <p class="gl-sub">
-                Tambah / hapus soal untuk level: <b>{{ $gameLevel->title }}</b>.
-                (Minimal 5 soal aktif untuk dimainkan.)
-            </p>
+            <div class="gl-minirow">
+                <div>
+                    <h2 style="margin:0;">Kelola Soal Level</h2>
+                    <p class="gl-sub" style="margin:6px 0 0;">
+                        Tambah / hapus soal untuk level: <b>{{ $gameLevel->title }}</b>.
+                    </p>
+                </div>
+                <div class="count">
+                    Total soal: <b style="color:var(--txt-body)">{{ $questions->count() }}</b> • Minimal siap main: <b style="color:var(--txt-body)">5 soal aktif</b>
+                </div>
+            </div>
 
             {{-- LIST QUESTIONS --}}
             <div class="q-list">
@@ -484,26 +661,22 @@
                                 </div>
                             </div>
 
-                            {{-- ✅ ACTIONS: EDIT + DELETE --}}
+                            {{-- ACTIONS: EDIT + DELETE --}}
                             <div class="q-actions">
-
-                                {{-- ✅ EDIT BUTTON --}}
                                 <a
                                     href="{{ route('admin.game-questions.edit', [$gameLevel->id, $q->id]) }}"
                                     class="gl-btn edit"
-                                    style="padding:10px 12px;"
                                 >
                                     Edit
                                 </a>
 
-                                {{-- DELETE --}}
                                 <form method="POST"
                                       action="{{ route('admin.game-questions.destroy', [$gameLevel->id, $q->id]) }}"
                                       onsubmit="return confirm('Yakin hapus soal ini?');"
                                       style="display:inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="gl-btn danger" style="padding:10px 12px;">Hapus</button>
+                                    <button type="submit" class="gl-btn danger">Hapus</button>
                                 </form>
                             </div>
                         </div>
@@ -524,8 +697,9 @@
                         @endif
                     </div>
                 @empty
-                    <div class="q-item" style="text-align:center;color:rgba(148,163,184,.92);font-weight:850;">
-                        Belum ada soal di level ini. Tambahkan dulu di bawah.
+                    <div class="q-item" style="text-align:center;">
+                        <div style="font-weight:1000;color:var(--muted);">Belum ada soal di level ini.</div>
+                        <div class="gl-note" style="margin-top:6px;">Tambahkan soal baru di form “Tambah Soal” di bawah.</div>
                     </div>
                 @endforelse
             </div>
@@ -536,17 +710,22 @@
             <h2 style="margin-top:0;">Tambah Soal</h2>
             <p class="gl-sub">Isi data soal. Pilih tipe soal supaya field yang relevan muncul.</p>
 
-            <form method="POST" action="{{ route('admin.game-questions.store', $gameLevel->id) }}">
-                @csrf
+<form method="POST" action="{{ route('admin.game-questions.store', $gameLevel->id) }}" enctype="multipart/form-data">
+
+            @csrf
 
                 <div class="q-form-grid">
-                    <div class="gl-field">
-                        <label class="gl-label">Tipe Soal</label>
-                        <select name="type" class="gl-select" id="qType" required>
-                            <option value="mcq" @selected(old('type') === 'mcq')>Pilihan Ganda (A/B/C/D)</option>
-                            <option value="fill" @selected(old('type') === 'fill')>Isian Singkat</option>
-                        </select>
-                    </div>
+                   <div class="gl-field">
+    <label class="gl-label">Upload Gambar (opsional)</label>
+    <input
+        type="file"
+        name="image"
+        class="gl-input"
+        accept="image/*"
+    />
+    <div class="gl-note">Pilih file gambar dari komputer (jpg/png/webp).</div>
+</div>
+
 
                     <div class="gl-field">
                         <label class="gl-label">Urutan Soal (Order)</label>
@@ -633,11 +812,10 @@
                             name="correct_text"
                             class="gl-input"
                             value="{{ old('correct_text') }}"
-                            placeholder="Contoh: MAS (atau IKANMAS sesuai kebutuhan)"
+                            placeholder="Contoh: mas / toba / dll"
                         />
                         <div class="gl-note">
-                            Panjang jawaban inilah yang nanti dipakai sebagai maxlength di input pemain.
-                            (Jawaban diperiksa case-insensitive, spasi diabaikan.)
+                            Panjang jawaban dipakai sebagai maxlength di input pemain (sesuai logic kamu).
                         </div>
                     </div>
                 </div>

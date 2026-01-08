@@ -142,6 +142,13 @@ Route::prefix('admin')
 
                 Route::delete('questions/{question}', [AdminQuizQuestionController::class, 'destroy'])
                     ->name('quiz-questions.destroy');
+
+                    Route::get('questions/{question}/edit', [AdminQuizQuestionController::class, 'edit'])
+    ->name('quiz-questions.edit');
+
+Route::put('questions/{question}', [AdminQuizQuestionController::class, 'update'])
+    ->name('quiz-questions.update');
+
             });
 
         // WARISAN (Heritages)

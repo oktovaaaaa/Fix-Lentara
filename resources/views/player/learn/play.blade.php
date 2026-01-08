@@ -1,4 +1,8 @@
 {{-- resources/views/player/learn/play.blade.php (REPLACE FULL) --}}
+
+@extends('layouts.game')
+@section('title', $level->title ?? 'Level')
+
 @php
     $player = $player ?? (object)[
         'xp_total' => 0,
@@ -6,6 +10,8 @@
         'hearts' => 5,
         'hearts_max' => 5,
         'display_name' => 'Player',
+        'nickname' => null,
+        'avatar_key' => 1,
     ];
 
     $islandColors = $islandColors ?? [];
@@ -15,12 +21,22 @@
     $islandSlug = $level->island?->slug ?? '';
     $accent = $islandColors[$islandSlug] ?? '#f97316';
 
-    // payload untuk JS (jangan tampilkan 5 card sekaligus)
+    $islandLabel = strtoupper($level->island?->subtitle ?? $level->island?->name ?? 'PULAU');
+
+    // ✅ pakai nickname sebagai nama tampil
+    $nickname = (string)($player->nickname ?? $player->display_name ?? 'Player');
+
+    $avatarKey = (int)($player->avatar_key ?? 1);
+    if ($avatarKey < 1) $avatarKey = 1;
+    if ($avatarKey > 5) $avatarKey = 5;
+    $avatarUrl = asset('images/avatars/avatar-'.$avatarKey.'.png');
+
+    // payload untuk JS
     $payload = [];
-    foreach($questions as $q){
+    foreach(($questions ?? []) as $q){
         $payload[] = [
             'id' => (int)$q->id,
-            'type' => (string)$q->type,
+            'type' => (string)$q->type, // mcq / fill
             'text' => (string)$q->question_text,
             'image' => $q->image_path ? asset($q->image_path) : null,
             'options' => [
@@ -33,426 +49,693 @@
         ];
     }
 
-    // TIME LIMIT (kamu belum punya kolom di game_levels, jadi kita set default 8 menit)
-    // kalau nanti mau dinamis, kita tambah kolom di migration game_levels (kamu belum minta sekarang).
-    $timeLimitSec = 8 * 60;
+    // default 8 menit (atau ambil dari level jika ada)
+    $timeLimitSec = (int)($level->time_limit_seconds ?? 0);
+    if ($timeLimitSec <= 0) $timeLimitSec = 8 * 60;
+
+    /**
+     * ✅ PENTING:
+     * Paksa URL check ke route yang benar supaya tidak pernah POST ke /belajar/level/{id}
+     * (Yang GET-only)
+     */
+    $checkUrl  = route('game.check', $level->id);          // POST /belajar/level/{level}/check
+    $refillUrl = route('game.hearts.refill');              // POST /hati/isi-ulang
+    $profileUrl= route('player.profile');                  // GET /profil
+
+    // ✅ SFX (request user)
+    $sfxCorrect = asset('audio/benar.M4A');
+    $sfxWrong   = asset('audio/salah.M4A');
 @endphp
 
-<!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="{{ request()->cookie('theme', 'dark') }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $levelTitle }} — Belajar</title>
 
-    <style>
-        :root{
-            --bg:#020617;
-            --card: rgba(15,23,42,.76);
-            --line: rgba(148,163,184,.20);
-            --txt: rgba(226,232,240,.95);
-            --muted: rgba(148,163,184,.86);
+@push('styles')
+<style>
+    /* =========================================================
+       THEME GLOBAL (SOLID — TANPA TRANSPARAN / GRADIENT)
+    ========================================================= */
+    :root{
+        --bg-body: #fdfaf5;
+        --txt-body: #0f172a;
+        --card: #ffffff;
+        --line: #e9e1d6;
+        --muted: #616161;
 
-            --accent: {{ $accent }};
-            --danger: #ef4444;
-            --ok: #22c55e;
+        --brand: #b7410e;
+        --brand-2: #f4c842;
 
-            --shadow: 0 26px 90px rgba(0,0,0,.40);
-            --overlay: rgba(0,0,0,.58);
+        /* ✅ Alert solid jelas */
+        --success-bg: #16a34a;
+        --success-border: #15803d;
 
-            --r-xl: 22px;
-            --r-lg: 18px;
-            --r-md: 14px;
-        }
+        --error-bg: #dc2626;
+        --error-border: #b91c1c;
 
-        html[data-theme="light"]{
-            --bg:#f8fafc;
-            --card: rgba(255,255,255,.82);
-            --line: rgba(15,23,42,.14);
-            --txt: rgba(15,23,42,.94);
-            --muted: rgba(71,85,105,.86);
-            --shadow: 0 24px 70px rgba(2,6,23,.12);
-            --overlay: rgba(2,6,23,.32);
-        }
+        --accent: {{ $accent }};
 
-        *{ box-sizing:border-box; }
-        html,body{ height:100%; }
-        body{
-            margin:0;
-            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-            background: var(--bg);
-            color: var(--txt);
-            overflow-x:hidden;
-        }
+        --r-xl: 26px;
+        --r-lg: 18px;
+        --r-md: 14px;
 
-        .bg{
-            position: fixed;
-            inset:0;
-            pointer-events:none;
-            z-index:0;
-            opacity:.9;
-            background:
-                radial-gradient(circle at 20% 10%, color-mix(in oklab, var(--accent) 25%, transparent), transparent 40%),
-                radial-gradient(circle at 85% 15%, rgba(59,130,246,.12), transparent 45%),
-                radial-gradient(circle at 15% 85%, rgba(34,197,94,.10), transparent 45%),
-                radial-gradient(circle at 85% 85%, rgba(250,204,21,.10), transparent 45%);
-        }
-        .bg::after{
-            content:"";
-            position:absolute;
-            inset:0;
-            opacity:.18;
-            background-image: radial-gradient(rgba(148,163,184,.45) 1px, transparent 1px);
-            background-size: 24px 24px;
-            mask-image: radial-gradient(circle at 52% 42%, #000 0%, rgba(0,0,0,.75) 40%, transparent 72%);
-        }
+        /* footer image height */
+        --footer-h: 96px; /* ~ h-24 */
+    }
 
-        .wrap{
-            position: relative;
-            z-index: 1;
-            max-width: 980px;
-            margin: 18px auto;
-            padding: 0 16px 26px;
-        }
+    html[data-theme="dark"]{
+        --bg-body: #020617;
+        --txt-body: #e5e7eb;
+        --card: #020617;
+        --line: #1f2937;
+        --muted: #9ca3af;
 
-        .topbar{
-            border-radius: var(--r-xl);
-            background: linear-gradient(180deg, color-mix(in oklab, var(--card) 92%, transparent), color-mix(in oklab, var(--card) 84%, transparent));
-            border: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-            box-shadow: var(--shadow);
-            padding: 14px;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap: 12px;
-        }
+        --brand: #f97316;
+        --brand-2: #fde68a;
+    }
 
-        .top-left{
-            display:flex;
-            align-items:center;
-            gap: 12px;
-            min-width:0;
-        }
-        .back{
-            width: 44px;
-            height: 44px;
-            border-radius: 16px;
-            border: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-            background: rgba(255,255,255,.03);
-            color: var(--txt);
-            display:grid;
-            place-items:center;
-            text-decoration:none;
-            flex:0 0 auto;
-        }
-        .back svg{ width:20px;height:20px; }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    background: var(--bg-body);
+    color: var(--txt-body);
+    overflow-x:hidden;
 
-        .title{
-            display:grid;
-            gap: 2px;
-            min-width:0;
-        }
-        .title small{
-            color: color-mix(in oklab, var(--muted) 92%, transparent);
-            font-weight: 900;
-        }
-        .title h1{
-            margin:0;
-            font-size: 18px;
-            font-weight: 950;
-            white-space:nowrap;
-            overflow:hidden;
-            text-overflow:ellipsis;
-            max-width: 520px;
-        }
+    /* ✅ bikin footer bawah bisa nempel bawah kalau konten pendek */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
-        .top-right{
-            display:flex;
-            align-items:center;
-            gap: 10px;
-            flex:0 0 auto;
-        }
 
-        .pill{
-            display:inline-flex;
-            align-items:center;
-            gap: 8px;
-            padding: 10px 12px;
-            border-radius: 16px;
-            border: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-            background: rgba(255,255,255,.03);
-            font-weight: 950;
-        }
-        .pill svg{ width:18px;height:18px; }
-        .pill.heart{ color: var(--danger); }
-        .pill.xp{ color: #93c5fd; }
-        .pill.time{ color: color-mix(in oklab, var(--accent) 70%, #ffffff 30%); }
+    /* =========================================================
+       ✅ FOOTER IMAGE (TOP & BOTTOM) — FIXED, DI BELAKANG KONTEN
+       - full width
+       - tidak gerak (fixed)
+       - komponen menimpa gambar (z-index konten lebih besar)
+    ========================================================= */
+/* TOP: tetap fixed di atas */
+.bg-footer.top{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: var(--footer-h);
+    object-fit: cover;
+    display:block;
+    z-index: 0;
+    pointer-events: none;
+}
 
-        .card{
-            margin-top: 14px;
-            border-radius: var(--r-xl);
-            background: linear-gradient(180deg, color-mix(in oklab, var(--card) 92%, transparent), color-mix(in oklab, var(--card) 84%, transparent));
-            border: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-            box-shadow: var(--shadow);
-            overflow:hidden;
-        }
+/* BOTTOM: ikut halaman (bukan fixed) */
+.bg-footer.bottom{
+    position: static;
+    width: 100%;
+    height: var(--footer-h);
+    object-fit: cover;
+    display:block;
 
-        .card-head{
-            padding: 14px;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            gap: 10px;
-            border-bottom: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-        }
-        .qmeta{
-            font-weight: 950;
-        }
-        .progress{
-            font-weight: 950;
-            color: color-mix(in oklab, var(--muted) 92%, transparent);
-        }
+    /* ✅ ini kuncinya: nempel bawah kalau konten pendek */
+    margin-top: auto;
 
-        .card-body{
-            padding: 14px;
-            display:grid;
-            gap: 12px;
-        }
+    /* optional biar gak “ketarik” mengecil */
+    flex-shrink: 0;
 
-        .qtext{
-            font-size: 16px;
-            font-weight: 900;
-            line-height: 1.4;
-            white-space: pre-wrap;
-        }
+    pointer-events: none;
+}
 
-        .qimg img{
-            max-width: 100%;
-            border-radius: 16px;
-            border: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-            display:block;
-        }
 
-        .options{
-            display:grid;
-            gap: 10px;
-        }
-        .opt{
-            display:flex;
-            align-items:center;
-            gap: 10px;
-            padding: 12px;
-            border-radius: 16px;
-            border: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-            background: rgba(255,255,255,.03);
-            cursor: pointer;
-            transition: transform .15s ease, border-color .15s ease, background .15s ease;
-            user-select:none;
-        }
-        .opt:hover{
-            transform: translateY(-1px);
-            border-color: color-mix(in oklab, var(--accent) 55%, var(--line));
-        }
-        .opt .badge{
-            width: 36px;
-            height: 36px;
-            border-radius: 14px;
-            display:grid;
-            place-items:center;
-            font-weight: 950;
-            background: rgba(255,255,255,.03);
-            border: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-        }
-        .opt .label{
-            font-weight: 900;
-        }
-        .opt.is-selected{
-            border-color: color-mix(in oklab, var(--accent) 65%, transparent);
-            box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 30%, transparent);
-            background: color-mix(in oklab, var(--accent) 10%, rgba(255,255,255,.03));
-        }
-        .opt.is-disabled{
-            cursor: not-allowed;
-            opacity: .7;
-        }
+    /* =========================================================
+       WRAP
+       - kasih ruang agar konten tidak ketutup footer image fixed
+    ========================================================= */
+.wrap{
+    position: relative;
+    z-index: 2;
+    max-width: 1180px;
+    margin: 16px auto;
+    padding: calc(var(--footer-h) + 10px) 18px 18px; /* ✅ bawah cukup kecil */
+    flex: 1 0 auto; /* ✅ dorong footer ke bawah saat konten pendek */
 
-        .fill{
-            display:flex;
-            gap: 10px;
-            align-items:flex-end;
-            flex-wrap: wrap;
-        }
-        .fill label{
-            display:block;
-            font-weight: 950;
-            margin-bottom: 6px;
-        }
-        .fill input{
-            width: 280px;
-            max-width: 100%;
-            padding: 12px;
-            border-radius: 16px;
-            border: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-            background: rgba(255,255,255,.02);
-            color: var(--txt);
-            font-weight: 950;
-            outline: none;
-            letter-spacing: .5px;
-        }
-        .fill input:focus{
-            border-color: color-mix(in oklab, var(--accent) 60%, transparent);
-            box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
-        }
-        .hint{
-            font-size: 12px;
-            font-weight: 900;
-            color: color-mix(in oklab, var(--muted) 92%, transparent);
-        }
+}
 
-        .footer{
-            padding: 14px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            gap: 12px;
-            border-top: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-            background: rgba(255,255,255,.01);
-        }
 
-        .feedback{
-            display:none;
-            align-items:center;
-            gap: 10px;
-            font-weight: 950;
-            padding: 10px 12px;
-            border-radius: 16px;
-            border: 1px solid transparent;
-            background: rgba(255,255,255,.03);
-        }
-        .feedback.ok{
-            display:flex;
-            border-color: rgba(34,197,94,.35);
-            background: rgba(34,197,94,.10);
-            color: rgba(167,243,208,.95);
-        }
-        .feedback.err{
-            display:flex;
-            border-color: rgba(239,68,68,.35);
-            background: rgba(239,68,68,.10);
-            color: rgba(254,202,202,.95);
-        }
-        html[data-theme="light"] .feedback.ok{ color: rgba(6,95,70,.95); }
-        html[data-theme="light"] .feedback.err{ color: rgba(127,29,29,.95); }
+    /* =========================================================
+       TOP BAR (SOLID)
+    ========================================================= */
+    .topbar{
+        border-radius: 999px;
+        background: var(--card);
+        border: 2px solid var(--line);
+        padding: 12px 14px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap: 12px;
+    }
 
-        .btn{
-            border-radius: 16px;
-            padding: 12px 14px;
-            font-weight: 950;
-            border: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-            background: rgba(255,255,255,.03);
-            color: var(--txt);
-            cursor: pointer;
-            transition: transform .12s ease, filter .12s ease, opacity .12s ease;
-        }
-        .btn:hover{ transform: translateY(-1px); filter:saturate(1.05); }
-        .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
-        .btn.primary{
-            background: var(--accent);
-            border-color: color-mix(in oklab, var(--accent) 60%, transparent);
-            color: #111;
-        }
-        html[data-theme="light"] .btn.primary{ color:#0b1220; }
+    .top-left{
+        display:flex;
+        align-items:center;
+        gap: 12px;
+        min-width: 260px;
+    }
 
-        /* Heart shake animation when wrong */
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            20% { transform: translateX(-6px); }
-            40% { transform: translateX(6px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
-            100% { transform: translateX(0); }
-        }
-        .shake{ animation: shake .35s ease; }
+    .back{
+        width: 44px;
+        height: 44px;
+        border-radius: 999px;
+        border: 2px solid var(--line);
+        background: var(--card);
+        color: var(--txt-body);
+        display:grid;
+        place-items:center;
+        text-decoration:none;
+        flex:0 0 auto;
+        transition: transform .14s ease, border-color .14s ease;
+    }
+    .back:hover{
+        transform: translateY(-1px);
+        border-color: var(--accent);
+    }
+    .back svg{ width:20px;height:20px; }
 
-        /* MODALS */
-        .modal-wrap{
-            position: fixed;
-            inset: 0;
-            z-index: 90;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            background: var(--overlay);
-        }
-        .modal-wrap.is-open{ display:flex; }
+    .title{
+        display:grid;
+        gap: 2px;
+        min-width:0;
+    }
+    .title small{
+        color: var(--muted);
+        font-weight: 900;
+        letter-spacing: .14em;
+        font-size: 11px;
+    }
+    .title h1{
+        margin:0;
+        font-size: 18px;
+        font-weight: 950;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+    }
 
-        .modal{
-            width: min(520px, 92vw);
-            border-radius: 22px;
-            border: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-            background: linear-gradient(180deg, color-mix(in oklab, var(--card) 95%, transparent), color-mix(in oklab, rgba(15,23,42,.60) 92%, transparent));
-            box-shadow: 0 30px 110px rgba(0,0,0,.55);
-            overflow: hidden;
-            position: relative;
-        }
-        .modal::before{
-            content:"";
-            position:absolute;
-            inset:-2px;
-            background: radial-gradient(420px 220px at 30% 15%, color-mix(in oklab, var(--modal-accent) 40%, transparent), transparent 62%);
-            pointer-events:none;
-            opacity:.9;
-        }
-        .modal-inner{ position:relative; z-index:1; padding: 16px; }
-        .modal-title{ font-weight: 950; font-size: 18px; margin: 0 0 6px; }
-        .modal-sub{ margin: 0 0 12px; color: color-mix(in oklab, var(--muted) 92%, transparent); font-weight: 850; line-height: 1.4; }
-        .modal-actions{ display:flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; margin-top: 10px; }
+    .top-mid{
+        flex: 1 1 auto;
+        display:flex;
+        justify-content:center;
+        min-width: 260px;
+    }
 
-        .stat-grid{
-            display:grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .stat{
-            border-radius: 18px;
-            border: 1px solid color-mix(in oklab, var(--line) 92%, transparent);
-            background: rgba(255,255,255,.03);
-            padding: 12px;
-            text-align:center;
-            font-weight: 950;
-        }
-        .stat .k{ font-size: 12px; color: color-mix(in oklab, var(--muted) 92%, transparent); font-weight: 900; margin-bottom: 6px; }
-        .stat .v{ font-size: 18px; }
+    .soal-pill{
+        width: min(460px, 100%);
+        border-radius: 999px;
+        border: 2px solid var(--line);
+        background: var(--card);
+        padding: 10px 12px;
+        display:flex;
+        align-items:center;
+        gap: 12px;
+    }
+    .soal-meta{
+        font-weight: 950;
+        letter-spacing:.10em;
+        font-size: 11px;
+        color: var(--muted);
+        display:flex;
+        flex-direction:column;
+        line-height: 1.05;
+        min-width: 68px;
+    }
+    .soal-meta b{
+        color: var(--txt-body);
+        letter-spacing: 0;
+        font-size: 12px;
+        margin-top: 4px;
+    }
 
-        @media (max-width: 560px){
-            .title h1{ max-width: 220px; }
-            .stat-grid{ grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
-<div class="bg" aria-hidden="true"></div>
+    .soal-bar{
+        height: 10px;
+        border-radius: 999px;
+        background: var(--line);
+        overflow:hidden;
+        flex: 1 1 auto;
+        position: relative;
+    }
+    .soal-bar > i{
+        position:absolute;
+        inset:0;
+        width: 0%;
+        border-radius: inherit;
+        background: var(--accent); /* ✅ solid */
+        transition: width .25s ease;
+    }
 
-<div class="wrap">
+    .top-right{
+        display:flex;
+        align-items:center;
+        justify-content:flex-end;
+        gap: 10px;
+        min-width: 420px;
+        flex-wrap: wrap;
+    }
 
+    .pill{
+        display:inline-flex;
+        align-items:center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 2px solid var(--line);
+        background: var(--card);
+        font-weight: 950;
+        white-space: nowrap;
+    }
+    .pill svg{ width:18px;height:18px; }
+
+    .pill.time{ color: var(--txt-body); }
+    .pill.xp{ color: #3b82f6; }
+    .pill.coin{ color: #22c55e; }
+    .pill.heart{ color: #dc2626; }
+
+    .profile-pill{
+        gap: 10px;
+        text-decoration:none;
+        color: inherit;
+        transition: transform .14s ease, border-color .14s ease;
+    }
+    .profile-pill:hover{
+        transform: translateY(-1px);
+        border-color: var(--accent);
+    }
+    .avatar{
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        border: 2px solid var(--line);
+        background: var(--card);
+        object-fit: cover;
+        display:block;
+    }
+    .pname{
+        font-weight: 950;
+        max-width: 160px;
+        overflow:hidden;
+        text-overflow:ellipsis;
+    }
+
+    /* =========================================================
+       GAME CARD
+       ✅ Aksen beda per pulau: border kiri + border atas solid
+    ========================================================= */
+    .card{
+        margin-top: 14px;
+        border-radius: var(--r-xl);
+        background: var(--card);
+        border: 2px solid var(--line);
+        border-left: 10px solid var(--accent);
+        overflow:hidden;
+    }
+    .card-head{
+        padding: 16px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap: 10px;
+        border-bottom: 2px solid var(--line);
+        /* aksen tipis atas juga */
+        box-shadow: inset 0 6px 0 0 var(--accent);
+    }
+    .qmeta{ font-weight: 950; font-size: 16px; }
+    .progress{ font-weight: 950; color: var(--muted); }
+
+    .card-body{
+        padding: 16px;
+        display:grid;
+        gap: 12px;
+    }
+
+    .qtext{
+        font-size: 16px;
+        font-weight: 900;
+        line-height: 1.4;
+        white-space: pre-wrap;
+    }
+
+.qimg img{
+    max-width: 320px;   /* ⬅️ BATAS UKURAN GAMBAR */
+    width: 100%;
+    max-height: 320px;  /* ⬅️ BATAS TINGGI */
+    object-fit: contain;
+    margin: 0 auto;
+    border-radius: 16px;
+    border: 2px solid var(--line);
+    display:block;
+}
+
+
+    .options{ display:grid; gap: 10px; }
+    .opt{
+        display:flex;
+        align-items:center;
+        gap: 10px;
+        padding: 12px;
+        border-radius: 18px;
+        border: 2px solid var(--line);
+        background: var(--card);
+        cursor: pointer;
+        transition: transform .15s ease, border-color .15s ease;
+        user-select:none;
+    }
+    .opt:hover{
+        transform: translateY(-1px);
+        border-color: var(--accent);
+    }
+    .opt .badge{
+        width: 36px;
+        height: 36px;
+        border-radius: 14px;
+        display:grid;
+        place-items:center;
+        font-weight: 950;
+        background: var(--card);
+        border: 2px solid var(--line);
+    }
+    .opt .label{ font-weight: 900; }
+    .opt.is-selected{
+        border-color: var(--accent);
+        background: var(--card);
+        box-shadow: inset 0 0 0 2px var(--accent);
+    }
+
+    .fill{
+        display:flex;
+        gap: 10px;
+        align-items:flex-end;
+        flex-wrap: wrap;
+    }
+    .fill label{
+        display:block;
+        font-weight: 950;
+        margin-bottom: 6px;
+    }
+    .fill input{
+        width: 280px;
+        max-width: 100%;
+        padding: 12px;
+        border-radius: 18px;
+        border: 2px solid var(--line);
+        background: var(--card);
+        color: var(--txt-body);
+        font-weight: 950;
+        outline: none;
+        letter-spacing: .5px;
+    }
+    .fill input:focus{
+        border-color: var(--accent);
+        box-shadow: inset 0 0 0 2px var(--accent);
+    }
+    .hint{
+        font-size: 12px;
+        font-weight: 900;
+        color: var(--muted);
+    }
+
+    .footer{
+        padding: 16px;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap: 12px;
+        border-top: 2px solid var(--line);
+        background: var(--card);
+    }
+
+    /* ✅ alert benar/salah solid, merah/hijau jelas */
+    .feedback{
+        display:none;
+        align-items:center;
+        gap: 10px;
+        font-weight: 950;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 2px solid var(--line);
+        background: var(--card);
+        color: var(--txt-body);
+    }
+    .feedback.ok{
+        display:flex;
+        background: var(--success-bg);
+        border-color: var(--success-border);
+        color: #ffffff;
+    }
+    .feedback.err{
+        display:flex;
+        background: var(--error-bg);
+        border-color: var(--error-border);
+        color: #ffffff;
+    }
+
+    .btn{
+        border-radius: 999px;
+        padding: 12px 16px;
+        font-weight: 950;
+        border: 2px solid var(--line);
+        background: var(--card);
+        color: var(--txt-body);
+        cursor: pointer;
+        transition: transform .12s ease, opacity .12s ease;
+        text-decoration:none;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+    }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+    .btn.primary{
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #0b1220;
+    }
+    html[data-theme="dark"] .btn.primary{ color:#0b1220; }
+
+    @keyframes shake {
+        0% { transform: translateX(0); }
+        20% { transform: translateX(-6px); }
+        40% { transform: translateX(6px); }
+        60% { transform: translateX(-4px); }
+        80% { transform: translateX(4px); }
+        100% { transform: translateX(0); }
+    }
+    .shake{ animation: shake .35s ease; }
+
+    /* =========================================================
+       MODALS (SOLID — TANPA TRANSPARAN)
+    ========================================================= */
+    .modal-wrap{
+        position: fixed;
+        inset: 0;
+        z-index: 90;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background: #0b1220; /* solid overlay */
+    }
+    .modal-wrap.is-open{ display:flex; }
+
+    .modal{
+        width: min(680px, 92vw);
+        border-radius: 28px;
+        border: 2px solid var(--line);
+        background: var(--card);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .modal-inner{ padding: 18px; }
+
+    .modal-title{
+        font-weight: 950;
+        font-size: 22px;
+        margin: 0 0 6px;
+    }
+    .modal-sub{
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-weight: 850;
+        line-height: 1.4;
+        font-size: 15px;
+    }
+
+    .modal-actions{
+        display:flex;
+        gap: 12px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        margin-top: 14px;
+    }
+
+    /* =========================================================
+       RESULT POPUP
+    ========================================================= */
+    .result-head{
+        text-align:center;
+        padding-top: 6px;
+    }
+    .result-head h2{
+        margin: 0;
+        font-size: 22px;
+        font-weight: 950;
+        letter-spacing: .2px;
+    }
+
+    .mascot-wrap{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding: 8px 0 2px;
+    }
+    .mascot-avatar{
+        width: min(220px, 70vw);
+        height: min(220px, 70vw);
+        border-radius: 999px;
+        border: 3px solid var(--accent);
+        background: var(--card);
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+    }
+    .mascot-avatar img{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display:block;
+    }
+
+    .result-message{
+        margin-top: 10px;
+        text-align: center;
+        padding: 0 18px;
+    }
+    .result-message-line1{
+        font-weight: 900;
+        font-size: 18px;
+        letter-spacing: .2px;
+    }
+    .result-message-line2{
+        margin-top: 6px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .result-stats{
+        display:grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 12px;
+    }
+    @media (max-width: 520px){
+        .result-stats{ grid-template-columns: 1fr; }
+    }
+
+    .rstat{
+        border-radius: 18px;
+        border: 2px solid var(--line);
+        background: var(--card);
+        padding: 12px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap: 12px;
+    }
+    .rstat .k{
+        font-size: 12px;
+        font-weight: 900;
+        color: var(--muted);
+        letter-spacing: .10em;
+        text-transform: uppercase;
+    }
+    .rstat .v{
+        font-size: 18px;
+        font-weight: 950;
+    }
+
+    .rbadge{
+        width: 40px; height: 40px;
+        border-radius: 14px;
+        border: 2px solid var(--line);
+        background: var(--card);
+        display:grid;
+        place-items:center;
+        flex: 0 0 auto;
+        color: var(--txt-body);
+    }
+    .rbadge svg{ width:20px;height:20px; }
+
+    /* responsive topbar */
+    @media (max-width: 980px){
+        .top-right{ min-width: unset; }
+        .top-left{ min-width: unset; }
+    }
+    @media (max-width: 820px){
+        .topbar{ flex-wrap: wrap; border-radius: 22px; }
+        .top-left{ flex: 1 1 100%; }
+        .top-mid{ flex: 1 1 100%; }
+        .top-right{ flex: 1 1 100%; justify-content: flex-start; }
+        .pname{ max-width: 240px; }
+    }
+</style>
+@endpush
+
+@section('content')
+
+{{-- ✅ TOP FOOTER IMAGE (BACKGROUND) --}}
+<img
+    src="{{ asset('images/icon/footer.JPEG') }}"
+    alt="Lentara Footer Top"
+    class="bg-footer top"
+    loading="lazy"
+/>
+
+
+
+<div
+    class="wrap"
+    id="quizApp"
+    data-sfx-correct="{{ $sfxCorrect }}"
+    data-sfx-wrong="{{ $sfxWrong }}"
+>
+
+    {{-- TOPBAR --}}
     <div class="topbar">
         <div class="top-left">
-            <a class="back" href="{{ route('game.learn') }}" aria-label="Kembali">
-                <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </a>
+<button class="back" type="button" id="btnExit" aria-label="Keluar">
+    <svg viewBox="0 0 24 24" fill="none">
+        <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+</button>
+
 
             <div class="title">
-                <small>{{ $level->island?->subtitle ?? $level->island?->name ?? 'Bagian' }}</small>
+                <small>{{ $islandLabel }}</small>
                 <h1>{{ $levelTitle }}</h1>
             </div>
         </div>
 
+        <div class="top-mid">
+            <div class="soal-pill" aria-label="Progress Soal">
+                <div class="soal-meta">
+                    <span>SOAL</span>
+                    <b id="soalText">0/5</b>
+                </div>
+                <div class="soal-bar" aria-hidden="true">
+                    <i id="soalBar"></i>
+                </div>
+            </div>
+        </div>
+
         <div class="top-right">
-            <div class="pill time" title="Waktu">
+            <div class="pill time" title="Waktu Berjalan">
                 <svg viewBox="0 0 24 24" fill="none">
                     <path d="M12 8v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M12 22a10 10 0 1 0-10-10 10 10 0 0 0 10 10Z" stroke="currentColor" stroke-width="2"/>
@@ -467,6 +750,21 @@
                 <span id="xpText">{{ (int)($player->xp_total ?? 0) }}</span>
             </div>
 
+            {{-- PROFILE --}}
+            <a class="pill profile-pill" href="{{ $profileUrl }}" title="Profil">
+                <img class="avatar" src="{{ $avatarUrl }}" alt="Avatar">
+                <span class="pname">{{ $nickname }}</span>
+            </a>
+
+            <div class="pill coin" title="Uang">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M20 12c0 4-4 7-8 7s-8-3-8-7 4-7 8-7 8 3 8 7Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 9v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M9.5 12H14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span id="coinsText">{{ (int)($player->coins ?? 0) }}</span>
+            </div>
+
             <div class="pill heart" title="Hati">
                 <svg viewBox="0 0 24 24" fill="none">
                     <path d="M12 21s-7-4.6-9.2-9.1C1.4 8.9 3.4 6 6.6 6c1.8 0 3.1 1 3.9 2 0.8-1 2.1-2 3.9-2 3.2 0 5.2 2.9 3.8 5.9C19 16.4 12 21 12 21Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
@@ -476,6 +774,7 @@
         </div>
     </div>
 
+    {{-- GAME CARD --}}
     <div class="card" id="gameCard">
         <div class="card-head">
             <div class="qmeta" id="qMeta">Soal 1</div>
@@ -494,7 +793,7 @@
             <div class="fill" id="qFill" style="display:none;">
                 <div>
                     <label for="fillInput">Jawaban</label>
-                    <input id="fillInput" type="text" maxlength="3" autocomplete="off" autocapitalize="none" spellcheck="false">
+                    <input id="fillInput" type="text" maxlength="50" autocomplete="off" autocapitalize="none" spellcheck="false">
                     <div class="hint" id="fillHint">Maks 3 huruf (harus pas)</div>
                 </div>
             </div>
@@ -504,105 +803,242 @@
             <div class="feedback" id="feedback"></div>
 
             <div style="display:flex;gap:10px;align-items:center;">
-                <button class="btn primary" id="btnCheck" disabled>Periksa</button>
-                <button class="btn" id="btnNext" style="display:none;">Soal Berikutnya</button>
+                <button type="button" class="btn primary" id="btnCheck" disabled>Periksa</button>
+                <button type="button" class="btn" id="btnNext" style="display:none;">Soal Berikutnya</button>
             </div>
         </div>
     </div>
 
+</div>
+{{-- ✅ BOTTOM FOOTER IMAGE (BACKGROUND) --}}
+<img
+    src="{{ asset('images/icon/footer.JPEG') }}"
+    alt="Lentara Footer Bottom"
+    class="bg-footer bottom"
+    loading="lazy"
+/>
+{{-- MODAL ROUTE ERROR --}}
+<div class="modal-wrap" id="modalRouteErr" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-inner">
+            <div class="modal-title">Sistem belum siap</div>
+            <div class="modal-sub" id="routeErrText">
+                Endpoint cek jawaban belum tersedia / tidak valid.
+            </div>
+            <div class="modal-actions" style="justify-content:flex-end;">
+                <a class="btn primary" href="{{ route('game.learn') }}">Kembali</a>
+            </div>
+        </div>
+    </div>
 </div>
 
 {{-- MODAL HATI HABIS --}}
 <div class="modal-wrap" id="modalHearts" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" style="--modal-accent: var(--danger);">
+    <div class="modal" role="dialog" aria-modal="true">
         <div class="modal-inner">
             <div class="modal-title">Hati kamu habis</div>
             <div class="modal-sub">
                 Kamu tidak bisa lanjut bermain sekarang.<br>
-                Silahkan tunggu hati terisi kembali atau isi ulang dengan 10 uang.
+                Tunggu hati terisi kembali atau isi ulang dengan 10 uang.
             </div>
 
             <div id="heartsModalMsg" class="modal-sub" style="display:none;"></div>
 
-            <div class="modal-actions">
-                <a class="btn" href="{{ route('home') }}" style="text-decoration:none;">Kembali ke Beranda</a>
-                <button class="btn primary" id="btnRefill">Isi Ulang Hati (10 Uang)</button>
+            <div class="modal-actions" style="justify-content: space-between;">
+                <a class="btn" href="{{ route('game.learn') }}">Kembali</a>
+                <button type="button" class="btn primary" id="btnRefill">Isi Ulang Hati (10 Uang)</button>
             </div>
         </div>
     </div>
 </div>
 
-{{-- MODAL WAKTU HABIS (HANYA 1 TOMBOL KEMBALI KE BERANDA) --}}
+{{-- MODAL WAKTU HABIS --}}
 <div class="modal-wrap" id="modalTime" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" style="--modal-accent: var(--accent);">
+    <div class="modal" role="dialog" aria-modal="true">
         <div class="modal-inner">
             <div class="modal-title">Waktu habis</div>
-            <div class="modal-sub">
-                Waktu pengerjaan habis. Silahkan kembali ke beranda.
-            </div>
-            <div class="modal-actions" style="justify-content:flex-end;">
-                <a class="btn primary" href="{{ route('home') }}" style="text-decoration:none;">Kembali ke Beranda</a>
+            <div class="modal-sub">Waktu pengerjaan habis.</div>
+            <div class="modal-actions" style="justify-content: space-between;">
+                <a class="btn primary" href="{{ route('game.play', $level->id) }}">Coba Lagi</a>
+                <a class="btn" href="{{ route('game.learn') }}">Kembali</a>
             </div>
         </div>
     </div>
 </div>
 
-{{-- MODAL SUMMARY --}}
+{{-- ✅ MODAL SUMMARY --}}
 <div class="modal-wrap" id="modalSummary" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" style="--modal-accent: var(--ok);">
+    <div class="modal" role="dialog" aria-modal="true">
         <div class="modal-inner">
-            <div class="modal-title" id="sumTitle">Selesai!</div>
-            <div class="modal-sub" id="sumSub">Ringkasan hasil permainan.</div>
 
-            <div class="stat-grid">
-                <div class="stat">
-                    <div class="k">TOTAL XP</div>
-                    <div class="v" id="sumXp">0</div>
-                </div>
-                <div class="stat">
-                    <div class="k">AKURASI</div>
-                    <div class="v" id="sumAcc">0%</div>
-                </div>
-                <div class="stat">
-                    <div class="k">WAKTU</div>
-                    <div class="v" id="sumTime">00:00</div>
+            <div class="result-head">
+                <h2 id="sumCongrats">Semangat {{ $nickname }}</h2>
+            </div>
+
+            <div class="mascot-wrap" aria-hidden="true">
+                <div class="mascot-avatar" title="Avatar">
+                    <img src="{{ $avatarUrl }}" alt="Avatar {{ $nickname }}">
                 </div>
             </div>
 
-            <div class="modal-actions" style="justify-content:flex-end;">
-                <a class="btn primary" id="btnClaim" href="{{ route('game.learn') }}" style="text-decoration:none;">KLAIM XP</a>
+            <div class="result-message">
+                <div class="result-message-line1" id="sumMsg1"></div>
+                <div class="result-message-line2" id="sumMsg2"></div>
+            </div>
+
+            <div class="result-stats">
+                <div class="rstat">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div class="rbadge" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M13 2s2 3 2 6-2 4-2 4 4-1 4-6 2-4 2-4-1 7-4 10-1 8-1 8-6-3-6-8 4-10 5-10Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="k">XP</div>
+                            <div class="v" id="sumXp">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rstat">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div class="rbadge" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M12 21s-7-4.6-9.2-9.1C1.4 8.9 3.4 6 6.6 6c1.8 0 3.1 1 3.9 2 0.8-1 2.1-2 3.9-2 3.2 0 5.2 2.9 3.8 5.9C19 16.4 12 21 12 21Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="k">Salah</div>
+                            <div class="v" id="sumWrong">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rstat">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div class="rbadge" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M20 7l-9 9-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="k">Akurasi</div>
+                            <div class="v" id="sumAcc">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rstat">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div class="rbadge" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M12 8v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 22a10 10 0 1 0-10-10 10 10 0 0 0 10 10Z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="k">Waktu</div>
+                            <div class="v" id="sumTime">00:00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions" id="sumActions" style="justify-content: space-between;">
+                {{-- injected by JS --}}
             </div>
         </div>
     </div>
 </div>
 
+{{-- ✅ MODAL KONFIRMASI KELUAR --}}
+<div class="modal-wrap" id="modalExit" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal-inner">
+            <div class="modal-title">Yakin mau keluar?</div>
+            <div class="modal-sub">
+                Progres soal yang sedang berjalan bisa hilang kalau kamu keluar sekarang.
+            </div>
+
+            <div class="modal-actions" style="justify-content: space-between;">
+                <button type="button" class="btn primary" id="btnExitStay">Lanjut Belajar</button>
+                <a class="btn" id="btnExitGoHome" href="{{ route('game.learn') }}">Keluar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endsection
+
+@push('scripts')
 <script>
 (function(){
     const QUESTIONS = @json($payload);
     const TOTAL_Q = QUESTIONS.length;
-    const TIME_LIMIT = {{ (int)$timeLimitSec }}; // detik
 
-    const csrf = "{{ csrf_token() }}";
-    const checkUrl = "{{ route('game.check', $level->id) }}";
-    const refillUrl = "{{ route('game.hearts.refill') }}";
+    // ✅ tetap ada limit, tapi UI timer COUNT UP (mulai 0 naik)
+    const TIME_LIMIT = {{ (int)$timeLimitSec }};
+
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || "{{ csrf_token() }}";
+
+    const checkUrl = @json($checkUrl);
+    const refillUrl = @json($refillUrl);
+
+    const modalExit   = document.getElementById('modalExit');
+const btnExit     = document.getElementById('btnExit');
+const btnExitStay = document.getElementById('btnExitStay');
+
+    const routeErrModal = document.getElementById('modalRouteErr');
+    const routeErrText  = document.getElementById('routeErrText');
 
     let idx = 0;
     let selected = null;
     let typed = "";
-    let locked = false; // after check, before next
+    let locked = false;
     let answered = 0;
     let correctCount = 0;
     let wrongCount = 0;
-    let runXp = 0;
 
-    // timer
+    let runXp = 0;
+    let xpTotal = {{ (int)($player->xp_total ?? 0) }};
+    let coinsTotal = {{ (int)($player->coins ?? 0) }};
+    let heartsNow  = {{ (int)($player->hearts ?? 0) }};
+    const heartsMax = {{ (int)($player->hearts_max ?? 5) }};
+
     const startedAt = Date.now();
     let timerTick = null;
     let timeOver = false;
 
+    const elApp    = document.getElementById('quizApp');
+    const sfxOkUrl = elApp?.getAttribute('data-sfx-correct') || "";
+    const sfxNgUrl = elApp?.getAttribute('data-sfx-wrong') || "";
+
+    // pre-create audio (best effort; browser will allow after user click)
+    const sfxOk = sfxOkUrl ? new Audio(sfxOkUrl) : null;
+    const sfxNg = sfxNgUrl ? new Audio(sfxNgUrl) : null;
+    if(sfxOk) sfxOk.preload = "auto";
+    if(sfxNg) sfxNg.preload = "auto";
+
+    function playSfx(which){
+        try{
+            const a = (which === 'ok') ? sfxOk : sfxNg;
+            if(!a) return;
+            a.pause();
+            a.currentTime = 0;
+            const p = a.play();
+            if(p && typeof p.catch === 'function') p.catch(()=>{});
+        }catch(e){}
+    }
+
     const elTime   = document.getElementById('timeText');
     const elXp     = document.getElementById('xpText');
+    const elCoins  = document.getElementById('coinsText');
     const elHearts = document.getElementById('heartsText');
+
+    const elSoalText = document.getElementById('soalText');
+    const elSoalBar  = document.getElementById('soalBar');
 
     const elMeta = document.getElementById('qMeta');
     const elProg = document.getElementById('qProgress');
@@ -620,14 +1056,45 @@
     const btnCheck  = document.getElementById('btnCheck');
     const btnNext   = document.getElementById('btnNext');
 
-    const card = document.getElementById('gameCard');
-
-    const modalHearts = document.getElementById('modalHearts');
-    const modalTime   = document.getElementById('modalTime');
-    const modalSummary= document.getElementById('modalSummary');
+    const modalHearts  = document.getElementById('modalHearts');
+    const modalTime    = document.getElementById('modalTime');
+    const modalSummary = document.getElementById('modalSummary');
 
     const btnRefill = document.getElementById('btnRefill');
     const heartsMsg = document.getElementById('heartsModalMsg');
+
+function openExitModal(){
+    if(modalExit){
+        modalExit.classList.add('is-open');
+        modalExit.setAttribute('aria-hidden','false');
+    }
+}
+
+function closeExitModal(){
+    if(modalExit){
+        modalExit.classList.remove('is-open');
+        modalExit.setAttribute('aria-hidden','true');
+    }
+}
+if(btnExit){
+    btnExit.addEventListener('click', function(){
+        // kalau modal lain sedang terbuka, biarkan normal saja
+        openExitModal();
+    });
+}
+
+if(btnExitStay){
+    btnExitStay.addEventListener('click', function(){
+        closeExitModal();
+        // lanjut main: tidak reset apa-apa
+    });
+}
+if(modalExit){
+    modalExit.addEventListener('click', function(e){
+        if(e.target === modalExit) closeExitModal();
+    });
+}
+
 
     function mmss(sec){
         sec = Math.max(0, sec|0);
@@ -635,26 +1102,39 @@
         const s = sec%60;
         return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
     }
-
     function elapsedSec(){
         return Math.floor((Date.now() - startedAt)/1000);
     }
-
-    function remainingSec(){
-        return TIME_LIMIT - elapsedSec();
+    function escapeHtml(str){
+        return String(str ?? '')
+            .replaceAll('&','&amp;')
+            .replaceAll('<','&lt;')
+            .replaceAll('>','&gt;')
+            .replaceAll('"','&quot;')
+            .replaceAll("'","&#039;");
     }
 
-    function setFeedback(type, text){
-        elFeedback.className = 'feedback ' + (type === 'ok' ? 'ok' : 'err');
-        elFeedback.textContent = text;
+    function openRouteErr(msg){
+        if(routeErrText) routeErrText.innerHTML = msg || 'Sistem belum siap.';
+        if(routeErrModal){
+            routeErrModal.classList.add('is-open');
+            routeErrModal.setAttribute('aria-hidden','false');
+        }
     }
 
-    function clearFeedback(){
-        elFeedback.className = 'feedback';
-        elFeedback.textContent = '';
-        elFeedback.style.display = 'none';
-        // class toggled by css, but keep consistent:
-        elFeedback.classList.remove('ok','err');
+    function updateTotalsUI(){
+        if(elXp) elXp.textContent = String(xpTotal);
+        if(elCoins) elCoins.textContent = String(coinsTotal);
+        if(elHearts) elHearts.textContent = String(heartsNow) + '/' + String(heartsMax);
+    }
+
+    function updateTopSoal(){
+        const shown = Math.min(TOTAL_Q, answered);
+        if(elSoalText) elSoalText.textContent = `${shown}/${TOTAL_Q}`;
+        if(elSoalBar){
+            const pct = TOTAL_Q > 0 ? Math.round((shown / TOTAL_Q) * 100) : 0;
+            elSoalBar.style.width = pct + '%';
+        }
     }
 
     function showFeedbackOk(text){
@@ -663,7 +1143,6 @@
         elFeedback.classList.add('ok');
         elFeedback.textContent = text;
     }
-
     function showFeedbackErr(text){
         elFeedback.style.display = 'flex';
         elFeedback.classList.remove('ok');
@@ -692,14 +1171,10 @@
         typed = "";
         locked = false;
 
-        // header
         elMeta.textContent = 'Soal ' + (idx+1);
         elProg.textContent = answered + '/' + TOTAL_Q;
-
-        // text
         elText.textContent = q.text || '';
 
-        // image
         if(q.image){
             elImgWrap.style.display = '';
             elImg.src = q.image;
@@ -708,7 +1183,6 @@
             elImg.src = '';
         }
 
-        // reset feedback/buttons
         elFeedback.style.display = 'none';
         elFeedback.className = 'feedback';
         elFeedback.textContent = '';
@@ -716,7 +1190,6 @@
         btnCheck.style.display = '';
         btnCheck.textContent = 'Periksa';
 
-        // content type
         if(q.type === 'mcq'){
             elFill.style.display = 'none';
             elOpts.style.display = '';
@@ -736,7 +1209,7 @@
 
                 div.addEventListener('click', function(){
                     if(locked || timeOver) return;
-                    document.querySelectorAll('.opt').forEach(x => x.classList.remove('is-selected'));
+                    Array.from(elOpts.querySelectorAll('.opt')).forEach(x => x.classList.remove('is-selected'));
                     div.classList.add('is-selected');
                     selected = k;
                     enableCheckIfReady(q);
@@ -753,11 +1226,19 @@
             elFillIn.value = '';
             elFillIn.maxLength = max;
             elFillHint.textContent = 'Maks ' + max + ' huruf (harus pas)';
-            elFillIn.focus({preventScroll:true});
+
+            // ✅ guard Enter supaya tidak ada submit "nyasar"
+            elFillIn.onkeydown = function(e){
+                if(e.key === 'Enter'){
+                    e.preventDefault();
+                    if(!btnCheck.disabled) doCheck();
+                }
+            };
+
+            try { elFillIn.focus({preventScroll:true}); } catch(e){}
 
             elFillIn.oninput = function(){
                 if(locked || timeOver) return;
-                // trim spasi, tapi tidak auto lower (biar user bebas; server case-insensitive)
                 typed = (elFillIn.value || '').replace(/\s+/g,'');
                 elFillIn.value = typed;
                 enableCheckIfReady(q);
@@ -767,18 +1248,23 @@
         enableCheckIfReady(q);
     }
 
-    function escapeHtml(str){
-        return String(str ?? '')
-            .replaceAll('&','&amp;')
-            .replaceAll('<','&lt;')
-            .replaceAll('>','&gt;')
-            .replaceAll('"','&quot;')
-            .replaceAll("'","&#039;");
+    async function safeJson(res){
+        const ct = (res.headers.get('content-type') || '').toLowerCase();
+        if(ct.includes('application/json')){
+            try { return await res.json(); } catch(e){ return null; }
+        }
+        try { await res.text(); } catch(e){}
+        return null;
     }
 
     async function doCheck(){
         const q = QUESTIONS[idx];
         if(!q || locked || timeOver) return;
+
+        if(!checkUrl || typeof checkUrl !== 'string' || !checkUrl.includes('/check')){
+            openRouteErr('URL cek jawaban tidak valid. Harus mengarah ke <b>/belajar/level/{level}/check</b>.');
+            return;
+        }
 
         enableCheckIfReady(q);
         if(btnCheck.disabled) return;
@@ -786,12 +1272,7 @@
         locked = true;
         btnCheck.disabled = true;
 
-        let ans = null;
-        if(q.type === 'mcq'){
-            ans = selected;
-        }else{
-            ans = typed;
-        }
+        const ans = (q.type === 'mcq') ? selected : typed;
 
         try{
             const res = await fetch(checkUrl, {
@@ -808,60 +1289,65 @@
                 })
             });
 
-            const json = await res.json();
+            const json = await safeJson(res);
 
-            if(!res.ok || !json.ok){
-                // hati habis (403)
+            if(!res.ok || !json || !json.ok){
                 if(json && json.code === 'HEARTS_EMPTY'){
                     openHeartsModal(json.message || 'Hati kamu habis.');
                     return;
                 }
-                showFeedbackErr(json.message || 'Terjadi kesalahan.');
+                showFeedbackErr((json && json.message) ? json.message : 'Terjadi kesalahan.');
                 btnNext.style.display = '';
                 btnNext.textContent = 'Lanjut';
+                locked = false;
+                enableCheckIfReady(q);
                 return;
             }
 
-            // update UI values
-            if(typeof json.xp_total === 'number'){
-                elXp.textContent = String(json.xp_total);
-            }
-            if(typeof json.hearts === 'number'){
-                elHearts.textContent = String(json.hearts) + '/' + String(json.hearts_max || {{ (int)($player->hearts_max ?? 5) }});
-            }
+            // update totals dari server jika ada
+            if(typeof json.hearts === 'number') heartsNow = json.hearts;
+            if(typeof json.coins === 'number') coinsTotal = json.coins;
+            if(typeof json.xp_total === 'number') xpTotal = json.xp_total;
 
-            // update stats
-            answered = json.answered_count || (answered + 1);
+            // progress/stats
+            answered = (typeof json.answered_count === 'number') ? json.answered_count : (answered + 1);
+            if(typeof json.correct_count === 'number') correctCount = json.correct_count;
+            if(typeof json.wrong_count === 'number') wrongCount = json.wrong_count;
 
-            correctCount = json.correct_count || correctCount;
-            wrongCount   = json.wrong_count || wrongCount;
-
-            // per soal xp
             if(typeof json.xp_gained === 'number'){
                 runXp += json.xp_gained;
+                if(typeof json.xp_total !== 'number') xpTotal += json.xp_gained;
             }
 
-            // feedback
+            if(typeof json.correct_count !== 'number' && typeof json.correct === 'boolean'){
+                if(json.correct) correctCount += 1;
+                else wrongCount += 1;
+            }
+
+            updateTotalsUI();
+
             if(json.correct === true){
+                playSfx('ok');
                 showFeedbackOk('Benar! +' + (json.xp_gained || 0) + ' XP');
             }else{
+                playSfx('ng');
                 showFeedbackErr('Salah! Hati berkurang');
-                // shake hearts pill
-                elHearts.parentElement.classList.add('shake');
-                setTimeout(()=> elHearts.parentElement.classList.remove('shake'), 400);
+                const heartPill = elHearts && elHearts.closest('.pill');
+                if(heartPill){
+                    heartPill.classList.add('shake');
+                    setTimeout(()=> heartPill.classList.remove('shake'), 400);
+                }
             }
 
             elProg.textContent = answered + '/' + TOTAL_Q;
+            updateTopSoal();
 
-            // kalau hati habis setelah jawab
             if(json.out_of_hearts){
-                openHeartsModal('Hati kamu habis.');
+                openHeartsModal(json.message || 'Hati kamu habis.');
                 return;
             }
 
-            // finished?
             if(json.finished){
-                // tampilkan summary
                 const acc = TOTAL_Q > 0 ? Math.round((correctCount / TOTAL_Q) * 100) : 0;
                 openSummaryModal({
                     xp: runXp,
@@ -872,7 +1358,6 @@
                 return;
             }
 
-            // show next button
             btnNext.style.display = '';
             btnNext.textContent = 'Soal Berikutnya';
 
@@ -880,17 +1365,20 @@
             showFeedbackErr('Terjadi kesalahan koneksi.');
             btnNext.style.display = '';
             btnNext.textContent = 'Lanjut';
+            locked = false;
+            enableCheckIfReady(q);
         }
     }
 
     function next(){
         if(timeOver) return;
+
         idx += 1;
         if(idx >= TOTAL_Q){
-            // should be handled by finished, but just in case:
+            const acc = TOTAL_Q > 0 ? Math.round((correctCount / TOTAL_Q) * 100) : 0;
             openSummaryModal({
                 xp: runXp,
-                acc: TOTAL_Q > 0 ? Math.round((correctCount / TOTAL_Q) * 100) : 0,
+                acc: acc,
                 time: mmss(elapsedSec()),
                 passed: (correctCount >= 3)
             });
@@ -911,14 +1399,19 @@
         locked = true;
         btnCheck.disabled = true;
         btnNext.disabled = true;
-        btnNext.style.pointerEvents = 'none';
-        btnCheck.style.pointerEvents = 'none';
-        btnNext.style.opacity = '.6';
-        btnCheck.style.opacity = '.6';
     }
 
     async function refill(){
         if(!btnRefill) return;
+
+        if(!refillUrl){
+            if(heartsMsg){
+                heartsMsg.style.display = 'block';
+                heartsMsg.textContent = 'URL refill tidak valid.';
+            }
+            return;
+        }
+
         btnRefill.disabled = true;
         btnRefill.style.opacity = '.7';
 
@@ -933,19 +1426,18 @@
                 body: JSON.stringify({})
             });
 
-            const json = await res.json();
+            const json = await safeJson(res);
 
-            if(!res.ok || !json.ok){
+            if(!res.ok || !json || !json.ok){
                 if(heartsMsg){
                     heartsMsg.style.display = 'block';
-                    heartsMsg.textContent = json.message || 'Uang tidak cukup. Silahkan tunggu hati sampai penuh.';
+                    heartsMsg.textContent = (json && json.message) ? json.message : 'Uang tidak cukup / terjadi kesalahan.';
                 }
                 btnRefill.disabled = false;
                 btnRefill.style.opacity = '1';
                 return;
             }
 
-            // reload ke map (atau lanjut main? kamu minta bisa lanjut, tapi hati habis harus stop)
             window.location.href = "{{ route('game.learn') }}";
         }catch(err){
             if(heartsMsg){
@@ -968,27 +1460,58 @@
         btnNext.disabled = true;
     }
 
+    function getResultMessage(accPercent, wrongCount){
+        const acc = Math.max(0, Math.min(100, parseInt(accPercent || 0, 10)));
+        const wrong = (typeof wrongCount === 'number') ? wrongCount : null;
+
+        const isPerfect = (acc >= 100) && (wrong === 0 || wrong === null);
+
+        if(isPerfect){
+            return { line1: 'Kamu memperoleh nilai sempurna!', line2: 'Luar biasa, terus pertahankan' };
+        }else if(acc >= 80){
+            return { line1: 'Hasil yang sangat bagus!', line2: 'Sedikit lagi menuju sempurna' };
+        }else if(acc >= 60){
+            return { line1: 'Usaha yang bagus!', line2: 'Coba ulangi supaya makin mantap' };
+        }else{
+            return { line1: 'Jangan sedih, ini bagian dari proses belajar', line2: 'Coba lagi ya, kamu pasti bisa!' };
+        }
+    }
+
     function openSummaryModal(stat){
         if(timerTick) clearInterval(timerTick);
 
-        const sumXp = document.getElementById('sumXp');
-        const sumAcc= document.getElementById('sumAcc');
-        const sumTime=document.getElementById('sumTime');
-        const sumTitle=document.getElementById('sumTitle');
-        const sumSub=document.getElementById('sumSub');
+        const sumXp   = document.getElementById('sumXp');
+        const sumAcc  = document.getElementById('sumAcc');
+        const sumTime = document.getElementById('sumTime');
+        const sumWrong= document.getElementById('sumWrong');
 
-        if(sumXp) sumXp.textContent = String(stat.xp ?? 0);
-        if(sumAcc) sumAcc.textContent = String(stat.acc ?? 0) + '%';
+        if(sumXp)   sumXp.textContent = String(stat.xp ?? 0);
+        if(sumAcc)  sumAcc.textContent = String(stat.acc ?? 0) + '%';
         if(sumTime) sumTime.textContent = String(stat.time ?? '00:00');
+        if(sumWrong)sumWrong.textContent = String(wrongCount);
 
-        // kalau tidak lulus, tetap tampilkan, tapi judul beda
-        if(sumTitle){
-            sumTitle.textContent = stat.passed ? 'Selesai!' : 'Belum Lulus';
-        }
-        if(sumSub){
-            sumSub.textContent = stat.passed
-                ? 'Kamu menyelesaikan level ini.'
-                : 'Kamu belum mencapai minimal 3 jawaban benar.';
+        const msg = getResultMessage(stat.acc, wrongCount);
+        const elMsg1 = document.getElementById('sumMsg1');
+        const elMsg2 = document.getElementById('sumMsg2');
+        if(elMsg1) elMsg1.textContent = msg.line1;
+        if(elMsg2) elMsg2.textContent = msg.line2;
+
+        const congrats = document.getElementById('sumCongrats');
+        if(congrats) congrats.textContent = "Selamat {{ $nickname }}";
+
+        const actions = document.getElementById('sumActions');
+        if(actions){
+            if(stat.passed){
+                actions.innerHTML = `
+                    <a class="btn primary" href="{{ route('game.learn') }}">Klaim XP</a>
+                    <a class="btn" href="{{ route('game.learn') }}">Kembali</a>
+                `;
+            }else{
+                actions.innerHTML = `
+                    <a class="btn primary" href="{{ route('game.play', $level->id) }}">Coba Lagi</a>
+                    <a class="btn" href="{{ route('game.learn') }}">Kembali</a>
+                `;
+            }
         }
 
         if(modalSummary){
@@ -1001,16 +1524,14 @@
         btnNext.disabled = true;
     }
 
-    // timer loop
+    // ✅ TIMER COUNT UP: mulai 00:00 naik
+    // tetap ada limit: kalau elapsed >= TIME_LIMIT -> modal waktu habis
     function startTimer(){
         function tick(){
-            const rem = remainingSec();
-            if(elTime){
-                // kamu minta waktu pengerjaan selesai (elapsed), tapi juga minta time limit habis.
-                // di atas kita tampilkan elapsed (mmss(elapsed)). Kalau time limit habis, modal time.
-                elTime.textContent = mmss(elapsedSec());
-            }
-            if(rem <= 0){
+            const el = elapsedSec();
+            if(elTime) elTime.textContent = mmss(el);
+
+            if(TIME_LIMIT > 0 && el >= TIME_LIMIT){
                 if(timerTick) clearInterval(timerTick);
                 openTimeModal();
             }
@@ -1019,23 +1540,23 @@
         timerTick = setInterval(tick, 500);
     }
 
-    // bind buttons
+    // events
     btnCheck.addEventListener('click', doCheck);
     btnNext.addEventListener('click', next);
-
     if(btnRefill) btnRefill.addEventListener('click', refill);
 
     // init
+    updateTotalsUI();
+
     if(TOTAL_Q !== 5){
-        // fallback hard stop
         showFeedbackErr('Level ini belum siap (harus 5 soal).');
         btnCheck.disabled = true;
+        updateTopSoal();
     }else{
         startTimer();
+        updateTopSoal();
         render();
     }
 })();
 </script>
-
-</body>
-</html>
+@endpush
