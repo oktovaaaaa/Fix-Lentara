@@ -291,6 +291,13 @@
           </div>
 
           <div class="gq-actions">
+
+            {{-- ✅ TOMBOL EDIT (BARU) --}}
+            <a class="gq-btn-ghost"
+               href="{{ route('admin.game-questions.edit', [$level->id, $q->id]) }}">
+              Edit
+            </a>
+
             <form method="POST" action="{{ route('admin.game-questions.destroy', [$level->id, $q->id]) }}">
               @csrf
               @method('DELETE')

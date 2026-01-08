@@ -215,17 +215,21 @@ Route::delete('abouts/item/{item}', [\App\Http\Controllers\Admin\TribeAboutContr
 
         // GAME LEVELS + QUESTIONS admin
         // GAME LEVELS
-Route::get('game-levels', [AdminGameLevelController::class, 'index'])->name('game-levels.index');
-Route::post('game-levels', [AdminGameLevelController::class, 'store'])->name('game-levels.store');
-Route::get('game-levels/{gameLevel}/edit', [AdminGameLevelController::class, 'edit'])->name('game-levels.edit');
-Route::put('game-levels/{gameLevel}', [AdminGameLevelController::class, 'update'])->name('game-levels.update');
-Route::delete('game-levels/{gameLevel}', [AdminGameLevelController::class, 'destroy'])->name('game-levels.destroy');
+        Route::get('game-levels', [AdminGameLevelController::class, 'index'])->name('game-levels.index');
+        Route::post('game-levels', [AdminGameLevelController::class, 'store'])->name('game-levels.store');
+        Route::get('game-levels/{gameLevel}/edit', [AdminGameLevelController::class, 'edit'])->name('game-levels.edit');
+        Route::put('game-levels/{gameLevel}', [AdminGameLevelController::class, 'update'])->name('game-levels.update');
+        Route::delete('game-levels/{gameLevel}', [AdminGameLevelController::class, 'destroy'])->name('game-levels.destroy');
 
-// GAME QUESTIONS per level
-Route::get('game-levels/{level}/questions', [AdminGameQuestionController::class, 'index'])->name('game-questions.index');
-Route::post('game-levels/{level}/questions', [AdminGameQuestionController::class, 'store'])->name('game-questions.store');
-Route::delete('game-levels/{level}/questions/{question}', [AdminGameQuestionController::class, 'destroy'])->name('game-questions.destroy');
+        // GAME QUESTIONS per level
+        Route::get('game-levels/{level}/questions', [AdminGameQuestionController::class, 'index'])->name('game-questions.index');
+        Route::post('game-levels/{level}/questions', [AdminGameQuestionController::class, 'store'])->name('game-questions.store');
 
+        // ✅ BARU: EDIT + UPDATE SOAL
+        Route::get('game-levels/{level}/questions/{question}/edit', [AdminGameQuestionController::class, 'edit'])->name('game-questions.edit');
+        Route::put('game-levels/{level}/questions/{question}', [AdminGameQuestionController::class, 'update'])->name('game-questions.update');
+
+        Route::delete('game-levels/{level}/questions/{question}', [AdminGameQuestionController::class, 'destroy'])->name('game-questions.destroy');
     });
 
 
@@ -271,3 +275,7 @@ Route::get('/papan-peringkat', [PlayerLeaderboardController::class, 'index'])
 
 Route::get('/profil', [PlayerProfileController::class, 'edit'])->name('player.profile')->middleware('player');
 Route::post('/profil', [PlayerProfileController::class, 'update'])->name('player.profile.update')->middleware('player');
+
+Route::get('/belajar/panduan', [GameController::class, 'guide'])
+    ->name('game.guide')
+    ->middleware('player');

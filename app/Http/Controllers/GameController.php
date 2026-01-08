@@ -184,6 +184,22 @@ class GameController extends Controller
         ]);
     }
 
+    public function guide()
+{
+    $player = Auth::guard('player')->user();
+    $this->syncHearts($player);
+    $player->refresh();
+
+    $tierLabel = $this->resolveTier((int)$player->xp_total);
+
+    return view('player.learn.guide', [
+        'player' => $player,
+        'tierLabel' => $tierLabel,
+        'islandColors' => $this->islandColors,
+    ]);
+}
+
+
     public function play(GameLevel $level)
     {
         $player = Auth::guard('player')->user();
