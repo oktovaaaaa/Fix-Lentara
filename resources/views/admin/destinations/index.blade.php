@@ -151,6 +151,10 @@
                             <th>Lokasi</th>
                             <th class="col-rating">Rating</th>
                             <th class="col-img">Gambar</th>
+
+                            {{-- ✅ Kolom 360 (baru, class admin tetap) --}}
+                            <th>360°</th>
+
                             <th class="col-active">Aktif</th>
                             <th class="col-actions">Aksi</th>
                         </tr>
@@ -158,6 +162,13 @@
 
                     <tbody>
                         @forelse($rows as $i => $row)
+                            @php
+                                $hasEmbed = !empty($row->pano_embed_url);
+                                $hasMaps  = !empty($row->pano_maps_url);
+                                $label360 = trim((string)($row->pano_label ?? ''));
+                                $label360 = $label360 !== '' ? $label360 : '360°';
+                            @endphp
+
                             <tr>
                                 <td class="col-num">{{ $i + 1 }}</td>
 
@@ -184,6 +195,38 @@
                                         <a href="{{ $row->image_display_url }}" target="_blank" class="a-link">
                                             Lihat
                                         </a>
+                                    @else
+                                        <span class="a-muted">—</span>
+                                    @endif
+                                </td>
+
+                                {{-- ✅ Kolom 360° --}}
+                                <td>
+                                    @if($hasEmbed || $hasMaps)
+                                        <div class="a-tdMain">
+                                            <span class="a-pillBadge">
+                                                <i class="bx bx-panorama"></i>
+                                                Ada
+                                            </span>
+                                        </div>
+
+                                        <div class="a-tdSub" style="display:flex;gap:10px;flex-wrap:wrap;">
+                                            @if($hasEmbed)
+                                                <a href="{{ $row->pano_embed_url }}" target="_blank" class="a-link" title="Buka link embed 360°">
+                                                    <i class="bx bx-link-external"></i> Embed
+                                                </a>
+                                            @endif
+
+                                            @if($hasMaps)
+                                                <a href="{{ $row->pano_maps_url }}" target="_blank" class="a-link" title="Buka di Google Maps">
+                                                    <i class="bx bx-map"></i> Maps
+                                                </a>
+                                            @endif
+
+                                            @if(($row->pano_label ?? null) !== null && trim((string)$row->pano_label) !== '')
+                                                <span class="a-muted">• {{ $label360 }}</span>
+                                            @endif
+                                        </div>
                                     @else
                                         <span class="a-muted">—</span>
                                     @endif
@@ -218,7 +261,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7">
+                                <td colspan="8">
                                     <div class="a-empty">
                                         Belum ada destinasi untuk pulau &amp; suku yang dipilih.
                                     </div>

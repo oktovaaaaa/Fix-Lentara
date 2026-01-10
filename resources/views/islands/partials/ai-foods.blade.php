@@ -344,7 +344,7 @@
                     </div>
 
                     <div class="food-modal-footnote">
-                        <span>Tip: klik di luar modal atau tekan ESC untuk menutup.</span>
+
                     </div>
                 </div>
             </div>

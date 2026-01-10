@@ -57,7 +57,7 @@
                 @endforeach
             </div>
         @else
-            <p class="history-empty">
+            <p class="history-empty" style="text-align: center">
                 Belum ada data sejarah {{ $tribeKey !== '' ? $tribeKey : 'suku' }} yang diinput dari admin.
             </p>
         @endif

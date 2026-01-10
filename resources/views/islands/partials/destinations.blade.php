@@ -50,6 +50,18 @@
         return $d->image_display_url ?? null;
     };
 
+    // 360 helpers (AMAN)
+    $getPanoEmbed = function ($d) {
+        // Embed iframe WAJIB: https://www.google.com/maps/embed?pb=...
+        return $d->pano_embed_url ?? ($d->pano_embed_display_url ?? null);
+    };
+    $getPanoMaps = function ($d) {
+        return $d->pano_maps_url ?? ($d->pano_maps_display_url ?? null);
+    };
+    $getPanoLabel = function ($d) {
+        return $d->pano_label ?? null;
+    };
+
     // themes rotation
     $themes = ['sunset','orange','mint','violet','sky','rose'];
 @endphp
@@ -162,7 +174,6 @@
   opacity: .95;
   animation: dest-neon-spin 7.5s linear infinite;
 }
-
 
 @keyframes dest-neon-spin { to { --dest-neon-angle: 360deg; } }
 
@@ -541,7 +552,7 @@ html[data-theme="dark"] #destinations .dest-mini-locIco{ color: #ff8c42; }
 #destinations .dest-mini-bottomRow{ margin-top: auto; display:flex; justify-content:flex-end; }
 
 /* =========================================================
-   MODAL
+   MODAL (POPUP DEFAULT) — DIPAKAI JIKA TIDAK ADA 360
 ========================================================= */
 #destinations .dest-modal{
   position: fixed;
@@ -809,60 +820,13 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
     margin: 12px 0 12px 12px;
   }
 }
+
 /* =========================================================
    FIX: NEON KHUSUS FEATURED (ANTI-HILANG / ANTI-MASK BUG)
 ========================================================= */
 #destinations .dest-featured-neon{
   position: relative;
   border: 1px solid rgba(255,107,0,.35); /* fallback kalau neon mati */
-}
-
-/* layer ring */
-#destinations .dest-featured-neon::before{
-  content:"";
-  position:absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 10px;
-  pointer-events:none;
-  z-index: 0;
-
-  background: conic-gradient(
-    from var(--dest-neon-angle),
-    rgba(249,115,22,0) 0deg,
-    rgba(249,115,22,.22) 24deg,
-    #f97316 60deg,
-    #22d3ee 120deg,
-    #34d399 180deg,
-    rgba(34,211,238,.22) 240deg,
-    #f97316 315deg,
-    rgba(249,115,22,0) 360deg
-  );
-
-  /* INI KUNCI: pakai mask yang kompatibel luas */
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-
-  /* fallback non-webkit (kalau perlu) */
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-
-  filter: blur(6px);
-  opacity: 1;
-  animation: dest-neon-spin 7.5s linear infinite;
-}
-
-/* pastikan isi card selalu di atas ring */
-#destinations .dest-featured-neon > *{
-  position: relative;
-  z-index: 1;
-}
-
-#destinations .dest-featured-neon::before{
-  content: none !important;
 }
 
 /* NEON RING FEATURED PALING AMAN (tanpa mask, tanpa blur) */
@@ -901,7 +865,305 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
   animation: dest-neon-spin 7.5s linear infinite;
 }
 
+/* =========================================================
+   FULLSCREEN DETAIL (DIPAKAI JIKA ADA 360)
+   - BUKAN "POPUP KECIL": ini 1 layar penuh
+   - 360 dibuat besar + tombol zoom + fullscreen
+========================================================= */
+#destinations .dest-full{
+  position: fixed;
+  inset: 0;
+  z-index: 999999; /* di atas semuanya */
+  display: flex;
+  flex-direction: column;
+  background: rgba(0,0,0,.60);
+  backdrop-filter: blur(10px);
+}
 
+#destinations .dest-full-shell{
+  position: relative;
+  margin: 12px;
+  flex: 1;
+  min-height: 0;
+  border-radius: 22px;
+  background: var(--card, rgba(15,23,42,.82));
+  border: 1px solid var(--line, rgba(148,163,184,.22));
+  box-shadow: 0 30px 90px rgba(0,0,0,.45);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+}
+
+/* neon ring */
+#destinations .dest-full-shell::before{
+  content:"";
+  position:absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 5px;
+  pointer-events:none;
+  z-index: 0;
+
+  background: conic-gradient(
+    from var(--dest-neon-angle),
+    rgba(249,115,22,0) 0deg,
+    rgba(249,115,22,.20) 22deg,
+    #f97316 55deg,
+    #22d3ee 110deg,
+    #34d399 165deg,
+    rgba(34,211,238,.20) 220deg,
+    #f97316 300deg,
+    rgba(249,115,22,0) 360deg
+  );
+
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+
+  filter: blur(6px);
+  opacity: .95;
+  animation: dest-neon-spin 7.5s linear infinite;
+}
+
+/* pastikan isi di atas ring */
+#destinations .dest-full-shell > *{ position: relative; z-index: 1; }
+
+#destinations .dest-full-topbar{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid rgba(148,163,184,.18);
+  background: linear-gradient(135deg, rgba(255,107,0,.08), rgba(148,163,184,.06));
+}
+html[data-theme="dark"] #destinations .dest-full-topbar{ background: rgba(2,6,23,.18); }
+
+#destinations .dest-full-titleWrap{ min-width:0; }
+#destinations .dest-full-title{
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 950;
+  color: var(--txt-body, rgba(226,232,240,.95));
+  line-height: 1.15;
+  overflow-wrap:anywhere;
+}
+#destinations .dest-full-sub{
+  margin-top: 6px;
+  display:flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items:center;
+}
+
+#destinations .dest-full-pill{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(15,23,42,.08);
+  box-shadow: 0 14px 28px rgba(0,0,0,.12);
+  backdrop-filter: blur(10px);
+  max-width: 100%;
+}
+html[data-theme="dark"] #destinations .dest-full-pill{
+  background: rgba(2,6,23,.72);
+  border-color: rgba(148,163,184,.18);
+}
+
+#destinations .dest-full-pillText{
+  font-size: .86rem;
+  font-weight: 900;
+  color: var(--txt-body, rgba(226,232,240,.95));
+  white-space: nowrap;
+  overflow:hidden;
+  text-overflow: ellipsis;
+  max-width: 62vw;
+}
+@media (max-width: 720px){
+  #destinations .dest-full-pillText{ max-width: 74vw; }
+}
+
+#destinations .dest-full-actions{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* icon buttons */
+#destinations .dest-ctrlBtn{
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,107,0,.30);
+  background: rgba(255,255,255,.86);
+  color: #ff6b00;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+  user-select: none;
+}
+html[data-theme="dark"] #destinations .dest-ctrlBtn{
+  background: rgba(2,6,23,.70);
+  border-color: rgba(255,107,0,.25);
+  color: #ff8c42;
+}
+#destinations .dest-ctrlBtn:hover{
+  transform: translateY(-1px);
+  background: rgba(255,107,0,.92);
+  color: #fff;
+  box-shadow: 0 18px 40px rgba(0,0,0,.25), 0 0 26px rgba(255,107,0,.20);
+  border-color: rgba(255,107,0,.92);
+}
+#destinations .dest-ctrlIco{ width: 20px; height: 20px; opacity: .95; }
+
+#destinations .dest-full-main{
+  flex: 1;
+  min-height: 0;
+  display:grid;
+  grid-template-columns: 1.55fr 1fr; /* 360 lebih besar */
+  gap: 0;
+}
+
+#destinations .dest-full-360{
+  position: relative;
+  min-height: 0;
+  border-right: 1px solid rgba(148,163,184,.18);
+  background: rgba(0,0,0,.16);
+}
+
+#destinations .dest-iframeStage{
+  position:absolute;
+  inset: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255,107,0,.18);
+  background: rgba(0,0,0,.22);
+  overflow: hidden;
+}
+
+/* wrapper untuk zoom manual (transform scale) */
+#destinations .dest-iframeZoom{
+  position:absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+#destinations .dest-iframe{
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display:block;
+  background: rgba(0,0,0,.10);
+}
+
+/* overlay label */
+#destinations .dest-360Label{
+  position:absolute;
+  left: 22px;
+  top: 22px;
+  z-index: 3;
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(15,23,42,.08);
+  box-shadow: 0 14px 28px rgba(0,0,0,.16);
+  backdrop-filter: blur(10px);
+  max-width: calc(100% - 44px);
+}
+html[data-theme="dark"] #destinations .dest-360Label{
+  background: rgba(2,6,23,.72);
+  border-color: rgba(148,163,184,.18);
+}
+#destinations .dest-360LabelText{
+  font-size: .86rem;
+  font-weight: 950;
+  color: var(--txt-body, rgba(226,232,240,.95));
+  white-space: nowrap;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+
+#destinations .dest-full-info{
+  min-height: 0;
+  padding: 16px 16px 14px;
+  overflow: auto;
+}
+
+#destinations .dest-full-aboutTitle{
+  font-size: 1.05rem;
+  font-weight: 950;
+  color: var(--txt-body, rgba(226,232,240,.95));
+  margin: 0 0 10px;
+}
+
+#destinations .dest-full-aboutText{
+  margin: 0 0 14px;
+  color: var(--muted, rgba(148,163,184,.9));
+  line-height: 1.7;
+  font-size: .95rem;
+  overflow-wrap: anywhere;
+}
+
+#destinations .dest-full-links{
+  display:flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* CTA link button */
+#destinations .dest-linkBtn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-weight: 950;
+  font-size: .9rem;
+  color: #fff;
+  background: linear-gradient(135deg, #ff6b00, #ff8c42);
+  box-shadow: 0 14px 28px rgba(0,0,0,.14);
+  text-decoration: none;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+#destinations .dest-linkBtn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 20px 44px rgba(0,0,0,.22), 0 0 26px rgba(255,107,0,.20);
+  filter: saturate(1.06);
+}
+#destinations .dest-linkIco{ width: 18px; height: 18px; opacity: .95; }
+
+#destinations .dest-full-footTip{
+  margin-top: 14px;
+  font-size: .82rem;
+  color: var(--muted, rgba(148,163,184,.9));
+}
+
+/* mobile: 360 tetap besar, info di bawah */
+@media (max-width: 860px){
+  #destinations .dest-full-main{
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(320px, 54vh) 1fr;
+  }
+  #destinations .dest-full-360{
+    border-right: 0;
+    border-bottom: 1px solid rgba(148,163,184,.18);
+  }
+  #destinations .dest-iframeStage{ inset: 12px; }
+}
 </style>
 
 <section id="destinations" class="py-12">
@@ -926,6 +1188,10 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
                     [$full, $half, $empty, $n] = $ratingParts($d->rating ?? 0);
                     $img = $getImg($d);
                     $theme = $themes[0];
+
+                    $panoEmbed = $getPanoEmbed($d);
+                    $panoMaps  = $getPanoMaps($d);
+                    $panoLabel = $getPanoLabel($d);
                 @endphp
 
                 <article
@@ -940,6 +1206,9 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
                     data-rating="{{ e($n) }}"
                     data-ratingtext="{{ e($fmtRating($d->rating ?? 0)) }}"
                     data-image="{{ e($img ?? '') }}"
+                    data-panoembed="{{ e($panoEmbed ?? '') }}"
+                    data-panomaps="{{ e($panoMaps ?? '') }}"
+                    data-panolabel="{{ e($panoLabel ?? '') }}"
                 >
                     <div class="dest-featured-media">
                         @if($img)
@@ -1013,7 +1282,12 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
                                 </span>
                             </div>
 
-                            <div class="dest-featured-hint">Klik untuk detail</div>
+                            <div class="dest-featured-hint">
+                                Klik untuk detail
+                                @if(!empty($panoEmbed))
+                                    • 360°
+                                @endif
+                            </div>
                         </div>
                     </div>
 
@@ -1056,6 +1330,10 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
                                     [$full, $half, $empty, $n] = $ratingParts($d->rating ?? 0);
                                     $img = $getImg($d);
                                     $theme = $themes[($idx + 1) % count($themes)];
+
+                                    $panoEmbed = $getPanoEmbed($d);
+                                    $panoMaps  = $getPanoMaps($d);
+                                    $panoLabel = $getPanoLabel($d);
                                 @endphp
 
                                 <article
@@ -1070,6 +1348,9 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
                                     data-rating="{{ e($n) }}"
                                     data-ratingtext="{{ e($fmtRating($d->rating ?? 0)) }}"
                                     data-image="{{ e($img ?? '') }}"
+                                    data-panoembed="{{ e($panoEmbed ?? '') }}"
+                                    data-panomaps="{{ e($panoMaps ?? '') }}"
+                                    data-panolabel="{{ e($panoLabel ?? '') }}"
                                 >
                                     <div class="dest-mini-row">
 
@@ -1136,6 +1417,7 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
                                                     </svg>
                                                 </span>
                                             </div>
+
                                         </div>
                                     </div>
                                 </article>
@@ -1143,15 +1425,117 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
                         </div>
                     </div>
                 @else
-                    <div class="dest-empty">
-                        Belum ada destinasi lainnya untuk {{ $tribeKey }}.
+                    <div class="dest-empty" style="text-align: center">
+                        Belum ada destinasi lainnya di daerah suku {{ $tribeKey }}.
                     </div>
                 @endif
 
             </div>
         </div>
 
-        {{-- ================= MODAL POPUP DETAIL ================= --}}
+        {{-- =========================================================
+           FULLSCREEN DETAIL (JIKA ADA 360)
+           - Jika ada data-panoembed -> buka panel 1 layar penuh
+           - Jika tidak ada -> tetap pakai modal popup seperti sebelumnya
+        ========================================================== --}}
+        <div id="destinationFull" class="dest-full dest-hidden" aria-hidden="true">
+            <div class="dest-full-shell" id="destFullShell" role="dialog" aria-modal="true" aria-labelledby="destFullTitle">
+                <div class="dest-full-topbar">
+                    <div class="dest-full-titleWrap">
+                        <h3 id="destFullTitle" class="dest-full-title">—</h3>
+
+                        <div class="dest-full-sub">
+                            <span class="dest-full-pill" aria-label="Rating">
+                                <span id="destFullStars" class="dest-modal-stars" aria-hidden="true" style="display:inline-flex;gap:3px;"></span>
+                                <span id="destFullRatingText" class="dest-full-pillText">0 / 5</span>
+                            </span>
+
+                            <span id="destFullLocPill" class="dest-full-pill dest-hidden" aria-label="Lokasi">
+                                <svg class="dest-ico" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span id="destFullLocText" class="dest-full-pillText"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="dest-full-actions">
+                        {{-- Zoom Out --}}
+                        <button type="button" class="dest-ctrlBtn" id="destZoomOut" aria-label="Zoom out">
+                            <svg class="dest-ctrlIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"/>
+                            </svg>
+                        </button>
+
+                        {{-- Zoom In --}}
+                        <button type="button" class="dest-ctrlBtn" id="destZoomIn" aria-label="Zoom in">
+                            <svg class="dest-ctrlIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14"/>
+                            </svg>
+                        </button>
+
+                        {{-- Fullscreen --}}
+                        <button type="button" class="dest-ctrlBtn" id="destGoFullscreen" aria-label="Layar penuh">
+                            <svg class="dest-ctrlIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3M3 16v3a2 2 0 002 2h3m11-2h-3m8-3v3a2 2 0 01-2 2h-3"/>
+                            </svg>
+                        </button>
+
+                        {{-- Close --}}
+                        <button type="button" class="dest-ctrlBtn" id="destFullClose" aria-label="Tutup detail">
+                            <svg class="dest-ctrlIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dest-full-main">
+                    <div class="dest-full-360">
+                        <div id="dest360Label" class="dest-360Label dest-hidden">
+                            <svg class="dest-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-9-9c2.2 0 4.3.8 5.9 2.2M21 3v6h-6"/>
+                            </svg>
+                            <span id="dest360LabelText" class="dest-360LabelText">360°</span>
+                        </div>
+
+                        <div class="dest-iframeStage" id="destIframeStage">
+                            <div class="dest-iframeZoom" id="destIframeZoom">
+                                <iframe
+                                    id="destPanoIframe"
+                                    class="dest-iframe"
+                                    src=""
+                                    loading="lazy"
+                                    allowfullscreen
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                ></iframe>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dest-full-info">
+                        <h4 class="dest-full-aboutTitle">Tentang Destinasi</h4>
+                        <p id="destFullDesc" class="dest-full-aboutText">—</p>
+
+                        <div class="dest-full-links">
+                            <a id="destMapsLink" href="#" class="dest-linkBtn dest-hidden" target="_blank" rel="noopener">
+                                <svg class="dest-linkIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                </svg>
+                                Buka di Google Maps
+                            </a>
+                        </div>
+
+                        <div class="dest-full-footTip">
+                            Tip: gunakan tombol <b>+</b> / <b>−</b> untuk memperbesar tampilan, tombol layar penuh untuk mode lebar,
+                            dan tekan <b>ESC</b> untuk keluar.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ================= MODAL POPUP DETAIL (DEFAULT) ================= --}}
         <div id="destinationModal" class="dest-modal dest-hidden" aria-hidden="true">
             <div class="dest-modal-backdrop" data-dest-close></div>
 
@@ -1186,14 +1570,27 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
                         <p id="destModalDesc" class="dest-modal-desc"></p>
 
                         <div class="dest-modal-actions">
-                            <button type="button" class="dest-modal-closeBtn" data-dest-close-btn>
-                                Tutup
-                                <span class="dest-modal-closeGlow" aria-hidden="true"></span>
-                            </button>
-                        </div>
+    {{-- ✅ tombol maps (muncul kalau ada data-panomaps) --}}
+    <a id="destModalMapsLink"
+       href="#"
+       class="dest-linkBtn dest-hidden"
+       target="_blank"
+       rel="noopener">
+        <svg class="dest-linkIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+        </svg>
+        Buka di Google Maps
+    </a>
+
+    <button type="button" class="dest-modal-closeBtn" data-dest-close-btn>
+        Tutup
+        <span class="dest-modal-closeGlow" aria-hidden="true"></span>
+    </button>
+</div>
+
 
                         <div class="dest-modal-footnote">
-                            Tip: klik di luar modal atau tekan ESC untuk menutup.
+
                         </div>
                     </div>
                 </div>
@@ -1201,7 +1598,7 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
         </div>
 
     @else
-        <p class="text-sm text-[var(--muted)]">
+        <p class="text-sm text-[var(--muted)]" style="text-align: center">
             Konten destinasi untuk {{ $tribeKey }} belum diinput dari admin.
         </p>
     @endif
@@ -1210,8 +1607,11 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
 <script>
 (function () {
     const modal = document.getElementById('destinationModal');
-    if (!modal) return;
+    const full  = document.getElementById('destinationFull');
 
+    if (!modal || !full) return;
+
+    // ===== popup modal refs =====
     const dialog = modal.querySelector('.dest-modal-dialog');
 
     const imgEl   = document.getElementById('destModalImg');
@@ -1225,10 +1625,47 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
 
     const starsEl = document.getElementById('destModalStars');
     const rateTxt = document.getElementById('destModalRatingText');
+    const modalMapsLink = document.getElementById('destModalMapsLink');
 
+    // ===== fullscreen 360 refs =====
+    const fullShell = document.getElementById('destFullShell');
+
+    const fullTitle = document.getElementById('destFullTitle');
+    const fullDesc  = document.getElementById('destFullDesc');
+
+    const fullLocPill = document.getElementById('destFullLocPill');
+    const fullLocText = document.getElementById('destFullLocText');
+
+    const fullStars   = document.getElementById('destFullStars');
+    const fullRateTxt = document.getElementById('destFullRatingText');
+
+    const labelWrap = document.getElementById('dest360Label');
+    const labelText = document.getElementById('dest360LabelText');
+
+    const iframe = document.getElementById('destPanoIframe');
+    const zoomWrap = document.getElementById('destIframeZoom');
+
+    const btnZoomIn  = document.getElementById('destZoomIn');
+    const btnZoomOut = document.getElementById('destZoomOut');
+    const btnFs      = document.getElementById('destGoFullscreen');
+    const btnClose   = document.getElementById('destFullClose');
+
+    const mapsLink = document.getElementById('destMapsLink');
+
+    // ===== navbar hide/show =====
     const headerEl = document.getElementById('top');
     let headerPrev = null;
+
+    // ===== focus management =====
     let lastFocus = null;
+
+    // ===== zoom state (visual zoom, karena iframe cross-origin) =====
+    let zoom = 1;
+    const Z_MIN = 1;
+    const Z_MAX = 2.6;
+    const Z_STEP = 0.15;
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
 
     function clampRating(n) {
         n = parseFloat(n || 0);
@@ -1309,6 +1746,18 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
         headerPrev = null;
     }
 
+    function lockScroll(){
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+    }
+    function unlockScroll(){
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+    }
+
+    // =========================================================
+    // POPUP MODAL (DEFAULT)
+    // =========================================================
     function openModalFromCard(card){
         if (!card) return;
 
@@ -1319,6 +1768,8 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
         const img  = card.getAttribute('data-image') || '';
         const loc  = card.getAttribute('data-location') || '';
         const rating = card.getAttribute('data-rating') || '0';
+        const panoMaps = (card.getAttribute('data-panomaps') || '').trim();
+
 
         titleEl.textContent = name;
         descEl.textContent  = desc ? desc : 'Deskripsi belum tersedia.';
@@ -1346,13 +1797,22 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
         renderStars(starsEl, rating);
         rateTxt.textContent = fmtRating(rating) + ' / 5';
 
-        hideNavbar();
+        // ✅ Maps link tetap tampil walau 360 kosong (modal popup)
+if (modalMapsLink) {
+    if (panoMaps) {
+        modalMapsLink.href = panoMaps;
+        modalMapsLink.classList.remove('dest-hidden');
+    } else {
+        modalMapsLink.href = '#';
+        modalMapsLink.classList.add('dest-hidden');
+    }
+}
 
+
+        hideNavbar();
         modal.classList.remove('dest-hidden');
         modal.setAttribute('aria-hidden', 'false');
-
-        document.documentElement.style.overflow = 'hidden';
-        document.body.style.overflow = 'hidden';
+        lockScroll();
 
         const xBtn = modal.querySelector('.dest-modal-close');
         if (xBtn) xBtn.focus();
@@ -1362,9 +1822,12 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
         modal.classList.add('dest-hidden');
         modal.setAttribute('aria-hidden', 'true');
 
-        document.documentElement.style.overflow = '';
-        document.body.style.overflow = '';
+        if (modalMapsLink) {
+    modalMapsLink.href = '#';
+    modalMapsLink.classList.add('dest-hidden');
+}
 
+        unlockScroll();
         showNavbar();
 
         if (lastFocus && typeof lastFocus.focus === 'function') {
@@ -1372,21 +1835,144 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
         }
     }
 
+    // =========================================================
+    // FULLSCREEN DETAIL (JIKA ADA 360)
+    // =========================================================
+    function applyZoom(){
+        zoom = clamp(zoom, Z_MIN, Z_MAX);
+        if (zoomWrap) zoomWrap.style.transform = `scale(${zoom})`;
+    }
+
+    function openFullFromCard(card){
+        if (!card) return;
+
+        lastFocus = document.activeElement;
+
+        const name = card.getAttribute('data-name') || '—';
+        const desc = card.getAttribute('data-description') || '';
+        const loc  = card.getAttribute('data-location') || '';
+        const rating = card.getAttribute('data-rating') || '0';
+
+        const panoEmbed = (card.getAttribute('data-panoembed') || '').trim();
+        const panoMaps  = (card.getAttribute('data-panomaps') || '').trim();
+        const panoLabel = (card.getAttribute('data-panolabel') || '').trim();
+
+        // safety: kalau embed kosong, jangan buka full
+        if (!panoEmbed) {
+            openModalFromCard(card);
+            return;
+        }
+
+        fullTitle.textContent = name;
+        fullDesc.textContent  = desc ? desc : 'Deskripsi belum tersedia.';
+
+        // location
+        if (loc && loc.trim() !== '') {
+            fullLocText.textContent = loc;
+            fullLocPill.classList.remove('dest-hidden');
+        } else {
+            fullLocText.textContent = '';
+            fullLocPill.classList.add('dest-hidden');
+        }
+
+        // rating
+        renderStars(fullStars, rating);
+        fullRateTxt.textContent = fmtRating(rating) + ' / 5';
+
+        // label 360
+        if (panoLabel) {
+            labelText.textContent = panoLabel;
+            labelWrap.classList.remove('dest-hidden');
+        } else {
+            labelText.textContent = '360°';
+            labelWrap.classList.remove('dest-hidden');
+        }
+
+        // maps link (opsional)
+        if (panoMaps) {
+            mapsLink.href = panoMaps;
+            mapsLink.classList.remove('dest-hidden');
+        } else {
+            mapsLink.href = '#';
+            mapsLink.classList.add('dest-hidden');
+        }
+
+        // set iframe
+        iframe.src = panoEmbed;
+
+        // reset zoom
+        zoom = 1;
+        applyZoom();
+
+        hideNavbar();
+        full.classList.remove('dest-hidden');
+        full.setAttribute('aria-hidden', 'false');
+        lockScroll();
+
+        // fokus ke tombol close agar keyboard enak
+        if (btnClose) btnClose.focus();
+    }
+
+    function closeFull(){
+        // keluar dari fullscreen browser jika aktif
+        try{
+            if (document.fullscreenElement) document.exitFullscreen();
+        } catch(e){}
+
+        full.classList.add('dest-hidden');
+        full.setAttribute('aria-hidden', 'true');
+
+        // bersihin iframe supaya stop load
+        iframe.src = '';
+        zoom = 1;
+        applyZoom();
+
+        unlockScroll();
+        showNavbar();
+
+        if (lastFocus && typeof lastFocus.focus === 'function') {
+            lastFocus.focus();
+        }
+    }
+
+    // fullscreen api untuk shell (biar panel jadi benar2 full screen)
+    function toggleFullscreen(){
+        try{
+            if (!document.fullscreenElement) {
+                if (fullShell && fullShell.requestFullscreen) fullShell.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        } catch(e){}
+    }
+
+    // =========================================================
+    // ROUTING CLICK: JIKA ADA 360 -> FULL, JIKA TIDAK -> POPUP
+    // =========================================================
+    function openByCard(card){
+        const panoEmbed = (card.getAttribute('data-panoembed') || '').trim();
+        if (panoEmbed) return openFullFromCard(card);
+        return openModalFromCard(card);
+    }
+
     document.querySelectorAll('[data-destination-modal-trigger]').forEach(card => {
         card.addEventListener('click', (e) => {
             const a = e.target.closest('a');
             if (a) return;
-            openModalFromCard(card);
+            openByCard(card);
         });
 
         card.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                openModalFromCard(card);
+                openByCard(card);
             }
         });
     });
 
+    // =========================================================
+    // CLOSE HANDLERS: POPUP
+    // =========================================================
     modal.querySelectorAll('[data-dest-close]').forEach(el => {
         el.addEventListener('click', (e) => {
             e.preventDefault();
@@ -1406,15 +1992,65 @@ html[data-theme="dark"] #destinations .dest-modal-badge{
         }, true);
     }
 
-    document.addEventListener('keydown', (e) => {
-        if (modal.classList.contains('dest-hidden')) return;
-        if (e.key === 'Escape') closeModal();
-    });
-
     modal.addEventListener('click', (e) => {
         if (modal.classList.contains('dest-hidden')) return;
         if (dialog && dialog.contains(e.target)) return;
         closeModal();
+    });
+
+    // =========================================================
+    // CLOSE HANDLERS: FULLSCREEN DETAIL
+    // =========================================================
+    if (btnClose) {
+        btnClose.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeFull();
+        });
+    }
+
+    full.addEventListener('click', (e) => {
+        // klik backdrop luar shell -> close
+        if (full.classList.contains('dest-hidden')) return;
+        if (fullShell && fullShell.contains(e.target)) return;
+        closeFull();
+    });
+
+    // zoom buttons
+    if (btnZoomIn) {
+        btnZoomIn.addEventListener('click', (e) => {
+            e.preventDefault();
+            zoom = zoom + Z_STEP;
+            applyZoom();
+        });
+    }
+    if (btnZoomOut) {
+        btnZoomOut.addEventListener('click', (e) => {
+            e.preventDefault();
+            zoom = zoom - Z_STEP;
+            applyZoom();
+        });
+    }
+
+    // fullscreen button
+    if (btnFs) {
+        btnFs.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleFullscreen();
+        });
+    }
+
+    // ESC: jika full terbuka -> tutup full, else jika modal terbuka -> tutup modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+
+        if (!full.classList.contains('dest-hidden')) {
+            closeFull();
+            return;
+        }
+        if (!modal.classList.contains('dest-hidden')) {
+            closeModal();
+            return;
+        }
     });
 })();
 </script>

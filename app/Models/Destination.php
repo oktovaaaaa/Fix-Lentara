@@ -19,6 +19,11 @@ class Destination extends Model
         'rating',
         'sort_order',
         'is_active',
+
+        // ===== 360 / Google Maps Embed =====
+        'pano_embed_url', // contoh: https://www.google.com/maps/embed?pb=...
+        'pano_maps_url',  // contoh: https://maps.app.goo.gl/xxxx atau link maps panjang
+        'pano_label',     // contoh: "360° Bukit Holbung"
     ];
 
     protected $casts = [
@@ -38,9 +43,49 @@ class Destination extends Model
      */
     public function getImageDisplayUrlAttribute(): ?string
     {
-        if (!empty($this->image_path) && Storage::disk('public')->exists($this->image_path)) {
-            return Storage::disk('public')->url($this->image_path);
+        $path = trim((string) ($this->image_path ?? ''));
+
+        if ($path !== '' && Storage::disk('public')->exists($path)) {
+            return Storage::disk('public')->url($path);
         }
-        return $this->image_url ?: null;
+
+        $url = trim((string) ($this->image_url ?? ''));
+        return $url !== '' ? $url : null;
+    }
+
+    /**
+     * Safety helper: embed URL yang valid untuk iframe.
+     */
+    public function getPanoEmbedDisplayUrlAttribute(): ?string
+    {
+        $url = trim((string) ($this->pano_embed_url ?? ''));
+        return $url !== '' ? $url : null;
+    }
+
+    /**
+     * Safety helper: link "View on Google Maps" (opsional).
+     */
+    public function getPanoMapsDisplayUrlAttribute(): ?string
+    {
+        $url = trim((string) ($this->pano_maps_url ?? ''));
+        return $url !== '' ? $url : null;
+    }
+
+    /**
+     * Helper boolean: dipakai view untuk menentukan
+     * "pakai layar penuh 360" atau "pakai popup biasa".
+     */
+    public function getHasPanoAttribute(): bool
+    {
+        return $this->getPanoEmbedDisplayUrlAttribute() !== null;
+    }
+
+    /**
+     * Label 360 yang aman untuk ditampilkan.
+     */
+    public function getPanoLabelDisplayAttribute(): ?string
+    {
+        $label = trim((string) ($this->pano_label ?? ''));
+        return $label !== '' ? $label : null;
     }
 }

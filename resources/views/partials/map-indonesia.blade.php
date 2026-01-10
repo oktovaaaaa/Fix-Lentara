@@ -1346,9 +1346,6 @@ const warna = props.warna || '#FF6B00';
     </div>
 </div>
 
-                <div class="mi-popup-note">
-                    Tekan wilayah lain untuk menjelajahi kekayaan Nusantara lainnya
-                </div>
             </div>`;
 
             const popupOptions = {

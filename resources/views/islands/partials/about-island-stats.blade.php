@@ -68,13 +68,13 @@
             </div>
 
             @if($heroDesc)
+            <p class="neon-subtitle whitespace-pre-line break-words">
+                {!! nl2br(e($heroDesc)) !!}
+            </p>
+        @else
+                        {{-- kalau tidak ada subtitle dari admin, kita buat default supaya konsisten dengan HOME --}}
                 <p class="neon-subtitle">
-                    {{ $heroDesc }}
-                </p>
-            @else
-                {{-- kalau tidak ada subtitle dari admin, kita buat default supaya konsisten dengan HOME --}}
-                <p class="neon-subtitle">
-                    Ringkasan tentang pulau ini, termasuk gambaran umum dan poin-poin penting yang kamu input di admin.
+                    Pulau ini merupakan bagian dari kekayaan Nusantara yang memiliki keberagaman budaya dan alam, tercermin dari suku-suku yang hidup dan berkembang, kuliner khas daerah, destinasi wisata, serta flora dan fauna yang menjadi identitas pulau ini.
                 </p>
             @endif
 
@@ -165,7 +165,7 @@
             <h2 class="neon-title">Statistik Pulau</h2>
             <div class="title-decoration"></div>
             <p class="neon-subtitle">
-                Ringkasan demografi pulau: jumlah penduduk, serta komposisi suku, bahasa, dan agama berdasarkan data yang kamu input di admin.
+                Informasi kependudukan dan keberagaman Nusantara pada pulau ini, termasuk suku, bahasa, dan agama, yang membantu mengenal budaya Indonesia secara lebih dekat.  
             </p>
 
             {{-- 3 CARD UTAMA --}}
@@ -179,7 +179,8 @@
                             </div>
                             <div class="stat-label">Jumlah Penduduk (perkiraan)</div>
                             <p class="mt-2">
-                                Nilai ini kamu isi dari panel admin. Gunakan angka perkiraan terbaru untuk pulau ini.
+                                Perkiraan jumlah penduduk yang tinggal di pulau ini sebagai gambaran skala kependudukan Nusantara.
+
                             </p>
                         </div>
                         <div class="opacity-90">
@@ -202,7 +203,7 @@
                             <div class="stat-number">{{ $ethnicities->count() }}</div>
                             <div class="stat-label">Data Suku Tercatat</div>
                             <p class="mt-2">
-                                Komposisi suku (persentase) yang kamu input. Chart akan menampilkan top data + “Lainnya”.
+                                Data suku yang tercatat, disajikan untuk menggambarkan keberagaman suku Nusantara yang membentuk identitas budaya.
                             </p>
                         </div>
                         <div class="opacity-90">
@@ -225,8 +226,9 @@
                             <div class="stat-number">{{ $languages->count() }}</div>
                             <div class="stat-label">Data Bahasa Tercatat</div>
                             <p class="mt-2">
-                                Komposisi bahasa (persentase) yang kamu input. Cocok buat ringkasan demografi pulau.
-                            </p>
+                                Menampilkan komposisi bahasa yang digunakan di pulau ini sebagai bagian dari kekayaan bahasa Nusantara.
+                              </p>
+                              
                         </div>
                         <div class="opacity-90">
                             <svg viewBox="0 0 24 24" class="w-12 h-12" fill="white" opacity="0.9">
@@ -254,7 +256,7 @@
                         <canvas id="ethnicChart"></canvas>
                     </div>
                     <p class="mt-3 text-sm text-[var(--muted)]">
-                        Menampilkan suku dengan persentase terbesar. Jika datanya banyak, sisanya digabung sebagai <em>Lainnya</em>.
+                        Data visual ini membantu memahami persebaran dan keberagaman suku Nusantara yang terdapat di pulau ini.
                     </p>
                 </div>
 
@@ -268,7 +270,7 @@
                         <canvas id="languageChart"></canvas>
                     </div>
                     <p class="mt-3 text-sm text-[var(--muted)]">
-                        Bahasa yang paling banyak digunakan di pulau ini berdasarkan input admin.
+                        Data visual ini membantu memahami keragaman bahasa Nusantara yang ada di pulau ini.
                     </p>
                 </div>
 
@@ -282,14 +284,10 @@
                         <canvas id="religionChart"></canvas>
                     </div>
                     <p class="mt-3 text-sm text-[var(--muted)]">
-                        Komposisi agama berdasarkan input admin. Jika data banyak, sisanya digabung sebagai <em>Lainnya</em>.
+                        Data visual ini membantu memahami keberagaman agama Nusantara yang ada di pulau ini.
                     </p>
                 </div>
             </div>
-
-            <p class="mt-4 text-xs text-[var(--muted)] opacity-70 text-center">
-                *Persentase mengikuti data yang kamu masukkan. Kalau total tidak 100% itu tidak masalah (tetap ditampilkan apa adanya).
-            </p>
 
             {{-- POPUP DETAIL --}}
             <div id="stats-modal-backdrop" class="fixed inset-0 z-50 items-center justify-center px-4" aria-hidden="true">
@@ -304,9 +302,7 @@
                         {{-- konten diisi via JS --}}
                     </div>
 
-                    <p class="mt-6 text-xs text-[var(--muted)] opacity-50">
-                        Data bersumber dari input admin Lentara (pulau ini).
-                    </p>
+
                 </div>
             </div>
 
@@ -355,25 +351,54 @@
                         population: {
                             title: `Jumlah Penduduk ${islandName}`,
                             body: `
-                                <p>Data penduduk untuk <strong>${islandName}</strong> diisi melalui panel admin.</p>
-                                <p>Nilai saat ini: <strong>${popValue > 0 ? fmtNumber(popValue) : '—'}</strong></p>
-                                <p class="mt-3">Gunakan angka perkiraan terbaru agar statistik pulau tetap relevan.</p>
+ <p>
+    Data kependudukan ini memberikan gambaran umum tentang jumlah penduduk yang
+    menetap di <strong>${islandName}</strong> sebagai bagian dari Nusantara.
+  </p>
+
+  <p>
+    <strong>Perkiraan jumlah penduduk:</strong>
+    <strong>${popValue > 0 ? fmtNumber(popValue) : '-'}</strong>
+  </p>
+
+  <p class="mt-3">
+    Data ditampilkan dalam bentuk perkiraan untuk membantu memahami kondisi
+    kependudukan dan keragaman masyarakat di <strong>${islandName}</strong>.
+  </p>
                             `
                         },
                         ethnicity: {
                             title: `Komposisi Suku di ${islandName}`,
                             body: `
-                                <p>Total entri suku yang tersimpan: <strong>${rawEthCount}</strong>.</p>
-                                <p>Ringkasan chart menampilkan <strong>Top data + Lainnya</strong> (kalau datanya banyak).</p>
-                                ${listHtml(ethLabels, ethData, '%')}
+                               <p>
+      <strong>${islandName}</strong> memiliki keberagaman suku yang membentuk
+      identitas budaya Nusantara di wilayah ini.
+    </p>
+
+    <p>
+      Data ini merangkum <strong>${rawEthCount}</strong> suku yang tercatat
+      untuk memberikan gambaran umum tentang komposisi suku.
+    </p>
+
+    <p class="mt-3">
+      Suku dengan persentase terbesar ditampilkan secara utama,
+      sedangkan sisanya digabung sebagai <strong>Lainnya</strong>.
+    </p>
                             `
                         },
                         language: {
                             title: `Komposisi Bahasa di ${islandName}`,
                             body: `
-                                <p>Total entri bahasa yang tersimpan: <strong>${rawLangCount}</strong>.</p>
-                                <p>Ringkasan chart menampilkan <strong>Top data + Lainnya</strong> (kalau datanya banyak).</p>
-                                ${listHtml(langLabels, langData, '%')}
+<p>
+  Bagian ini menampilkan keberagaman bahasa yang digunakan di
+  <strong>${islandName}</strong> sebagai bagian dari kekayaan bahasa Nusantara.
+</p>
+
+<p>
+  <strong>Total bahasa tercatat:</strong> ${rawLangCount}.
+  Data disajikan dalam bentuk ringkasan untuk memudahkan pemahaman.
+</p>
+
                             `
                         }
                     };

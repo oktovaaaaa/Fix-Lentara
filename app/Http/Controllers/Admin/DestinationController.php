@@ -88,11 +88,22 @@ class DestinationController extends Controller
             'name'        => ['required', 'string', 'max:180'],
             'location'    => ['nullable', 'string', 'max:180'],
             'description' => ['nullable', 'string'],
+
             'image_url'   => ['nullable', 'string', 'max:1000'],
             'image_file'  => ['nullable', 'image', 'max:4096'], // max 4MB
+
             'rating'      => ['nullable', 'numeric', 'min:0', 'max:5'],
             'sort_order'  => ['nullable', 'integer', 'min:0'],
             'is_active'   => ['nullable', 'boolean'],
+
+            // ===== 360 / Google Maps Embed =====
+            // embed wajib format iframe google maps embed
+'pano_embed_url' => ['nullable', 'string', 'max:1600', 'regex:/^https:\/\/(www\.google\.com\/maps\/embed\?|(maps\.app\.goo\.gl\/)|((www\.)?google\.[a-z.]+\/maps))/i'],
+            // link maps bebas: shortlink / link panjang
+            'pano_maps_url'  => ['nullable', 'string', 'max:1200'],
+            'pano_label'     => ['nullable', 'string', 'max:255'],
+        ], [
+            'pano_embed_url.starts_with' => 'Link embed harus diawali dengan https://www.google.com/maps/embed?',
         ]);
 
         $dest = new Destination();
@@ -101,10 +112,17 @@ class DestinationController extends Controller
         $dest->name        = (string) $validated['name'];
         $dest->location    = $validated['location'] ?? null;
         $dest->description = $validated['description'] ?? null;
+
         $dest->image_url   = $validated['image_url'] ?? null;
+
         $dest->rating      = isset($validated['rating']) ? (float) $validated['rating'] : 0.0;
         $dest->sort_order  = isset($validated['sort_order']) ? (int) $validated['sort_order'] : 0;
         $dest->is_active   = (bool) ($validated['is_active'] ?? true);
+
+        // ===== 360 / Google Maps Embed =====
+        $dest->pano_embed_url = $validated['pano_embed_url'] ?? null;
+        $dest->pano_maps_url  = $validated['pano_maps_url'] ?? null;
+        $dest->pano_label     = $validated['pano_label'] ?? null;
 
         // Upload file jika ada
         if ($request->hasFile('image_file')) {
@@ -148,12 +166,22 @@ class DestinationController extends Controller
             'name'        => ['required', 'string', 'max:180'],
             'location'    => ['nullable', 'string', 'max:180'],
             'description' => ['nullable', 'string'],
+
             'image_url'   => ['nullable', 'string', 'max:1000'],
             'image_file'  => ['nullable', 'image', 'max:4096'],
             'remove_upload' => ['nullable', 'boolean'],
+
             'rating'      => ['nullable', 'numeric', 'min:0', 'max:5'],
             'sort_order'  => ['nullable', 'integer', 'min:0'],
             'is_active'   => ['nullable', 'boolean'],
+
+            // ===== 360 / Google Maps Embed =====
+'pano_embed_url' => ['nullable', 'string', 'max:1600', 'regex:/^https:\/\/(www\.google\.com\/maps\/embed\?|(maps\.app\.goo\.gl\/)|((www\.)?google\.[a-z.]+\/maps))/i'],
+
+            'pano_maps_url'  => ['nullable', 'string', 'max:1200'],
+            'pano_label'     => ['nullable', 'string', 'max:255'],
+        ], [
+            'pano_embed_url.starts_with' => 'Link embed harus diawali dengan https://www.google.com/maps/embed?',
         ]);
 
         $destination->island_id   = (int) $validated['island_id'];
@@ -161,10 +189,17 @@ class DestinationController extends Controller
         $destination->name        = (string) $validated['name'];
         $destination->location    = $validated['location'] ?? null;
         $destination->description = $validated['description'] ?? null;
+
         $destination->image_url   = $validated['image_url'] ?? null;
+
         $destination->rating      = isset($validated['rating']) ? (float) $validated['rating'] : 0.0;
         $destination->sort_order  = isset($validated['sort_order']) ? (int) $validated['sort_order'] : 0;
         $destination->is_active   = (bool) ($validated['is_active'] ?? false);
+
+        // ===== 360 / Google Maps Embed =====
+        $destination->pano_embed_url = $validated['pano_embed_url'] ?? null;
+        $destination->pano_maps_url  = $validated['pano_maps_url'] ?? null;
+        $destination->pano_label     = $validated['pano_label'] ?? null;
 
         // Hapus upload lama jika dicentang
         if (!empty($validated['remove_upload']) && $destination->image_path) {

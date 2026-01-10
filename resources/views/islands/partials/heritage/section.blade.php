@@ -763,9 +763,7 @@
         <div class="wf-row wf-reveal" id="{{ $rowId }}" data-wf-row="{{ $key }}">
             <div class="wf-category-title-wrap">
                 <h3 class="wf-category-title">{{ $label }}</h3>
-                @if($loop->first && $heroDescription)
-                    <p class="wf-category-desc">{{ $heroDescription }}</p>
-                @endif
+
             </div>
 
             <div class="wf-flow">
@@ -1000,7 +998,7 @@
 
                 </div>
 
-                <div class="wf-modal-note">Tip: klik area gelap atau tekan ESC untuk menutup.</div>
+
             </div>
         `;
 

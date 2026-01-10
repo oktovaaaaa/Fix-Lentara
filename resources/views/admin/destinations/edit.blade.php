@@ -1,3 +1,4 @@
+{{-- resources/views/admin/destinations/edit.blade.php (REPLACE FULL) --}}
 @extends('layouts.admin')
 
 @section('title', 'Admin - Edit Destinasi')
@@ -16,11 +17,14 @@
         </div>
     @endif
 
-    <form action="{{ route('admin.destinations.update', $destination) }}" method="POST" enctype="multipart/form-data"
-          class="rounded-xl bg-slate-900/60 border border-slate-700 p-5 space-y-4">
+    <form action="{{ route('admin.destinations.update', $destination) }}"
+          method="POST"
+          enctype="multipart/form-data"
+          class="rounded-xl bg-slate-900/60 border border-slate-700 p-5 space-y-5">
         @csrf
         @method('PUT')
 
+        {{-- Pulau & Suku --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-xs text-slate-400 mb-1">Pulau</label>
@@ -45,39 +49,48 @@
             </div>
         </div>
 
+        {{-- Nama --}}
         <div>
             <label class="block text-xs text-slate-400 mb-1">Nama Destinasi</label>
-            <input type="text" name="name" value="{{ old('name', $destination->name) }}"
+            <input type="text" name="name"
+                   value="{{ old('name', $destination->name) }}"
                    class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm">
         </div>
 
+        {{-- Lokasi --}}
         <div>
             <label class="block text-xs text-slate-400 mb-1">Lokasi</label>
-            <input type="text" name="location" value="{{ old('location', $destination->location) }}"
+            <input type="text" name="location"
+                   value="{{ old('location', $destination->location) }}"
                    class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm">
         </div>
 
+        {{-- Deskripsi --}}
         <div>
             <label class="block text-xs text-slate-400 mb-1">Deskripsi</label>
             <textarea name="description" rows="5"
                       class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm">{{ old('description', $destination->description) }}</textarea>
         </div>
 
+        {{-- Gambar --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="block text-xs text-slate-400 mb-1">Gambar (URL) - opsional</label>
-                <input type="text" name="image_url" value="{{ old('image_url', $destination->image_url) }}"
+                <label class="block text-xs text-slate-400 mb-1">Gambar (URL) – opsional</label>
+                <input type="text" name="image_url"
+                       value="{{ old('image_url', $destination->image_url) }}"
                        class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm">
             </div>
 
             <div>
-                <label class="block text-xs text-slate-400 mb-1">Gambar (Upload) - opsional</label>
+                <label class="block text-xs text-slate-400 mb-1">Gambar (Upload) – opsional</label>
                 <input type="file" name="image_file"
                        class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm">
 
                 @if($destination->image_path)
                     <div class="mt-2 text-xs text-slate-300">
-                        Upload aktif: <span class="text-orange-400">{{ $destination->image_path }}</span>
+                        Upload aktif:
+                        <span class="text-orange-400">{{ $destination->image_path }}</span>
+
                         <label class="ml-3 inline-flex items-center gap-2">
                             <input type="checkbox" name="remove_upload" value="1" class="w-4 h-4">
                             Hapus upload ini
@@ -87,9 +100,63 @@
             </div>
         </div>
 
+        {{-- =======================
+             360° GOOGLE MAPS
+        ======================== --}}
+        <div class="border-t border-slate-700 pt-4 space-y-4">
+            <div class="flex items-center gap-2 text-orange-400 font-semibold text-sm">
+                <i class="bx bx-panorama text-lg"></i>
+                Konten 360° (Google Maps)
+            </div>
+
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">
+                    Embed Google Maps (iframe)
+                </label>
+                <textarea name="pano_embed_url" rows="3"
+                          placeholder="https://www.google.com/maps/embed?pb=..."
+                          class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm">{{ old('pano_embed_url', $destination->pano_embed_url) }}</textarea>
+                <div class="text-xs text-slate-500 mt-1">
+                    Digunakan untuk tampilan 360 layar penuh di halaman publik.
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">
+                    Link Google Maps (opsional)
+                </label>
+                <input type="text" name="pano_maps_url"
+                       value="{{ old('pano_maps_url', $destination->pano_maps_url) }}"
+                       placeholder="https://maps.app.goo.gl/xxxx"
+                       class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm">
+            </div>
+
+            <div>
+                <label class="block text-xs text-slate-400 mb-1">
+                    Label 360° (opsional)
+                </label>
+                <input type="text" name="pano_label"
+                       value="{{ old('pano_label', $destination->pano_label) }}"
+                       placeholder="Contoh: 360° Bukit Holbung"
+                       class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm">
+            </div>
+
+            @if($destination->pano_embed_url)
+                <div class="text-xs text-green-400 flex items-center gap-2">
+                    <i class="bx bx-check-circle"></i>
+                    Konten 360° sudah terpasang dan akan tampil fullscreen di halaman publik.
+                </div>
+            @else
+                <div class="text-xs text-slate-500">
+                    Jika embed kosong, halaman publik akan menggunakan tampilan popup biasa.
+                </div>
+            @endif
+        </div>
+
+        {{-- Rating / Order / Aktif --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-                <label class="block text-xs text-slate-400 mb-1">Rating (0 - 5)</label>
+                <label class="block text-xs text-slate-400 mb-1">Rating (0 – 5)</label>
                 <input type="number" name="rating" step="0.1" min="0" max="5"
                        value="{{ old('rating', $destination->rating) }}"
                        class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm">
@@ -103,12 +170,14 @@
             </div>
 
             <div class="flex items-center gap-2 pt-6">
-                <input type="checkbox" name="is_active" value="1" {{ old('is_active', $destination->is_active) ? 'checked' : '' }}
+                <input type="checkbox" name="is_active" value="1"
+                       {{ old('is_active', $destination->is_active) ? 'checked' : '' }}
                        class="w-4 h-4">
                 <label class="text-sm text-slate-200">Aktif</label>
             </div>
         </div>
 
+        {{-- Actions --}}
         <div class="flex gap-3">
             <button type="submit"
                     class="bg-orange-600 hover:bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-semibold">

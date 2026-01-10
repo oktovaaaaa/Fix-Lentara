@@ -27,6 +27,19 @@ return new class extends Migration {
             $table->string('image_url', 1000)->nullable();
             $table->string('image_path', 600)->nullable();
 
+            /**
+             * ===============================
+             * 360° VIEW (GOOGLE MAPS EMBED)
+             * ===============================
+             * Harus SAMA dengan field yang dipakai Controller + Model:
+             * - pano_embed_url (iframe embed)
+             * - pano_maps_url  (link maps biasa / shortlink)
+             * - pano_label     (label/judul viewer)
+             */
+            $table->string('pano_embed_url', 1600)->nullable();
+            $table->string('pano_maps_url', 1200)->nullable();
+            $table->string('pano_label', 255)->nullable();
+
             // rating 0.0 - 5.0 (misal 4.5)
             $table->decimal('rating', 2, 1)->default(0);
 
@@ -37,6 +50,9 @@ return new class extends Migration {
 
             // Kombinasi island + tribe untuk query cepat
             $table->index(['island_id', 'tribe_key']);
+
+            // Index opsional (ini boleh, tapi sebenarnya mirip dengan index di atas)
+            $table->index(['island_id', 'tribe_key', 'is_active']);
         });
     }
 
