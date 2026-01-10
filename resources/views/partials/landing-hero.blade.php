@@ -130,20 +130,24 @@
         <div class="hero-title-wrapper">
             <div class="max-w-3xl space-y-2 text-center md:text-left">
                 <p class="hero-title-line text-[9px] sm:text-[10px] md:text-xs tracking-[0.3em] uppercase text-white/80">
-                    Nusantara • Pulau • Cerita • Tradisi
+                    Pulau • Suku • Budaya • Pengetahuan
                 </p>
                 <h1
                     class="hero-title-line content-title-1
                            text-3xl sm:text-4xl md:text-6xl lg:text-7xl
                            font-bold leading-tight sm:leading-none drop-shadow-[0_0_20px_rgba(0,0,0,0.7)]">
-                    BUDAYA INDONESIA
+                    Lentara Nusantara
                 </h1>
+
                 <p
-                    class="hero-title-line content-title-2
-                           text-base sm:text-xl md:text-2xl lg:text-3xl
-                           font-semibold text-white/90 drop-shadow-[0_0_20px_rgba(0,0,0,0.7)]">
-                    Jelajahi pulau, cerita daerah, dan tradisi Nusantara.
-                </p>
+  class="hero-title-line content-title-2
+         text-base sm:text-xl md:text-2xl lg:text-3xl
+         font-semibold text-white/90 drop-shadow-[0_0_20px_rgba(0,0,0,0.7)]">
+  Belajar Suku Nusantara,
+  <br class="hidden md:block">
+  Lewat Pulau dan Teknologi.
+</p>
+
             </div>
         </div>
     @endif

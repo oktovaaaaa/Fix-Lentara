@@ -5,9 +5,8 @@
   const themeToggle = document.getElementById('themeToggle');
   const drawerTheme = document.getElementById('drawerTheme');
 
-  const links = [...document.querySelectorAll('.nav-btn')];
-  const indicator = document.querySelector('.active-indicator');
   const navLinksBox = document.getElementById('navLinks');
+  const indicator = document.querySelector('.active-indicator');
 
   const mobileMenuToggle = document.getElementById('mobileMenuToggle');
   const drawer = document.getElementById('drawer');
@@ -15,6 +14,12 @@
   const closeDrawerBtn = document.getElementById('closeDrawer');
 
   const navPill = document.querySelector('.nav-pill');
+
+  // Semua tombol nav (termasuk dropdown toggle karena dia .nav-btn)
+  const navBtns = Array.from(document.querySelectorAll('.nav-btn'));
+  // Dropdown toggle khusus Pulau (desktop)
+  const islandsDropdown = document.querySelector('.nav-dropdown[data-dropdown="islands"]');
+  const islandsToggle = islandsDropdown ? islandsDropdown.querySelector('.nav-dropdown-toggle') : null;
 
   // ===== THEME (light/dark) =====
   function applyTheme(mode) {
@@ -36,35 +41,70 @@
     return window.matchMedia('(max-width: 860px)').matches;
   }
 
-  // ===== NAV ACTIVE INDICATOR (desktop only) =====
-function moveIndicator(targetBtn) {
-  if (!indicator || !targetBtn || isMobile() || !navLinksBox) return;
+  function clearActive() {
+    navBtns.forEach(b => b.classList.remove('is-active'));
+  }
 
-  // ukuran & posisi real sesuai layout flex
-  const w = targetBtn.offsetWidth;
-  const x = targetBtn.offsetLeft;
+  function getDefaultBtn() {
+    // prioritas: button yang punya data-default="1"
+    const def = navBtns.find(b => b.dataset.default === '1');
+    if (def) return def;
 
-  // sedikit “napas” biar indikator tidak terlalu mepet (opsional)
-  const pad = 6;
+    // fallback: yang punya .is-active
+    const active = navBtns.find(b => b.classList.contains('is-active'));
+    if (active) return active;
 
-  indicator.style.transform = `translateX(${x - pad}px)`;
-  indicator.style.width = `${w + (pad * 2)}px`;
-  indicator.style.opacity = 1;
-}
+    // fallback terakhir: tombol pertama
+    return navBtns[0] || null;
+  }
 
+  // ===== ACTIVE INDICATOR (DESKTOP) =====
+  function moveIndicator(targetBtn) {
+    if (!indicator || !targetBtn || isMobile() || !navLinksBox) return;
+
+    const boxRect = navLinksBox.getBoundingClientRect();
+    const btnRect = targetBtn.getBoundingClientRect();
+
+    // ukuran & posisi (lebih stabil daripada offsetLeft untuk case dropdown/flex)
+    const w = btnRect.width;
+    const x = btnRect.left - boxRect.left;
+
+    // napas, biar mirip style lama
+    const pad = 6;
+
+    indicator.style.transform = `translateX(${x - pad}px)`;
+    indicator.style.width = `${w + (pad * 2)}px`;
+    indicator.style.opacity = 1;
+  }
 
   function hideIndicator() {
     if (indicator) indicator.style.opacity = 0;
   }
 
-  // set awal
-  const initial = document.querySelector('.nav-btn.is-active') || links[0];
+  function setActive(btn, { move = true } = {}) {
+    if (!btn) return;
+    clearActive();
+    btn.classList.add('is-active');
+    if (!isMobile() && move) moveIndicator(btn);
+  }
+
+  // ===== INIT INDICATOR =====
+  const initial = document.querySelector('.nav-btn.is-active') || getDefaultBtn();
   if (!isMobile()) moveIndicator(initial);
   else hideIndicator();
 
-  // klik btn → scroll ke section / redirect Home (mode island)
-  links.forEach(btn => {
-    btn.addEventListener('click', () => {
+  // ===== CLICK HANDLER (SCROLL / REDIRECT) =====
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      // Dropdown toggle: hanya open/close dropdown (handled below),
+      // tapi tetap boleh jadi active indicator kalau section #islands aktif via observer.
+      if (btn.classList.contains('nav-dropdown-toggle')) {
+        // jangan trigger scroll / active dari click, supaya sesuai behavior lama
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
       const url = btn.dataset.url;
       if (url) {
         window.location.href = url;
@@ -74,9 +114,7 @@ function moveIndicator(targetBtn) {
       const targetSelector = btn.dataset.target;
       const target = targetSelector ? document.querySelector(targetSelector) : null;
 
-      links.forEach(l => l.classList.remove('is-active'));
-      btn.classList.add('is-active');
-      if (!isMobile()) moveIndicator(btn);
+      setActive(btn);
 
       if (target) {
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -84,24 +122,44 @@ function moveIndicator(targetBtn) {
     });
   });
 
-  // update aktif berdasarkan scroll (IntersectionObserver)
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = `#${entry.target.id}`;
-        const btn = links.find(b => b.dataset.target === id);
-        if (btn) {
-          links.forEach(l => l.classList.remove('is-active'));
-          btn.classList.add('is-active');
-          if (!isMobile()) moveIndicator(btn);
-        }
-      }
-    });
-  }, { rootMargin: "-40% 0px -55% 0px", threshold: 0.01 });
+  // ===== SECTION OBSERVER (LIKE NAVBAR LAMA) =====
+  // Map sectionId -> button
+  function findBtnByTarget(idHash) {
+    // cari tombol biasa yang match data-target
+    const normal = navBtns.find(b => !b.classList.contains('nav-dropdown-toggle') && b.dataset.target === idHash);
+    if (normal) return normal;
 
-  document.querySelectorAll('section').forEach(sec => io.observe(sec));
+    // fallback khusus: section islands -> dropdown toggle Pulau
+    if (idHash === '#islands' && islandsToggle) return islandsToggle;
 
-  // ===== DROPDOWN "PULAU" DI NAVBAR DESKTOP =====
+    return null;
+  }
+
+  const sections = Array.from(document.querySelectorAll('section'))
+    .filter(sec => sec && sec.id);
+
+  if (sections.length) {
+    const io = new IntersectionObserver((entries) => {
+      // pilih entry yang paling "kuat" terlihat
+      const visible = entries
+        .filter(en => en.isIntersecting && en.target && en.target.id)
+        .sort((a, b) => (b.intersectionRatio || 0) - (a.intersectionRatio || 0));
+
+      if (!visible.length) return;
+
+      const top = visible[0];
+      const idHash = `#${top.target.id}`;
+      const btn = findBtnByTarget(idHash);
+      if (!btn) return;
+
+      // setActive tapi jangan memaksa open dropdown
+      setActive(btn);
+    }, { rootMargin: "-40% 0px -55% 0px", threshold: [0.01, 0.05, 0.1, 0.2, 0.35] });
+
+    sections.forEach(sec => io.observe(sec));
+  }
+
+  // ===== DROPDOWN "PULAU" (DESKTOP) =====
   const dropdowns = document.querySelectorAll('.nav-dropdown');
 
   function closeAllDropdowns() {
@@ -118,7 +176,7 @@ function moveIndicator(targetBtn) {
     const labelSpan = drop.querySelector('.dropdown-label');
     if (!toggle || !menu) return;
 
-    // ==== INITIAL STATE dari Blade (selectedIsland) ====
+    // initial state label dari blade (mode island)
     const currentIsland = drop.dataset.currentIsland;
     if (currentIsland && labelSpan) {
       labelSpan.textContent = currentIsland;
@@ -126,19 +184,25 @@ function moveIndicator(targetBtn) {
       if (navLinksBox) navLinksBox.classList.add('nav-links--transparent');
     }
 
+    // Toggle dropdown open/close
     toggle.addEventListener('click', (e) => {
+      e.preventDefault();
       e.stopPropagation();
+
       const willOpen = !drop.classList.contains('open');
       closeAllDropdowns();
+
       if (willOpen) {
         drop.classList.add('open');
         toggle.setAttribute('aria-expanded', 'true');
       }
     });
 
+    // Klik item dropdown -> ganti label -> redirect
     menu.querySelectorAll('.dropdown-item').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
+        e.stopPropagation();
 
         const islandName = item.dataset.island || item.textContent.trim();
         const url = item.dataset.url;
@@ -167,10 +231,7 @@ function moveIndicator(targetBtn) {
     overlay.classList.add('show');
     drawer.setAttribute('aria-hidden', 'false');
 
-    // ✅ hide icon circle lewat class di html (CSS handle)
     html.classList.add('drawer-open');
-
-    // Prevent body scroll
     document.body.style.overflow = 'hidden';
   }
 
@@ -180,29 +241,27 @@ function moveIndicator(targetBtn) {
     overlay.classList.remove('show');
     drawer.setAttribute('aria-hidden', 'true');
 
-    // ✅ show icon circle lagi
     html.classList.remove('drawer-open');
-
-    // Restore body scroll
     document.body.style.overflow = '';
   }
 
   // Toggle drawer dengan klik circle logo di mobile
   if (mobileMenuToggle) {
-  mobileMenuToggle.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+    mobileMenuToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    if (!isMobile()) {
-      const homeUrl = mobileMenuToggle.dataset.homeUrl;
-      if (homeUrl) window.location.href = homeUrl;
-      return;
-    }
+      // di desktop: klik logo circle diarahkan ke home (biar aman)
+      if (!isMobile()) {
+        const homeUrl = mobileMenuToggle.dataset.homeUrl;
+        if (homeUrl) window.location.href = homeUrl;
+        return;
+      }
 
-    const willOpen = !(drawer && drawer.classList.contains('open'));
-    willOpen ? openDrawer() : closeDrawer();
-  });
-}
+      const willOpen = !(drawer && drawer.classList.contains('open'));
+      willOpen ? openDrawer() : closeDrawer();
+    });
+  }
 
   if (overlay) overlay.addEventListener('click', closeDrawer);
   if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
@@ -236,24 +295,24 @@ function moveIndicator(targetBtn) {
     });
   });
 
-  // ✅ Resize: rapikan indicator + kalau pindah ke desktop, pastikan drawer tertutup
+  // ===== RESIZE =====
   window.addEventListener('resize', () => {
     if (isMobile()) {
       hideIndicator();
     } else {
-      // jika berubah ke desktop, tutup drawer biar tidak nyangkut
       closeDrawer();
-      const active = document.querySelector('.nav-btn.is-active') || links[0];
+      const active = document.querySelector('.nav-btn.is-active') || getDefaultBtn();
       moveIndicator(active);
     }
   });
 
-  // efek shrink/bounce saat scroll (desktop saja karena mobile nav-pill disembunyikan)
+  // ===== SCROLL EFFECT (desktop pill) =====
   let scrollTimer;
   window.addEventListener('scroll', () => {
     if (!navPill) return;
     navPill.classList.add('scrolling');
     navPill.classList.remove('idle-bounce');
+
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(() => {
       navPill.classList.remove('scrolling');
@@ -263,5 +322,3 @@ function moveIndicator(targetBtn) {
   }, { passive: true });
 
 })();
-
-

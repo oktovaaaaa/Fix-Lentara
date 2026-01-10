@@ -182,11 +182,17 @@ FULL CSS (REPLACE SEMUA <style> KAMU DENGAN INI)
     }
 
     /* ========= CARD CONTAINER (BAWAH) ========= */
-    .mi-card-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 2rem;
-    }
+.mi-card-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+/* ✅ kalau cuma ada 1 card, otomatis span full lebar */
+.mi-card-container > .mi-card:only-child {
+    grid-column: 1 / -1;
+}
+
 
     @media (max-width: 900px) {
         .mi-card-container {
@@ -758,10 +764,7 @@ FULL CSS (REPLACE SEMUA <style> KAMU DENGAN INI)
         overflow: hidden;
     }
 
-    .mi-hover-icon::before {
-        content: '📍';
-        position: absolute;
-    }
+
 
     @keyframes mi-hover-glow {
         0% { box-shadow: 0 8px 25px rgba(255, 107, 0, 0.3), 0 0 0 1px rgba(255, 107, 0, 0.2); }
@@ -855,6 +858,105 @@ FULL CSS (REPLACE SEMUA <style> KAMU DENGAN INI)
         0% { filter: brightness(1.1) saturate(1.2); }
         100% { filter: brightness(1.3) saturate(1.4); }
     }
+
+
+    /* ========= STEPS: CARA MENJELAJAHI ========= */
+.mi-steps{
+    display: grid;
+    gap: 12px;
+    margin: 14px 0 18px;
+}
+
+.mi-step{
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255, 107, 0, 0.04);
+    border: 1px solid rgba(255, 107, 0, 0.12);
+    transition: all .25s ease;
+}
+
+.mi-step:hover{
+    transform: translateY(-2px);
+    background: rgba(255, 107, 0, 0.06);
+    box-shadow: 0 10px 24px rgba(0,0,0,.08);
+}
+
+.mi-step-badge{
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    flex: 0 0 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: linear-gradient(135deg, #ff6b00, #ff8c42);
+    box-shadow: 0 8px 18px rgba(255, 107, 0, 0.28);
+}
+
+.mi-step-body{
+    display: grid;
+    gap: 4px;
+    line-height: 1.5;
+}
+
+.mi-step-title{
+    font-weight: 800;
+    color: var(--txt-body);
+    font-size: .95rem;
+}
+
+.mi-step-desc{
+    color: var(--muted);
+    font-size: .9rem;
+}
+
+/* kecilin jarak CTA biar lebih rapih */
+.mi-card-cta .mi-card-heading{
+    margin-top: 6px;
+}
+
+
+/* =========================
+   MOBILE: POPUP JADI SCROLLABLE
+========================= */
+@media (max-width: 640px) {
+
+/* wrapper popup dibatasi tingginya */
+.leaflet-popup.mi-custom-popup .leaflet-popup-content-wrapper{
+  max-height: 72vh !important;
+  overflow: hidden !important; /* biar wrapper ga ikut scroll aneh */
+}
+
+/* area content jadi scroll */
+.leaflet-popup.mi-custom-popup .leaflet-popup-content{
+  max-height: 72vh !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 !important;
+}
+
+/* card jangan bikin tinggi liar */
+.leaflet-popup.mi-custom-popup .mi-popup-card{
+  min-width: 240px !important;
+  max-width: 320px !important;
+  padding: 14px !important;
+  padding-top: 44px !important; /* kasih ruang buat tombol close */
+}
+
+/* tombol close selalu kelihatan */
+.leaflet-popup.mi-custom-popup .leaflet-popup-close-button{
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  z-index: 9999 !important;
+}
+}
+
+
 </style>
 
 
@@ -864,7 +966,7 @@ FULL CSS (REPLACE SEMUA <style> KAMU DENGAN INI)
             <div class="mi-title-decoration"></div>
             <p class="mi-subtitle">
                 Jelajahi keindahan dan keragaman Indonesia melalui peta interaktif.
-                Klik setiap wilayah untuk menemukan kekayaan budaya, destinasi wisata,
+                tekan setiap wilayah untuk menemukan kekayaan budaya, destinasi wisata,
                 dan kuliner khas Nusantara.
             </p>
         </div>
@@ -882,104 +984,140 @@ FULL CSS (REPLACE SEMUA <style> KAMU DENGAN INI)
             <div class="mi-card-container">
 
 
-                                {{-- KARTU FITUR --}}
-                <div class="mi-card">
-                    <div class="mi-card-glow"></div>
-                    <div class="mi-card-inner">
-                        <h3 class="mi-features-title">Fitur Peta Interaktif</h3>
 
-                        <div class="mi-features-grid">
-                            <div class="mi-feature-item">
-                                <div class="mi-feature-icon">🔍</div>
-                                <div class="mi-feature-label">Zoom In/Out</div>
-                                <div class="mi-feature-desc">Gunakan roda mouse atau tombol +/- untuk memperbesar/memperkecil</div>
-                            </div>
-
-                            <div class="mi-feature-item">
-                                <div class="mi-feature-icon">🗺️</div>
-                                <div class="mi-feature-label">Ganti Lapisan</div>
-                                <div class="mi-feature-desc">Pilih tampilan peta satelit, gelap, atau terang sesuai preferensi</div>
-                            </div>
-
-                            <div class="mi-feature-item">
-                                <div class="mi-feature-icon">📍</div>
-                                <div class="mi-feature-label">Klik Pulau</div>
-                                <div class="mi-feature-desc">Dapatkan informasi detail tentang pulau yang diklik dari GeoJSON</div>
-                            </div>
-
-                            <div class="mi-feature-item">
-                                <div class="mi-feature-icon">🔄</div>
-                                <div class="mi-feature-label">Toggle Layer</div>
-                                <div class="mi-feature-desc">Aktif/nonaktifkan layer pulau untuk tampilan bersih</div>
-                            </div>
-
-                            <div class="mi-feature-item">
-                                <div class="mi-feature-icon">📱</div>
-                                <div class="mi-feature-label">Responsif</div>
-                                <div class="mi-feature-desc">Tampilan optimal di desktop, tablet, dan smartphone</div>
-                            </div>
-
-                            <div class="mi-feature-item">
-                                <div class="mi-feature-icon">🌓</div>
-                                <div class="mi-feature-label">Mode Gelap/Terang</div>
-                                <div class="mi-feature-desc">Otomatis menyesuaikan tema website Anda</div>
-                            </div>
-                        </div>
-
-                        <div class="mi-watermark">
-                            <img src="{{ asset('images/icon/icon_lentara.png') }}" alt="Lentara Nusantara Icon">
-                            <div class="mi-watermark-text">
-                                <strong>Lentara Nusantara</strong> • Peta Interaktif Indonesia
-                            </div>
-                        </div>
-
-                        <div class="mi-sources">
-                            Teknologi: <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a> •
-                            <a href="https://openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a>
-                        </div>
-                    </div>
-                </div>
 
                 {{-- KARTU INFO UTAMA --}}
                 <div class="mi-card">
                     <div class="mi-card-glow"></div>
                     <div class="mi-card-inner">
                         <div class="mi-card-badge">Keunikan Indonesia</div>
-                        <h3 class="mi-card-heading">Negeri Seribu Pulau dengan Segudang Keajaiban</h3>
+                        <h3 class="mi-card-heading">Identitas Budaya Pulau-Pulau Nusantara</h3>
                         <p class="mi-card-text">
-                            Indonesia bukan hanya sekadar negara kepulauan, melainkan
-                            mozaik peradaban yang hidup. Setiap pulau menyimpan kisahnya
-                            sendiri, dari ritual kuno hingga seni kontemporer.
+                            Indonesia terbentuk dari ribuan pulau yang masing-masing memiliki identitas budaya tersendiri. Setiap pulau menjadi ruang hidup bagi beragam suku bangsa, dengan sejarah, tradisi, dan cara hidup yang tumbuh secara turun-temurun. Keberagaman ini membentuk wajah Nusantara sebagai satu kesatuan budaya yang kaya dan saling terhubung.
                         </p>
 
-                        <div class="mi-card-highlights">
-                            <div class="mi-highlight-item">
-                                <div class="mi-highlight-icon">🌏</div>
-                                <div class="mi-highlight-text">
-                                    <strong>17.380 pulau</strong> dengan nama dan koordinat resmi (Data 2024)
-                                </div>
-                            </div>
-                            <div class="mi-highlight-item">
-                                <div class="mi-highlight-icon">🗣️</div>
-                                <div class="mi-highlight-text">
-                                    <strong>718 bahasa daerah</strong> yang masih hidup dan aktif digunakan
-                                </div>
-                            </div>
-                            <div class="mi-highlight-item">
-                                <div class="mi-highlight-icon">👥</div>
-                                <div class="mi-highlight-text">
-                                    <strong>1.340 suku bangsa</strong> dengan tradisi dan adat istiadat unik
-                                </div>
-                            </div>
-                        </div>
+<div class="mi-card-highlights">
+    <div class="mi-highlight-item">
+        <div class="mi-highlight-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2v20" stroke="currentColor" stroke-width="2"/>
+                <path d="M2 12h20" stroke="currentColor" stroke-width="2"/>
+                <path d="M4.5 7.5c2.5-2 5.1-3 7.5-3s5 1 7.5 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M4.5 16.5c2.5 2 5.1 3 7.5 3s5-1 7.5-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="mi-highlight-text">
+            <strong>Pulau-Pulau Nusantara</strong><br>
+            Setiap pulau di Indonesia memiliki karakter budaya yang unik, dipengaruhi oleh kondisi alam, sejarah, dan interaksi antarsuku sejak ratusan tahun lalu.
+        </div>
+    </div>
+
+    <div class="mi-highlight-item">
+        <div class="mi-highlight-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M16 11a4 4 0 1 0-8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M4 20c1.2-3.6 4.3-6 8-6s6.8 2.4 8 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M12 12v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="mi-highlight-text">
+            <strong>Suku-Suku Utama</strong><br>
+            Tiap pulau dihuni oleh beberapa suku besar yang menjadi fondasi budaya setempat, seperti Jawa, Sunda, dan Betawi di Pulau Jawa, atau Dayak di Kalimantan.
+        </div>
+    </div>
+
+    <div class="mi-highlight-item">
+        <div class="mi-highlight-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M6 6v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M6 10h15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M6 14h15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M6 18h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="mi-highlight-text">
+            <strong>Wilayah Budaya</strong><br>
+            Budaya berkembang mengikuti wilayah geografis dan sosial, menciptakan ragam tradisi di setiap provinsi dan daerah adat.
+        </div>
+    </div>
+
+    <div class="mi-highlight-item">
+        <div class="mi-highlight-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M7 20V9l5-3 5 3v11" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M9 20v-6h6v6" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M12 2v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="mi-highlight-text">
+            <strong>Ciri Budaya</strong><br>
+            Keraton, rumah adat, kain tradisional, seni pertunjukan, hingga ritual kepercayaan menjadi penanda identitas budaya di tiap pulau.
+        </div>
+    </div>
+
+    <div class="mi-highlight-item" style="margin-bottom:0;">
+        <div class="mi-highlight-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M12 12a3 3 0 1 0-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M21 20c-1.4-3.2-4.7-5.5-9-5.5S4.4 16.8 3 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M17 7a3 3 0 1 0-2-2.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="mi-highlight-text">
+            <strong>Keragaman Suku</strong><br>
+            Indonesia memiliki lebih dari seribu kelompok etnis yang tersebar di seluruh kepulauan, menjadikannya salah satu negara dengan keragaman budaya terbesar di dunia.
+        </div>
+    </div>
+</div>
+
+
+
 
                         <div class="mi-card-cta">
-                            <h4 class="mi-card-heading" style="font-size: 1.2rem; margin-bottom: 1rem;">Cara Menjelajahi Nusantara</h4>
-                            <p class="mi-card-text" style="margin-bottom: 1.5rem;">
-                                1. Klik wilayah berwarna di peta untuk melihat ringkasan<br>
-                                2. Jelajahi halaman pulau untuk detail lengkap<br>
-                                3. Temukan destinasi dan kuliner yang wajib dicoba
-                            </p>
+<h4 class="mi-card-heading" style="font-size: 1.2rem; margin-bottom: .6rem;">Cara Menjelajahi Nusantara</h4>
+
+<div class="mi-steps" role="list">
+    <div class="mi-step" role="listitem">
+        <div class="mi-step-badge" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 10.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+        </div>
+        <div class="mi-step-body">
+            <div class="mi-step-title">Tekan wilayah di peta</div>
+            <div class="mi-step-desc">Arahkan kursor lalu tekan pulau untuk melihat ringkasan budaya.</div>
+        </div>
+    </div>
+
+    <div class="mi-step" role="listitem">
+        <div class="mi-step-badge" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M6 4h12v16H6z" stroke="currentColor" stroke-width="2"/>
+                <path d="M8 8h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M8 12h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div class="mi-step-body">
+            <div class="mi-step-title">Buka halaman pulau</div>
+            <div class="mi-step-desc">Lihat daftar suku, wilayah budaya, dan ringkasan identitas pulau.</div>
+        </div>
+    </div>
+
+    <div class="mi-step" role="listitem">
+        <div class="mi-step-badge" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.2L5.5 20l2-7L2 9h7l3-7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="mi-step-body">
+            <div class="mi-step-title">Lanjut ke kuis & Permainan</div>
+            <div class="mi-step-desc">Uji pengetahuan suku dan budaya lewat kuis, lalu lanjut belajar per tahapan.</div>
+        </div>
+    </div>
+</div>
+
 
                             <button class="mi-cta-button" onclick="document.getElementById('map-indonesia-section')?.scrollIntoView({behavior:'smooth'})">
                                 <span>Mulai Eksplorasi</span>
@@ -992,7 +1130,6 @@ FULL CSS (REPLACE SEMUA <style> KAMU DENGAN INI)
                         <div class="mi-sources">
                             Sumber data terpercaya:
                             <a target="_blank" rel="noopener" href="https://sipulau.big.go.id/news/11">Badan Informasi Geospasial</a> •
-                            <a target="_blank" rel="noopener" href="https://petabahasa.kemdikbud.go.id/">Peta Bahasa Kemendikbud</a> •
                             <a target="_blank" rel="noopener" href="https://indonesiabaik.id/infografis/sebaran-jumlah-suku-di-indonesia">IndonesiaBaik</a>
                         </div>
                     </div>
@@ -1158,63 +1295,78 @@ FULL JS (REPLACE SEMUA <script> MAP KAMU DENGAN INI)
 
     // Popup dengan data lengkap dari GeoJSON
     function openRegionPopup(latlng, props) {
-        // Data dari GeoJSON - hanya data yang ada di struktur Anda
-        const nama = safeText(props.name || props.nama || 'Wilayah Indonesia');
-        const aksara = safeText(props.aksara || 'Tidak tersedia');
-        const kataKhas = safeText(props.kata_khas || 'Tidak tersedia');
-        const makna = safeText(props.makna || 'Tidak tersedia');
-        const digunakanDi = safeText(props.digunakan_di || 'Tidak tersedia');
-        const warna = props.warna || '#FF6B00';
+// ===== DATA BARU (UNTUK CARD/POPUP) =====
+const pulau = safeText(props.pulau || props.nama || props.name || 'Wilayah Indonesia');
+
+
+// boleh string atau array di geojson
+const sukuUtama = safeText(props.suku_utama || props.sukuUtama || props.suku || '—');
+const wilayahBudaya = safeText(props.wilayah_utama || props.wilayahBudaya || '—');
+const ciriBudaya = safeText(props.ciri_budaya || props.ciriBudaya || '—');
+
+
+const warna = props.warna || '#FF6B00';
+
 
         const content = `
             <div class="mi-popup-card">
                 <div class="mi-popup-header">
-                    <div class="mi-popup-icon" style="background: linear-gradient(135deg, ${warna}, ${warna}99);">📍</div>
-                    <div class="mi-popup-title">${nama}</div>
-                </div>
+<div class="mi-popup-icon" style="background: linear-gradient(135deg, ${warna}, ${warna}99);">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11Z" stroke="currentColor" stroke-width="2"/>
+        <path d="M12 10.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" stroke="currentColor" stroke-width="2"/>
+    </svg>
+</div>
+
+<div class="mi-popup-title">${pulau}</div>
+
+</div>
 
                 <div class="mi-popup-divider"></div>
 
                 <div class="mi-popup-content">
-                    <div class="mi-popup-item">
-                        <div class="mi-popup-label">Aksara</div>
-                        <div class="mi-popup-value">${aksara}</div>
-                    </div>
+    <div class="mi-popup-item">
+        <div class="mi-popup-label">Pulau</div>
+        <div class="mi-popup-value">${pulau}</div>
+    </div>
 
-                    <div class="mi-popup-item">
-                        <div class="mi-popup-label">Kata Khas</div>
-                        <div class="mi-popup-value">${kataKhas}</div>
-                    </div>
+    <div class="mi-popup-item">
+        <div class="mi-popup-label">Suku Utama</div>
+        <div class="mi-popup-value">${sukuUtama}</div>
+    </div>
 
-                    <div class="mi-popup-item">
-                        <div class="mi-popup-label">Makna</div>
-                        <div class="mi-popup-value">${makna}</div>
-                    </div>
+    <div class="mi-popup-item">
+        <div class="mi-popup-label">Wilayah Budaya</div>
+        <div class="mi-popup-value">${wilayahBudaya}</div>
+    </div>
 
-                    <div class="mi-popup-item">
-                        <div class="mi-popup-label">Digunakan di</div>
-                        <div class="mi-popup-value">${digunakanDi}</div>
-                    </div>
-                </div>
+    <div class="mi-popup-item">
+        <div class="mi-popup-label">Ciri Budaya</div>
+        <div class="mi-popup-value">${ciriBudaya}</div>
+    </div>
+</div>
 
                 <div class="mi-popup-note">
-                    Klik wilayah lain untuk menjelajahi kekayaan Nusantara lainnya
+                    Tekan wilayah lain untuk menjelajahi kekayaan Nusantara lainnya
                 </div>
             </div>`;
 
-        // Mobile optimization
-        const popupOptions = {
-            closeButton: true,
-            maxWidth: isMobileDevice() ? 300 : 420,
-            minWidth: isMobileDevice() ? 240 : 320,
-            autoClose: true,
-            closeOnClick: true,
-            keepInView: true,
-            className: 'mi-custom-popup',
-            autoPanPadding: isMobileDevice() ? [20, 20] : [50, 50],
-            autoPanPaddingTopLeft: isMobileDevice() ? [10, 10] : null,
-            autoPanPaddingBottomRight: isMobileDevice() ? [10, 10] : null
-        };
+            const popupOptions = {
+  closeButton: true,
+  maxWidth: isMobileDevice() ? 320 : 420,
+  minWidth: isMobileDevice() ? 240 : 320,
+  maxHeight: isMobileDevice() ? Math.round(window.innerHeight * 0.72) : null,
+
+  autoClose: true,
+  closeOnClick: true,
+  keepInView: true,
+  className: 'mi-custom-popup',
+
+  autoPanPadding: isMobileDevice() ? [14, 14] : [50, 50],
+  autoPanPaddingTopLeft: isMobileDevice() ? [10, 10] : null,
+  autoPanPaddingBottomRight: isMobileDevice() ? [10, 10] : null
+};
+
 
         const popup = L.popup(popupOptions)
             .setLatLng(latlng)
@@ -1260,11 +1412,16 @@ FULL JS (REPLACE SEMUA <script> MAP KAMU DENGAN INI)
                 const nama = props.name || props.nama || 'Pulau';
 
                 const tooltipHtml = `
-                  <div class="mi-hover-card">
-                      <div class="mi-hover-icon">📍</div>
-                      <div class="mi-hover-title">${nama}</div>
-                  </div>
-                `;
+  <div class="mi-hover-card">
+      <div class="mi-hover-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 10.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" stroke="currentColor" stroke-width="2"/>
+          </svg>
+      </div>
+      <div class="mi-hover-title">${nama}</div>
+  </div>
+`;
 
                 l.bindTooltip(tooltipHtml, {
                     direction: 'top',
@@ -1301,11 +1458,12 @@ FULL JS (REPLACE SEMUA <script> MAP KAMU DENGAN INI)
     }
 
     // ===== LAYERS CONTROL =====
-    const baseChoices = {};
-    if (maptilerSatellite) baseChoices['Satellite (MapTiler)'] = maptilerSatellite;
-    if (maptilerLight) baseChoices['Light (MapTiler)'] = maptilerLight;
-    if (maptilerDark) baseChoices['Dark (MapTiler)'] = maptilerDark;
-    baseChoices['OpenStreetMap'] = osmTiles;
+const baseChoices = {};
+if (maptilerSatellite) baseChoices['Satelit (MapTiler)'] = maptilerSatellite;
+if (maptilerLight) baseChoices['Terang (MapTiler)'] = maptilerLight;
+if (maptilerDark) baseChoices['Gelap (MapTiler)'] = maptilerDark;
+baseChoices['OpenStreetMap'] = osmTiles;
+
 
     const overlays = {};
 
@@ -1503,17 +1661,23 @@ FULL JS (REPLACE SEMUA <script> MAP KAMU DENGAN INI)
                 className: 'mi-mobile-hint'
             })
             .setLatLng(INITIAL_VIEW.center)
-            .setContent(`
-                <div style="padding: 15px; text-align: center;">
-                    <div style="font-size: 24px; margin-bottom: 10px;">📍</div>
-                    <div style="font-weight: bold; margin-bottom: 5px;">Tips Mobile:</div>
-                    <div style="font-size: 14px;">
-                        • Sentuh pulau untuk info<br>
-                        • Geser dengan 2 jari untuk zoom<br>
-                        • Geser dengan 1 jari untuk pan
-                    </div>
-                </div>
-            `);
+.setContent(`
+    <div style="padding: 15px; text-align: center;">
+        <div style="margin-bottom: 10px; display:flex; justify-content:center;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 10.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+        </div>
+        <div style="font-weight: 800; margin-bottom: 6px;">Panduan di Ponsel</div>
+        <div style="font-size: 14px; line-height: 1.6;">
+            • Sentuh wilayah untuk melihat informasi<br>
+            • Cubit dengan dua jari untuk memperbesar/perkecil<br>
+            • Geser satu jari untuk menggeser peta
+        </div>
+    </div>
+`);
+
 
             // Only show hint on first visit
             if (!localStorage.getItem('mapHintShown')) {

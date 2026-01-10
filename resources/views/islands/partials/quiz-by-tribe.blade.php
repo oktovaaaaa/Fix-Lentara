@@ -14,9 +14,6 @@
         Belum ada kuis untuk suku <b>{{ $tribeName }}</b>.
     </p>
 @else
-    <x-quiz.neon
-        :quiz="$activeQuiz"
-        :contextLabel="$tribeName"
-        storagePrefix="storage/"
-    />
+@include('partials.quiz-section', ['quiz' => $activeQuiz])
+
 @endif

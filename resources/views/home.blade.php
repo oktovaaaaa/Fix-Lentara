@@ -99,637 +99,7 @@
                 }
             </style>
 
-            {{-- ================= ISLANDS LIST / JELAJAH PULAU ================= --}}
-            <section id="islands" class="py-12">
-                <h2 class="neon-title">
-                    Jelajahi Pulau-Pulau Indonesia
-                </h2>
-                <div class="title-decoration"></div>
-                <p class="neon-subtitle">
-                    Pilih salah satu pulau untuk melihat budaya, suku, tradisi, destinasi, dan kuliner khasnya.
-                    Konten tiap pulau bisa kamu kembangkan dari 3 suku utama yang kamu pilih.
-                </p>
 
-                {{-- CARD + MODAL STYLE dengan NEON seperti Quiz --}}
-                <style>
-                    /* =========================================================
-                       NEON RING BORDER (ANIM) - SAMA PERSIS DENGAN QUIZ
-                    ========================================================= */
-                    @property --neon-angle {
-                        syntax: "<angle>";
-                        inherits: false;
-                        initial-value: 0deg;
-                    }
-
-                    /* ===== Card Look ===== */
-                    #islands .nus-card {
-                        position: relative;
-                        border-radius: 26px;
-                        padding: 20px;
-                        background: linear-gradient(145deg, var(--card-bg), var(--card-bg-dark));
-                        box-shadow:
-                            0 0 0 1px rgba(255, 255, 255, 0.06),
-                            0 30px 60px rgba(0, 0, 0, 0.45);
-                        border: 1px solid rgba(255, 107, 0, 0.2);
-                        overflow: hidden;
-                        transition: all 0.3s ease;
-                        cursor: pointer;
-                    }
-
-                    /* Dark mode adjustment */
-                    html[data-theme="dark"] #islands .nus-card {
-                        background: linear-gradient(145deg, #111827, #020617);
-                    }
-
-                    html[data-theme="light"] #islands .nus-card {
-                        background: linear-gradient(145deg, #ffffff, #f8fafc);
-                    }
-
-                    /* EFEK NEON BORDER SAMA PERSIS QUIZ */
-                    #islands .nus-card::before {
-                        content: "";
-                        position: absolute;
-                        inset: -6px;
-                        border-radius: inherit;
-                        padding: 10px;
-                        pointer-events: none;
-                        z-index: 0;
-                        background: conic-gradient(
-                            from var(--neon-angle),
-                            rgba(249, 115, 22, 0) 0deg,
-                            rgba(249, 115, 22, 0.20) 22deg,
-                            #f97316 55deg,
-                            #22d3ee 110deg,
-                            #34d399 165deg,
-                            rgba(34, 211, 238, 0.20) 220deg,
-                            #f97316 300deg,
-                            rgba(249, 115, 22, 0) 360deg
-                        );
-                        -webkit-mask:
-                            linear-gradient(#000 0 0) content-box,
-                            linear-gradient(#000 0 0);
-                        -webkit-mask-composite: xor;
-                        mask-composite: exclude;
-                        filter: blur(6px);
-                        opacity: 0;
-                        transition: opacity 0.4s ease;
-                        animation: neon-spin 7.5s linear infinite paused;
-                    }
-
-                    #islands .nus-card:hover::before {
-                        opacity: 0.95;
-                        animation-play-state: running;
-                    }
-
-                    @keyframes neon-spin {
-                        to {
-                            --neon-angle: 360deg;
-                        }
-                    }
-
-                    /* pastikan semua konten di atas neon ring */
-                    #islands .nus-card > * {
-                        position: relative;
-                        z-index: 1;
-                    }
-
-                    /* Efek hover card */
-                    #islands .nus-card:hover {
-                        transform: translateY(-8px);
-                        box-shadow:
-                            0 40px 80px rgba(0, 0, 0, 0.55),
-                            0 0 0 1px rgba(255, 107, 0, 0.3);
-                    }
-
-                    /* Dark mode hover adjustment */
-                    html[data-theme="dark"] #islands .nus-card:hover {
-                        box-shadow:
-                            0 40px 80px rgba(0, 0, 0, 0.7),
-                            0 0 0 1px rgba(255, 107, 0, 0.4);
-                    }
-
-                    /* ANIMASI KLIK NEON */
-                    #islands .nus-card:active::before {
-                        opacity: 1;
-                        filter: blur(8px);
-                        background: conic-gradient(
-                            from var(--neon-angle),
-                            rgba(249, 115, 22, 0) 0deg,
-                            #f97316 30deg,
-                            #22d3ee 90deg,
-                            #34d399 150deg,
-                            #22d3ee 210deg,
-                            #f97316 270deg,
-                            rgba(249, 115, 22, 0) 360deg
-                        );
-                    }
-
-                    #islands .nus-card:active {
-                        animation: card-pulse 0.3s ease-out;
-                    }
-
-                    @keyframes card-pulse {
-                        0% {
-                            transform: translateY(-8px) scale(1);
-                        }
-                        50% {
-                            transform: translateY(-8px) scale(0.98);
-                            box-shadow:
-                                0 50px 100px rgba(249, 115, 22, 0.3),
-                                0 0 30px rgba(249, 115, 22, 0.4);
-                        }
-                        100% {
-                            transform: translateY(-8px) scale(1);
-                        }
-                    }
-
-                    #islands .nus-card-title {
-                        font-weight: 800;
-                        letter-spacing: -0.02em;
-                        color: var(--txt-body);
-                        font-size: 1.5rem;
-                        margin-bottom: 0.75rem;
-                        background: linear-gradient(90deg, var(--txt-body), color-mix(in srgb, var(--txt-body) 70%, transparent));
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                    }
-
-                    #islands .nus-card-link {
-                        color: #ff6b00;
-                        font-weight: 700;
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 0.5rem;
-                        transition: all 0.3s ease;
-                    }
-                    #islands .nus-card-link:hover {
-                        color: #ff8c42;
-                        transform: translateX(3px);
-                        text-shadow: 0 0 10px rgba(255, 107, 0, 0.5);
-                    }
-
-                    /* ===== Island image dengan efek cahaya statis ===== */
-                    #islands .island-thumb {
-                        width: 100%;
-                        border-radius: 16px;
-                        overflow: hidden;
-                        border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
-                        background: linear-gradient(145deg, var(--card-bg), var(--card-bg-dark));
-                        cursor: zoom-in;
-                        position: relative;
-                        margin-bottom: 1rem;
-                        isolation: isolate;
-                    }
-
-                    /* Dark/Light mode adjustment for thumb */
-                    html[data-theme="dark"] #islands .island-thumb {
-                        background: linear-gradient(145deg, #111827, #020617);
-                    }
-
-                    html[data-theme="light"] #islands .island-thumb {
-                        background: linear-gradient(145deg, #ffffff, #f8fafc);
-                    }
-
-                    /* CAHAYA STATIS TEBAL DARI BERBAGAI SISI */
-                    #islands .island-thumb::before {
-                        content: "";
-                        position: absolute;
-                        inset: -3px;
-                        background:
-                            radial-gradient(circle at top left, rgba(249, 115, 22, 0.4), transparent 55%),
-                            radial-gradient(circle at top right, rgba(34, 211, 238, 0.3), transparent 55%),
-                            radial-gradient(circle at bottom left, rgba(52, 211, 153, 0.25), transparent 55%),
-                            radial-gradient(circle at bottom right, rgba(249, 115, 22, 0.3), transparent 55%),
-                            radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent 70%);
-                        filter: blur(15px);
-                        opacity: 0;
-                        transition: opacity 0.4s ease;
-                        z-index: 1;
-                        border-radius: 19px;
-                    }
-
-                    #islands .island-thumb:hover::before {
-                        opacity: 1;
-                    }
-
-                    #islands .island-thumb img {
-                        width: 100%;
-                        height: 200px;
-                        object-fit: contain;
-                        display: block;
-                        transform: scale(1);
-                        transition: transform 0.3s ease;
-                        padding: 15px;
-                        position: relative;
-                        z-index: 2;
-                        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
-                    }
-
-                    #islands .island-thumb:hover img {
-                        transform: scale(1.08);
-                    }
-
-                    #islands .thumb-hint {
-                        position: absolute;
-                        right: 10px;
-                        bottom: 10px;
-                        font-size: 11px;
-                        padding: 5px 10px;
-                        border-radius: 999px;
-                        border: 1px solid rgba(249, 115, 22, 0.3);
-                        background: rgba(17, 24, 39, 0.85);
-                        color: #f97316;
-                        backdrop-filter: blur(6px);
-                        z-index: 3;
-                        transition: all 0.3s ease;
-                    }
-
-                    /* Dark/Light mode adjustment for hint */
-                    html[data-theme="dark"] #islands .thumb-hint {
-                        background: rgba(17, 24, 39, 0.85);
-                    }
-
-                    html[data-theme="light"] #islands .thumb-hint {
-                        background: rgba(255, 255, 255, 0.85);
-                        color: #b7410e;
-                        border-color: rgba(183, 65, 14, 0.3);
-                    }
-
-                    #islands .island-thumb:hover .thumb-hint {
-                        background: rgba(249, 115, 22, 0.9);
-                        color: white;
-                        border-color: #fb923c;
-                        transform: translateY(-2px);
-                        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-                    }
-
-                    /* ANIMASI KLIK PADA THUMB */
-                    #islands .island-thumb:active {
-                        animation: thumb-click 0.3s ease;
-                    }
-
-                    @keyframes thumb-click {
-                        0% { transform: scale(1); }
-                        50% {
-                            transform: scale(0.98);
-                            box-shadow: 0 0 40px 20px rgba(249, 115, 22, 0.3);
-                        }
-                        100% { transform: scale(1); }
-                    }
-
-                    /* ===== Modal (popup) dengan efek neon sama ===== */
-                    #island-modal-backdrop {
-                        display: none;
-                        backdrop-filter: blur(12px);
-                        background: rgba(0, 0, 0, 0.8);
-                    }
-                    #island-modal-backdrop.is-open {
-                        display: flex;
-                    }
-
-                    #island-modal {
-                        position: relative;
-                        border-radius: 26px;
-                        background: linear-gradient(145deg, var(--card-bg), var(--card-bg-dark));
-                        color: var(--txt-body);
-                        box-shadow:
-                            0 0 0 1px rgba(255, 255, 255, 0.06),
-                            0 30px 60px rgba(0, 0, 0, 0.55);
-                        border: 1px solid rgba(249, 115, 22, 0.2);
-                        transform: translateY(12px) scale(.97);
-                        opacity: 0;
-                        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-                        overflow: hidden;
-                        max-width: 900px;
-                        width: 90%;
-                    }
-
-                    /* Dark/Light mode adjustment for modal */
-                    html[data-theme="dark"] #island-modal {
-                        background: linear-gradient(145deg, #111827, #020617);
-                    }
-
-                    html[data-theme="light"] #island-modal {
-                        background: linear-gradient(145deg, #ffffff, #f8fafc);
-                    }
-
-                    /* NEON BORDER UNTUK MODAL JUGA */
-                    #island-modal::before {
-                        content: "";
-                        position: absolute;
-                        inset: -6px;
-                        border-radius: inherit;
-                        padding: 10px;
-                        pointer-events: none;
-                        z-index: 0;
-                        background: conic-gradient(
-                            from var(--neon-angle),
-                            rgba(249, 115, 22, 0) 0deg,
-                            rgba(249, 115, 22, 0.20) 22deg,
-                            #f97316 55deg,
-                            #22d3ee 110deg,
-                            #34d399 165deg,
-                            rgba(34, 211, 238, 0.20) 220deg,
-                            #f97316 300deg,
-                            rgba(249, 115, 22, 0) 360deg
-                        );
-                        -webkit-mask:
-                            linear-gradient(#000 0 0) content-box,
-                            linear-gradient(#000 0 0);
-                        -webkit-mask-composite: xor;
-                        mask-composite: exclude;
-                        filter: blur(6px);
-                        opacity: 0.8;
-                        animation: neon-spin 7.5s linear infinite;
-                    }
-
-                    #island-modal-backdrop.is-open #island-modal {
-                        transform: translateY(0) scale(1);
-                        opacity: 1;
-                    }
-
-                    /* Konten modal di atas neon */
-                    #island-modal > * {
-                        position: relative;
-                        z-index: 1;
-                    }
-
-                    #island-modal-title {
-                        color: var(--txt-body);
-                        font-size: 1.8rem;
-                        font-weight: 800;
-                        background: linear-gradient(90deg, #f97316, #22d3ee, #34d399);
-                        -webkit-background-clip: text;
-                        -webkit-text-fill-color: transparent;
-                        animation: neon-glow 3s ease-in-out infinite;
-                        background-size: 200% auto;
-                    }
-
-                    #island-modal-subtitle {
-                        color: var(--muted);
-                        font-size: 1rem;
-                    }
-
-                    #island-modal-image {
-                        width: 100%;
-                        height: min(65vh, 500px);
-                        object-fit: contain;
-                        background:
-                            linear-gradient(145deg, var(--card-bg), var(--card-bg-dark)),
-                            radial-gradient(circle at top left, rgba(249, 115, 22, 0.2), transparent 40%),
-                            radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.2), transparent 40%);
-                        display: block;
-                        padding: 25px;
-                        border-radius: 12px;
-                        margin: 0 auto;
-                        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
-                    }
-
-                    /* Dark/Light mode adjustment for modal image */
-                    html[data-theme="dark"] #island-modal-image {
-                        background: linear-gradient(145deg, #111827, #020617),
-                                   radial-gradient(circle at top left, rgba(249, 115, 22, 0.2), transparent 40%),
-                                   radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.2), transparent 40%);
-                    }
-
-                    html[data-theme="light"] #island-modal-image {
-                        background: linear-gradient(145deg, #ffffff, #f8fafc),
-                                   radial-gradient(circle at top left, rgba(249, 115, 22, 0.1), transparent 40%),
-                                   radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.1), transparent 40%);
-                    }
-
-                    .island-modal-close {
-                        width: 44px;
-                        height: 44px;
-                        border-radius: 999px;
-                        display: grid;
-                        place-items: center;
-                        border: 1px solid rgba(249, 115, 22, 0.3);
-                        background: rgba(17, 24, 39, 0.9);
-                        color: #f97316;
-                        transition: all 0.2s ease;
-                        font-size: 1.2rem;
-                        position: relative;
-                        overflow: hidden;
-                        z-index: 2;
-                    }
-
-                    /* Dark/Light mode adjustment for close button */
-                    html[data-theme="dark"] .island-modal-close {
-                        background: rgba(17, 24, 39, 0.9);
-                    }
-
-                    html[data-theme="light"] .island-modal-close {
-                        background: rgba(255, 255, 255, 0.9);
-                        color: #b7410e;
-                        border-color: rgba(183, 65, 14, 0.3);
-                    }
-
-                    .island-modal-close:hover {
-                        transform: translateY(-2px);
-                        border-color: #f97316;
-                        color: white;
-                        background: rgba(249, 115, 22, 0.9);
-                    }
-
-                    /* Tombol Buka Gambar Lengkap dengan efek neon */
-                    #island-modal-open-new {
-                        position: relative;
-                        overflow: hidden;
-                    }
-
-                    #island-modal-open-new::before {
-                        content: "";
-                        position: absolute;
-                        inset: -2px;
-                        border-radius: inherit;
-                        background: conic-gradient(
-                            from var(--neon-angle),
-                            rgba(249, 115, 22, 0) 0deg,
-                            rgba(249, 115, 22, 0.30) 22deg,
-                            #f97316 55deg,
-                            #22d3ee 110deg,
-                            rgba(34, 211, 238, 0.30) 220deg,
-                            #f97316 300deg,
-                            rgba(249, 115, 22, 0) 360deg
-                        );
-                        z-index: -1;
-                        opacity: 0.7;
-                        animation: neon-spin 4s linear infinite;
-                    }
-                </style>
-
-                @php
-                    $islandCards = [
-                        [
-                            'key'  => 'sumatera',
-                            'name' => 'Sumatera',
-                            'desc' => 'Jejak kerajaan maritim, ragam adat, dan kuliner rempah yang kuat—dari pesisir hingga dataran tinggi.',
-                            'href' => url('/islands/sumatera'),
-                            'img'  => asset('images/pulau/sumatera.PNG'),
-                        ],
-                        [
-                            'key'  => 'jawa',
-                            'name' => 'Jawa',
-                            'desc' => 'Pusat sejarah & kebudayaan: keraton, batik, seni pertunjukan, serta ragam bahasa daerah yang hidup.',
-                            'href' => url('/islands/jawa'),
-                            'img'  => asset('images/pulau/jawa.PNG'),
-                        ],
-                        [
-                            'key'  => 'kalimantan',
-                            'name' => 'Kalimantan',
-                            'desc' => 'Bentang hutan tropis dan sungai besar, dengan tradisi Dayak yang beragam dan kaya simbol.',
-                            'href' => url('/islands/kalimantan'),
-                            'img'  => asset('images/pulau/kalimantan.PNG'),
-                        ],
-                        [
-                            'key'  => 'sulawesi',
-                            'name' => 'Sulawesi',
-                            'desc' => 'Persimpangan budaya maritim & pegunungan—ritual, rumah adat, dan tradisi pelayaran yang kuat.',
-                            'href' => url('/islands/sulawesi'),
-                            'img'  => asset('images/pulau/sulawesi.PNG'),
-                        ],
-                        [
-                            'key'  => 'bali-nusa-tenggara',
-                            'name' => 'Bali & Nusa Tenggara',
-                            'desc' => 'Ritual dan seni yang kuat, lanskap vulkanik, pesisir, hingga savana—ragam budaya pulau-pulau kecil.',
-                            'href' => url('/islands/bali-nusa-tenggara'),
-                            'img'  => asset('images/pulau/sunda kecil.PNG'),
-                        ],
-                        [
-                            'key'  => 'papua-maluku',
-                            'name' => 'Papua & Maluku',
-                            'desc' => 'Kawasan timur dengan kekayaan bahasa, tradisi, dan bentang alam ikonik—dari kepulauan rempah hingga pegunungan.',
-                            'href' => url('/islands/papua-maluku'),
-                            'img'  => asset('images/pulau/papua dan maluku.PNG'),
-                        ],
-                    ];
-                @endphp
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach ($islandCards as $c)
-                        <div class="nus-card text-[var(--txt-body)]">
-                            {{-- THUMB (klik -> modal) --}}
-                            <button type="button"
-                                    class="island-thumb w-full"
-                                    data-island-modal="1"
-                                    data-title="{{ $c['name'] }}"
-                                    data-desc="{{ $c['desc'] }}"
-                                    data-img="{{ $c['img'] }}"
-                                    aria-label="Lihat gambar {{ $c['name'] }}">
-                                <img src="{{ $c['img'] }}"
-                                     alt="Peta 3D {{ $c['name'] }}"
-                                     loading="lazy">
-                                <span class="thumb-hint">Klik untuk zoom</span>
-                            </button>
-
-                            <h3 class="nus-card-title">
-                                {{ $c['name'] }}
-                            </h3>
-
-                            <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed mb-4">
-                                {{ $c['desc'] }}
-                            </p>
-
-                            <a href="{{ $c['href'] }}" class="nus-card-link text-sm">
-                                Selengkapnya
-                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M8 1v14M1 8h14"/>
-                                </svg>
-                            </a>
-                        </div>
-                    @endforeach
-                </div>
-
-                {{-- MODAL POPUP (gambar pulau) --}}
-                <div id="island-modal-backdrop"
-                     class="fixed inset-0 z-50 items-center justify-center px-4"
-                     aria-hidden="true">
-                    <div id="island-modal" class="w-full">
-                        <div class="flex items-start justify-between gap-4 p-6 border-b"
-                             style="border-color: rgba(249, 115, 22, 0.2);">
-                            <div>
-                                <h3 id="island-modal-title" class="text-xl sm:text-2xl font-extrabold">Detail Pulau</h3>
-                                <p id="island-modal-subtitle" class="text-sm mt-1"></p>
-                            </div>
-
-                            <button type="button"
-                                    class="island-modal-close"
-                                    id="island-modal-close"
-                                    aria-label="Tutup">
-                                ✕
-                            </button>
-                        </div>
-
-                        <img id="island-modal-image" src="" alt="Gambar Pulau" />
-
-                        <div class="p-6">
-                            <div class="flex items-center justify-between gap-3">
-                                <p class="text-xs text-[var(--muted)]">
-                                    Tip: tekan <strong>Esc</strong> atau klik area gelap untuk menutup.
-                                </p>
-                                <button type="button"
-                                        id="island-modal-open-new"
-                                        class="text-sm font-bold px-4 py-2 rounded-lg transition-all hover:scale-105 active:scale-95 relative overflow-hidden"
-                                        style="background: linear-gradient(135deg, #f97316, #fb923c); color: white; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);">
-                                    <span class="relative z-2">Buka Gambar Lengkap</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- SCRIPT MODAL (ringan, no library) --}}
-                <script>
-                    (function () {
-                        const backdrop = document.getElementById('island-modal-backdrop');
-                        const modalImg = document.getElementById('island-modal-image');
-                        const modalTitle = document.getElementById('island-modal-title');
-                        const modalSub = document.getElementById('island-modal-subtitle');
-                        const closeBtn = document.getElementById('island-modal-close');
-                        const openNewBtn = document.getElementById('island-modal-open-new');
-
-                        if (!backdrop || !modalImg || !modalTitle || !modalSub || !closeBtn || !openNewBtn) return;
-
-                        function openModal({ title, desc, img }) {
-                            modalTitle.textContent = title || 'Detail Pulau';
-                            modalSub.textContent = desc || '';
-                            modalImg.src = img || '';
-                            modalImg.alt = title ? ('Peta 3D ' + title) : 'Gambar Pulau';
-                            openNewBtn.onclick = () => {
-                                if (img) window.open(img, '_blank');
-                            };
-
-                            backdrop.classList.add('is-open');
-                            document.body.classList.add('overflow-hidden');
-                        }
-
-                        function closeModal() {
-                            backdrop.classList.remove('is-open');
-                            document.body.classList.remove('overflow-hidden');
-                            modalImg.src = '';
-                        }
-
-                        document.querySelectorAll('#islands [data-island-modal="1"]').forEach(btn => {
-                            btn.addEventListener('click', () => {
-                                openModal({
-                                    title: btn.getAttribute('data-title'),
-                                    desc: btn.getAttribute('data-desc'),
-                                    img: btn.getAttribute('data-img'),
-                                });
-                            });
-                        });
-
-                        closeBtn.addEventListener('click', closeModal);
-                        backdrop.addEventListener('click', (e) => {
-                            if (e.target === backdrop) closeModal();
-                        });
-                        document.addEventListener('keydown', (e) => {
-                            if (e.key === 'Escape') closeModal();
-                        });
-                    })();
-                </script>
-            </section>
 
             {{-- ================= ABOUT INDONESIA (SINGLE CARD LAYOUT) ================= --}}
             <section id="about" class="py-12">
@@ -1372,6 +742,8 @@
                 </div>
             </section>
 
+
+
             {{-- ================= HISTORY SECTION: Sejarah Nama Pulau di Indonesia ================= --}}
             <section id="history" class="history-section py-12">
                 <style>
@@ -1739,941 +1111,1650 @@
                 </div>
             </section>
 
-                {{-- ================= STATISTIK INDONESIA (NEON THEME) ================= --}}
-                <section id="stats" class="py-12">
-                    <h2 class="neon-title">
-                        Statistik Budaya Indonesia
-                    </h2>
-                    <div class="title-decoration"></div>
-                    <p class="neon-subtitle">
-                        Ringkasan keragaman Indonesia: jumlah pulau, warisan budaya takbenda yang diakui
-                        UNESCO, serta dinamika jumlah penduduk.
-                    </p>
+                        {{-- ================= ISLANDS LIST / JELAJAH PULAU ================= --}}
+            <section id="islands" class="py-12">
+                <h2 class="neon-title">
+                    Jelajahi Pulau-Pulau Indonesia
+                </h2>
+                <div class="title-decoration"></div>
+<div class="neon-subtitle">
+    <p>
+        Setiap pulau di Indonesia menyimpan keragaman suku, budaya, dan cara hidup yang berbeda. Di balik bentang alamnya, terdapat sejarah, tradisi, dan kebiasaan yang tumbuh bersama masyarakatnya dari generasi ke generasi. Nusantara bukan sekadar kumpulan pulau, melainkan ruang hidup yang kaya akan identitas dan makna.
+    </p>
 
-                    {{-- CSS STATISTIK DENGAN EFEK NEON --}}
-                    <style>
-                        /* =========================================================
-                        NEON RING BORDER SAMA PERSIS DENGAN QUIZ DAN PULAU
-                        ========================================================= */
-                        @property --neon-angle {
-                            syntax: "<angle>";
-                            inherits: false;
-                            initial-value: 0deg;
+    <p class="mt-5">
+        Melalui Lentara, kamu dapat menjelajahi pulau-pulau Nusantara untuk memahami suku-suku utama yang membentuk tradisi, sejarah, destinasi, dan kuliner khas setiap daerah. Setiap pulau dikembangkan sebagai ruang pembelajaran yang terus berkembang, membuka lapisan demi lapisan pengetahuan tentang Nusantara secara utuh dan berkelanjutan.
+    </p>
+</div>
+
+
+                {{-- CARD + MODAL STYLE dengan NEON seperti Quiz --}}
+                <style>
+                    /* =========================================================
+                       NEON RING BORDER (ANIM) - SAMA PERSIS DENGAN QUIZ
+                    ========================================================= */
+                    @property --neon-angle {
+                        syntax: "<angle>";
+                        inherits: false;
+                        initial-value: 0deg;
+                    }
+
+                    /* ===== Card Look ===== */
+                    #islands .nus-card {
+                        position: relative;
+                        border-radius: 26px;
+                        padding: 20px;
+                        background: linear-gradient(145deg, var(--card-bg), var(--card-bg-dark));
+                        box-shadow:
+                            0 0 0 1px rgba(255, 255, 255, 0.06),
+                            0 30px 60px rgba(0, 0, 0, 0.45);
+                        border: 1px solid rgba(255, 107, 0, 0.2);
+                        overflow: hidden;
+                        transition: all 0.3s ease;
+                        cursor: pointer;
+                    }
+
+                    /* Dark mode adjustment */
+                    html[data-theme="dark"] #islands .nus-card {
+                        background: linear-gradient(145deg, #111827, #020617);
+                    }
+
+                    html[data-theme="light"] #islands .nus-card {
+                        background: linear-gradient(145deg, #ffffff, #f8fafc);
+                    }
+
+                    /* EFEK NEON BORDER SAMA PERSIS QUIZ */
+                    #islands .nus-card::before {
+                        content: "";
+                        position: absolute;
+                        inset: -6px;
+                        border-radius: inherit;
+                        padding: 10px;
+                        pointer-events: none;
+                        z-index: 0;
+                        background: conic-gradient(
+                            from var(--neon-angle),
+                            rgba(249, 115, 22, 0) 0deg,
+                            rgba(249, 115, 22, 0.20) 22deg,
+                            #f97316 55deg,
+                            #22d3ee 110deg,
+                            #34d399 165deg,
+                            rgba(34, 211, 238, 0.20) 220deg,
+                            #f97316 300deg,
+                            rgba(249, 115, 22, 0) 360deg
+                        );
+                        -webkit-mask:
+                            linear-gradient(#000 0 0) content-box,
+                            linear-gradient(#000 0 0);
+                        -webkit-mask-composite: xor;
+                        mask-composite: exclude;
+                        filter: blur(6px);
+                        opacity: 0;
+                        transition: opacity 0.4s ease;
+                        animation: neon-spin 7.5s linear infinite paused;
+                    }
+
+                    #islands .nus-card:hover::before {
+                        opacity: 0.95;
+                        animation-play-state: running;
+                    }
+
+                    @keyframes neon-spin {
+                        to {
+                            --neon-angle: 360deg;
                         }
+                    }
 
-                        /* ================= STAT CARD UTAMA ================= */
-                        #stats .stat-card {
-                            position: relative;
-                            border-radius: 26px;
-                            padding: 1.5rem;
-                            overflow: hidden;
-                            cursor: pointer;
-                            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-                            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                    /* pastikan semua konten di atas neon ring */
+                    #islands .nus-card > * {
+                        position: relative;
+                        z-index: 1;
+                    }
 
-                            /* Base gradient background */
-                            background: linear-gradient(135deg,
-                                rgba(249, 115, 22, 0.9),
-                                rgba(34, 211, 238, 0.8),
-                                rgba(52, 211, 153, 0.9)
-                            );
-                            border: 1px solid rgba(255, 255, 255, 0.1);
+                    /* Efek hover card */
+                    #islands .nus-card:hover {
+                        transform: translateY(-8px);
+                        box-shadow:
+                            0 40px 80px rgba(0, 0, 0, 0.55),
+                            0 0 0 1px rgba(255, 107, 0, 0.3);
+                    }
 
-                            opacity: 0;
-                            transform: translateY(20px);
-                            animation: statsFadeUp 0.7s ease-out forwards;
+                    /* Dark mode hover adjustment */
+                    html[data-theme="dark"] #islands .nus-card:hover {
+                        box-shadow:
+                            0 40px 80px rgba(0, 0, 0, 0.7),
+                            0 0 0 1px rgba(255, 107, 0, 0.4);
+                    }
+
+                    /* ANIMASI KLIK NEON */
+                    #islands .nus-card:active::before {
+                        opacity: 1;
+                        filter: blur(8px);
+                        background: conic-gradient(
+                            from var(--neon-angle),
+                            rgba(249, 115, 22, 0) 0deg,
+                            #f97316 30deg,
+                            #22d3ee 90deg,
+                            #34d399 150deg,
+                            #22d3ee 210deg,
+                            #f97316 270deg,
+                            rgba(249, 115, 22, 0) 360deg
+                        );
+                    }
+
+                    #islands .nus-card:active {
+                        animation: card-pulse 0.3s ease-out;
+                    }
+
+                    @keyframes card-pulse {
+                        0% {
+                            transform: translateY(-8px) scale(1);
                         }
-
-                        /* EFEK NEON BORDER SAMA DENGAN QUIZ */
-                        #stats .stat-card::before {
-                            content: "";
-                            position: absolute;
-                            inset: -6px;
-                            border-radius: inherit;
-                            padding: 10px;
-                            pointer-events: none;
-                            z-index: 0;
-                            background: conic-gradient(
-                                from var(--neon-angle),
-                                rgba(249, 115, 22, 0) 0deg,
-                                rgba(249, 115, 22, 0.20) 22deg,
-                                #f97316 55deg,
-                                #22d3ee 110deg,
-                                #34d399 165deg,
-                                rgba(34, 211, 238, 0.20) 220deg,
-                                #f97316 300deg,
-                                rgba(249, 115, 22, 0) 360deg
-                            );
-                            -webkit-mask:
-                                linear-gradient(#000 0 0) content-box,
-                                linear-gradient(#000 0 0);
-                            -webkit-mask-composite: xor;
-                            mask-composite: exclude;
-                            filter: blur(6px);
-                            opacity: 0;
-                            transition: opacity 0.4s ease;
-                            animation: neon-spin 7.5s linear infinite paused;
-                        }
-
-                        #stats .stat-card:hover::before {
-                            opacity: 0.95;
-                            animation-play-state: running;
-                        }
-
-                        @keyframes neon-spin {
-                            to { --neon-angle: 360deg; }
-                        }
-
-                        /* Konten card di atas neon */
-                        #stats .stat-card > * {
-                            position: relative;
-                            z-index: 1;
-                        }
-
-                        /* Efek hover card */
-                        #stats .stat-card:hover {
-                            transform: translateY(-10px) scale(1.02);
+                        50% {
+                            transform: translateY(-8px) scale(0.98);
                             box-shadow:
-                                0 30px 80px rgba(0, 0, 0, 0.4),
-                                0 0 40px rgba(249, 115, 22, 0.3);
+                                0 50px 100px rgba(249, 115, 22, 0.3),
+                                0 0 30px rgba(249, 115, 22, 0.4);
                         }
-
-                        /* Animasi klik */
-                        #stats .stat-card:active {
-                            animation: stat-click 0.3s ease-out;
+                        100% {
+                            transform: translateY(-8px) scale(1);
                         }
+                    }
 
-                        @keyframes stat-click {
-                            0% { transform: translateY(-10px) scale(1.02); }
-                            50% {
-                                transform: translateY(-10px) scale(0.98);
-                                box-shadow:
-                                    0 40px 100px rgba(249, 115, 22, 0.4),
-                                    0 0 60px rgba(249, 115, 22, 0.5);
-                            }
-                            100% { transform: translateY(-10px) scale(1.02); }
+                    #islands .nus-card-title {
+                        font-weight: 800;
+                        letter-spacing: -0.02em;
+                        color: var(--txt-body);
+                        font-size: 1.5rem;
+                        margin-bottom: 0.75rem;
+                        background: linear-gradient(90deg, var(--txt-body), color-mix(in srgb, var(--txt-body) 70%, transparent));
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                    }
+
+                    #islands .nus-card-link {
+                        color: #ff6b00;
+                        font-weight: 700;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        transition: all 0.3s ease;
+                    }
+                    #islands .nus-card-link:hover {
+                        color: #ff8c42;
+                        transform: translateX(3px);
+                        text-shadow: 0 0 10px rgba(255, 107, 0, 0.5);
+                    }
+
+                    /* ===== Island image dengan efek cahaya statis ===== */
+                    #islands .island-thumb {
+                        width: 100%;
+                        border-radius: 16px;
+                        overflow: hidden;
+                        border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+                        background: linear-gradient(145deg, var(--card-bg), var(--card-bg-dark));
+                        cursor: zoom-in;
+                        position: relative;
+                        margin-bottom: 1rem;
+                        isolation: isolate;
+                    }
+
+                    /* Dark/Light mode adjustment for thumb */
+                    html[data-theme="dark"] #islands .island-thumb {
+                        background: linear-gradient(145deg, #111827, #020617);
+                    }
+
+                    html[data-theme="light"] #islands .island-thumb {
+                        background: linear-gradient(145deg, #ffffff, #f8fafc);
+                    }
+
+                    /* CAHAYA STATIS TEBAL DARI BERBAGAI SISI */
+                    #islands .island-thumb::before {
+                        content: "";
+                        position: absolute;
+                        inset: -3px;
+                        background:
+                            radial-gradient(circle at top left, rgba(249, 115, 22, 0.4), transparent 55%),
+                            radial-gradient(circle at top right, rgba(34, 211, 238, 0.3), transparent 55%),
+                            radial-gradient(circle at bottom left, rgba(52, 211, 153, 0.25), transparent 55%),
+                            radial-gradient(circle at bottom right, rgba(249, 115, 22, 0.3), transparent 55%),
+                            radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent 70%);
+                        filter: blur(15px);
+                        opacity: 0;
+                        transition: opacity 0.4s ease;
+                        z-index: 1;
+                        border-radius: 19px;
+                    }
+
+                    #islands .island-thumb:hover::before {
+                        opacity: 1;
+                    }
+
+                    #islands .island-thumb img {
+                        width: 100%;
+                        height: 200px;
+                        object-fit: contain;
+                        display: block;
+                        transform: scale(1);
+                        transition: transform 0.3s ease;
+                        padding: 15px;
+                        position: relative;
+                        z-index: 2;
+                        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+                    }
+
+                    #islands .island-thumb:hover img {
+                        transform: scale(1.08);
+                    }
+
+                    #islands .thumb-hint {
+                        position: absolute;
+                        right: 10px;
+                        bottom: 10px;
+                        font-size: 11px;
+                        padding: 5px 10px;
+                        border-radius: 999px;
+                        border: 1px solid rgba(249, 115, 22, 0.3);
+                        background: rgba(17, 24, 39, 0.85);
+                        color: #f97316;
+                        backdrop-filter: blur(6px);
+                        z-index: 3;
+                        transition: all 0.3s ease;
+                    }
+
+                    /* Dark/Light mode adjustment for hint */
+                    html[data-theme="dark"] #islands .thumb-hint {
+                        background: rgba(17, 24, 39, 0.85);
+                    }
+
+                    html[data-theme="light"] #islands .thumb-hint {
+                        background: rgba(255, 255, 255, 0.85);
+                        color: #b7410e;
+                        border-color: rgba(183, 65, 14, 0.3);
+                    }
+
+                    #islands .island-thumb:hover .thumb-hint {
+                        background: rgba(249, 115, 22, 0.9);
+                        color: white;
+                        border-color: #fb923c;
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+                    }
+
+                    /* ANIMASI KLIK PADA THUMB */
+                    #islands .island-thumb:active {
+                        animation: thumb-click 0.3s ease;
+                    }
+
+                    @keyframes thumb-click {
+                        0% { transform: scale(1); }
+                        50% {
+                            transform: scale(0.98);
+                            box-shadow: 0 0 40px 20px rgba(249, 115, 22, 0.3);
                         }
+                        100% { transform: scale(1); }
+                    }
 
-                        /* Variasi warna untuk setiap card */
-                        #stats .stat-card--red {
-                            background: linear-gradient(135deg,
-                                rgba(249, 115, 22, 0.9),
-                                rgba(220, 38, 38, 0.8),
-                                rgba(251, 146, 60, 0.9)
-                            );
-                        }
+                    /* ===== Modal (popup) dengan efek neon sama ===== */
+                    #island-modal-backdrop {
+                        display: none;
+                        backdrop-filter: blur(12px);
+                        background: rgba(0, 0, 0, 0.8);
+                    }
+                    #island-modal-backdrop.is-open {
+                        display: flex;
+                    }
 
-                        #stats .stat-card--purple {
-                            background: linear-gradient(135deg,
-                                rgba(124, 58, 237, 0.9),
-                                rgba(139, 92, 246, 0.8),
-                                rgba(168, 85, 247, 0.9)
-                            );
-                        }
+                    #island-modal {
+                        position: relative;
+                        border-radius: 26px;
+                        background: linear-gradient(145deg, var(--card-bg), var(--card-bg-dark));
+                        color: var(--txt-body);
+                        box-shadow:
+                            0 0 0 1px rgba(255, 255, 255, 0.06),
+                            0 30px 60px rgba(0, 0, 0, 0.55);
+                        border: 1px solid rgba(249, 115, 22, 0.2);
+                        transform: translateY(12px) scale(.97);
+                        opacity: 0;
+                        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                        overflow: hidden;
+                        max-width: 900px;
+                        width: 90%;
+                    }
 
-                        #stats .stat-card--green {
-                            background: linear-gradient(135deg,
-                                rgba(5, 150, 105, 0.9),
-                                rgba(16, 185, 129, 0.8),
-                                rgba(34, 197, 94, 0.9)
-                            );
-                        }
+                    /* Dark/Light mode adjustment for modal */
+                    html[data-theme="dark"] #island-modal {
+                        background: linear-gradient(145deg, #111827, #020617);
+                    }
 
-                        /* Stat number styling */
-                        #stats .stat-number {
-                            font-size: 3rem;
-                            line-height: 1;
-                            font-weight: 900;
-                            color: white;
-                            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-                            margin-bottom: 0.5rem;
-                        }
+                    html[data-theme="light"] #island-modal {
+                        background: linear-gradient(145deg, #ffffff, #f8fafc);
+                    }
 
-                        #stats .stat-label {
-                            font-size: 1.1rem;
-                            font-weight: 700;
-                            color: rgba(255, 255, 255, 0.95);
-                            margin-bottom: 1rem;
-                        }
+                    /* NEON BORDER UNTUK MODAL JUGA */
+                    #island-modal::before {
+                        content: "";
+                        position: absolute;
+                        inset: -6px;
+                        border-radius: inherit;
+                        padding: 10px;
+                        pointer-events: none;
+                        z-index: 0;
+                        background: conic-gradient(
+                            from var(--neon-angle),
+                            rgba(249, 115, 22, 0) 0deg,
+                            rgba(249, 115, 22, 0.20) 22deg,
+                            #f97316 55deg,
+                            #22d3ee 110deg,
+                            #34d399 165deg,
+                            rgba(34, 211, 238, 0.20) 220deg,
+                            #f97316 300deg,
+                            rgba(249, 115, 22, 0) 360deg
+                        );
+                        -webkit-mask:
+                            linear-gradient(#000 0 0) content-box,
+                            linear-gradient(#000 0 0);
+                        -webkit-mask-composite: xor;
+                        mask-composite: exclude;
+                        filter: blur(6px);
+                        opacity: 0.8;
+                        animation: neon-spin 7.5s linear infinite;
+                    }
 
-                        #stats .stat-card p {
-                            font-size: 0.95rem;
-                            line-height: 1.6;
-                            color: rgba(255, 255, 255, 0.85);
-                            margin-bottom: 1.5rem;
-                        }
+                    #island-modal-backdrop.is-open #island-modal {
+                        transform: translateY(0) scale(1);
+                        opacity: 1;
+                    }
 
-                        #stats .stat-more {
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 8px;
-                            font-size: 0.9rem;
-                            font-weight: 700;
-                            text-transform: uppercase;
-                            letter-spacing: 0.05em;
-                            color: white;
-                            padding: 8px 16px;
-                            border-radius: 12px;
-                            background: rgba(255, 255, 255, 0.15);
-                            backdrop-filter: blur(10px);
-                            border: 1px solid rgba(255, 255, 255, 0.2);
-                            transition: all 0.3s ease;
-                        }
+                    /* Konten modal di atas neon */
+                    #island-modal > * {
+                        position: relative;
+                        z-index: 1;
+                    }
 
-                        #stats .stat-card:hover .stat-more {
-                            background: rgba(255, 255, 255, 0.25);
-                            transform: translateX(5px);
-                            border-color: rgba(255, 255, 255, 0.4);
-                        }
+                    #island-modal-title {
+                        color: var(--txt-body);
+                        font-size: 1.8rem;
+                        font-weight: 800;
+                        background: linear-gradient(90deg, #f97316, #22d3ee, #34d399);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        animation: neon-glow 3s ease-in-out infinite;
+                        background-size: 200% auto;
+                    }
 
-                        #stats .stat-more-icon {
-                            transition: transform 0.3s ease;
-                        }
+                    #island-modal-subtitle {
+                        color: var(--muted);
+                        font-size: 1rem;
+                    }
 
-                        #stats .stat-card:hover .stat-more-icon {
-                            transform: translateX(4px) rotate(45deg);
-                        }
+                    #island-modal-image {
+                        width: 100%;
+                        height: min(65vh, 500px);
+                        object-fit: contain;
+                        background:
+                            linear-gradient(145deg, var(--card-bg), var(--card-bg-dark)),
+                            radial-gradient(circle at top left, rgba(249, 115, 22, 0.2), transparent 40%),
+                            radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.2), transparent 40%);
+                        display: block;
+                        padding: 25px;
+                        border-radius: 12px;
+                        margin: 0 auto;
+                        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+                    }
 
-                        /* ================= CHART CARD ================= */
-                        #stats .chart-card {
-                            position: relative;
-                            border-radius: 26px;
-                            padding: 1.5rem;
-                            background: linear-gradient(145deg,
-                                color-mix(in oklab, var(--card) 90%, transparent),
-                                color-mix(in oklab, var(--card-bg-dark) 90%, transparent)
-                            );
-                            border: 1px solid rgba(249, 115, 22, 0.2);
-                            box-shadow:
-                                0 20px 60px rgba(0, 0, 0, 0.4),
-                                0 0 0 1px rgba(255, 255, 255, 0.06);
-                            overflow: hidden;
-                            transition: all 0.3s ease;
+                    /* Dark/Light mode adjustment for modal image */
+                    html[data-theme="dark"] #island-modal-image {
+                        background: linear-gradient(145deg, #111827, #020617),
+                                   radial-gradient(circle at top left, rgba(249, 115, 22, 0.2), transparent 40%),
+                                   radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.2), transparent 40%);
+                    }
 
-                            opacity: 0;
-                            transform: translateY(20px);
-                            animation: statsFadeUp 0.7s ease-out forwards;
-                            color: var(--txt-body);
-                        }
+                    html[data-theme="light"] #island-modal-image {
+                        background: linear-gradient(145deg, #ffffff, #f8fafc),
+                                   radial-gradient(circle at top left, rgba(249, 115, 22, 0.1), transparent 40%),
+                                   radial-gradient(circle at bottom right, rgba(34, 211, 238, 0.1), transparent 40%);
+                    }
 
-                        /* Dark/Light mode adjustment */
-                        html[data-theme="dark"] #stats .chart-card {
-                            background: linear-gradient(145deg, #111827, #020617);
-                            color: white;
-                        }
+                    .island-modal-close {
+                        width: 44px;
+                        height: 44px;
+                        border-radius: 999px;
+                        display: grid;
+                        place-items: center;
+                        border: 1px solid rgba(249, 115, 22, 0.3);
+                        background: rgba(17, 24, 39, 0.9);
+                        color: #f97316;
+                        transition: all 0.2s ease;
+                        font-size: 1.2rem;
+                        position: relative;
+                        overflow: hidden;
+                        z-index: 2;
+                    }
 
-                        html[data-theme="light"] #stats .chart-card {
-                            background: linear-gradient(145deg, #ffffff, #f8fafc);
-                            color: #0f172a;
-                        }
+                    /* Dark/Light mode adjustment for close button */
+                    html[data-theme="dark"] .island-modal-close {
+                        background: rgba(17, 24, 39, 0.9);
+                    }
 
-                        /* Neon border untuk chart card */
-                        #stats .chart-card::before {
-                            content: "";
-                            position: absolute;
-                            inset: -6px;
-                            border-radius: inherit;
-                            padding: 10px;
-                            pointer-events: none;
-                            z-index: 0;
-                            background: conic-gradient(
-                                from var(--neon-angle),
-                                rgba(249, 115, 22, 0) 0deg,
-                                rgba(249, 115, 22, 0.15) 22deg,
-                                #f97316 55deg,
-                                #22d3ee 110deg,
-                                #34d399 165deg,
-                                rgba(34, 211, 238, 0.15) 220deg,
-                                #f97316 300deg,
-                                rgba(249, 115, 22, 0) 360deg
-                            );
-                            -webkit-mask:
-                                linear-gradient(#000 0 0) content-box,
-                                linear-gradient(#000 0 0);
-                            -webkit-mask-composite: xor;
-                            mask-composite: exclude;
-                            filter: blur(4px);
-                            opacity: 0.7;
-                            animation: neon-spin 10s linear infinite;
-                        }
+                    html[data-theme="light"] .island-modal-close {
+                        background: rgba(255, 255, 255, 0.9);
+                        color: #b7410e;
+                        border-color: rgba(183, 65, 14, 0.3);
+                    }
 
-                        #stats .chart-card > * {
-                            position: relative;
-                            z-index: 1;
-                        }
+                    .island-modal-close:hover {
+                        transform: translateY(-2px);
+                        border-color: #f97316;
+                        color: white;
+                        background: rgba(249, 115, 22, 0.9);
+                    }
 
-                        #stats .chart-card:hover {
-                            transform: translateY(-8px);
-                            box-shadow:
-                                0 30px 80px rgba(0, 0, 0, 0.5),
-                                0 0 40px rgba(249, 115, 22, 0.25);
-                        }
+                    /* Tombol Buka Gambar Lengkap dengan efek neon */
+                    #island-modal-open-new {
+                        position: relative;
+                        overflow: hidden;
+                    }
 
-                        #stats .chart-title {
-                            font-size: 1.1rem;
-                            font-weight: 800;
-                            margin-bottom: 0.5rem;
-                            color: var(--txt-body);
-                        }
+                    #island-modal-open-new::before {
+                        content: "";
+                        position: absolute;
+                        inset: -2px;
+                        border-radius: inherit;
+                        background: conic-gradient(
+                            from var(--neon-angle),
+                            rgba(249, 115, 22, 0) 0deg,
+                            rgba(249, 115, 22, 0.30) 22deg,
+                            #f97316 55deg,
+                            #22d3ee 110deg,
+                            rgba(34, 211, 238, 0.30) 220deg,
+                            #f97316 300deg,
+                            rgba(249, 115, 22, 0) 360deg
+                        );
+                        z-index: -1;
+                        opacity: 0.7;
+                        animation: neon-spin 4s linear infinite;
+                    }
+                </style>
 
-                        html[data-theme="light"] #stats .chart-title {
-                            color: #0f172a;
-                        }
+                @php
+                    $islandCards = [
+                        [
+                            'key'  => 'sumatera',
+                            'name' => 'Sumatera',
+                            'desc' => 'Jejak kerajaan maritim, ragam adat, dan kuliner rempah yang kuat—dari pesisir hingga dataran tinggi.',
+                            'href' => url('/islands/sumatera'),
+                            'img'  => asset('images/pulau/sumatera.PNG'),
+                        ],
+                        [
+                            'key'  => 'jawa',
+                            'name' => 'Jawa',
+                            'desc' => 'Pusat sejarah & kebudayaan: keraton, batik, seni pertunjukan, serta ragam bahasa daerah yang hidup.',
+                            'href' => url('/islands/jawa'),
+                            'img'  => asset('images/pulau/jawa.PNG'),
+                        ],
+                        [
+                            'key'  => 'kalimantan',
+                            'name' => 'Kalimantan',
+                            'desc' => 'Bentang hutan tropis dan sungai besar, dengan tradisi Dayak yang beragam dan kaya simbol.',
+                            'href' => url('/islands/kalimantan'),
+                            'img'  => asset('images/pulau/kalimantan.PNG'),
+                        ],
+                        [
+                            'key'  => 'sulawesi',
+                            'name' => 'Sulawesi',
+                            'desc' => 'Persimpangan budaya maritim & pegunungan—ritual, rumah adat, dan tradisi pelayaran yang kuat.',
+                            'href' => url('/islands/sulawesi'),
+                            'img'  => asset('images/pulau/sulawesi.PNG'),
+                        ],
+                        [
+                            'key'  => 'bali-nusa-tenggara',
+                            'name' => 'Bali & Nusa Tenggara',
+                            'desc' => 'Ritual dan seni yang kuat, lanskap vulkanik, pesisir, hingga savana—ragam budaya pulau-pulau kecil.',
+                            'href' => url('/islands/bali-nusa-tenggara'),
+                            'img'  => asset('images/pulau/sunda kecil.PNG'),
+                        ],
+                        [
+                            'key'  => 'papua-maluku',
+                            'name' => 'Papua & Maluku',
+                            'desc' => 'Kawasan timur dengan kekayaan bahasa, tradisi, dan bentang alam ikonik—dari kepulauan rempah hingga pegunungan.',
+                            'href' => url('/islands/papua-maluku'),
+                            'img'  => asset('images/pulau/papua dan maluku.PNG'),
+                        ],
+                    ];
+                @endphp
 
-                        #stats .chart-subtitle {
-                            font-size: 0.8rem;
-                            color: var(--muted);
-                            background: rgba(249, 115, 22, 0.2);
-                            padding: 4px 10px;
-                            border-radius: 20px;
-                            font-weight: 700;
-                        }
-
-                        #stats .chart-wrapper {
-                            position: relative;
-                            width: 100%;
-                            height: 240px;
-                            margin: 1rem 0;
-                        }
-
-                        /* ================= ANIMASI ================= */
-                        @keyframes statsFadeUp {
-                            from {
-                                opacity: 0;
-                                transform: translateY(20px) scale(0.98);
-                            }
-                            to {
-                                opacity: 1;
-                                transform: translateY(0) scale(1);
-                            }
-                        }
-
-                        /* Stagger animation delay */
-                        #stats .stat-card[data-stat="islands"] { animation-delay: 0.1s; }
-                        #stats .stat-card[data-stat="unesco"] { animation-delay: 0.2s; }
-                        #stats .stat-card[data-stat="population"] { animation-delay: 0.3s; }
-
-                        #stats .chart-card:nth-child(1) { animation-delay: 0.4s; }
-                        #stats .chart-card:nth-child(2) { animation-delay: 0.5s; }
-                        #stats .chart-card:nth-child(3) { animation-delay: 0.6s; }
-
-                        /* ================= MODAL ================= */
-                        #stats-modal-backdrop {
-                            display: none;
-                            backdrop-filter: blur(12px);
-                            background: rgba(0, 0, 0, 0.8);
-                        }
-
-                        #stats-modal-backdrop.is-open {
-                            display: flex;
-                        }
-
-                        #stats-modal {
-                            position: relative;
-                            border-radius: 26px;
-                            background: linear-gradient(145deg,
-                                color-mix(in oklab, var(--card) 95%, transparent),
-                                color-mix(in oklab, var(--card-bg-dark) 95%, transparent)
-                            );
-                            color: var(--txt-body);
-                            border: 1px solid rgba(249, 115, 22, 0.3);
-                            box-shadow:
-                                0 30px 80px rgba(0, 0, 0, 0.6),
-                                0 0 0 1px rgba(255, 255, 255, 0.06);
-                            transform: translateY(20px) scale(0.97);
-                            opacity: 0;
-                            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-                            overflow: hidden;
-                            max-width: 800px;
-                            width: 90%;
-                            padding: 2rem;
-                        }
-
-                        /* Dark/Light mode adjustment */
-                        html[data-theme="dark"] #stats-modal {
-                            background: linear-gradient(145deg, #111827, #020617);
-                            color: white;
-                        }
-
-                        html[data-theme="light"] #stats-modal {
-                            background: linear-gradient(145deg, #ffffff, #f8fafc);
-                            color: #0f172a;
-                        }
-
-                        /* Neon border untuk modal */
-                        #stats-modal::before {
-                            content: "";
-                            position: absolute;
-                            inset: -6px;
-                            border-radius: inherit;
-                            padding: 10px;
-                            pointer-events: none;
-                            z-index: 0;
-                            background: conic-gradient(
-                                from var(--neon-angle),
-                                rgba(249, 115, 22, 0) 0deg,
-                                rgba(249, 115, 22, 0.20) 22deg,
-                                #f97316 55deg,
-                                #22d3ee 110deg,
-                                #34d399 165deg,
-                                rgba(34, 211, 238, 0.20) 220deg,
-                                #f97316 300deg,
-                                rgba(249, 115, 22, 0) 360deg
-                            );
-                            -webkit-mask:
-                                linear-gradient(#000 0 0) content-box,
-                                linear-gradient(#000 0 0);
-                            -webkit-mask-composite: xor;
-                            mask-composite: exclude;
-                            filter: blur(6px);
-                            opacity: 0.8;
-                            animation: neon-spin 7.5s linear infinite;
-                        }
-
-                        #stats-modal > * {
-                            position: relative;
-                            z-index: 1;
-                        }
-
-                        #stats-modal-backdrop.is-open #stats-modal {
-                            transform: translateY(0) scale(1);
-                            opacity: 1;
-                        }
-
-                        #stats-modal-title {
-                            font-size: 1.8rem;
-                            font-weight: 900;
-                            margin-bottom: 1.5rem;
-                            background: linear-gradient(90deg, #f97316, #22d3ee, #34d399);
-                            -webkit-background-clip: text;
-                            -webkit-text-fill-color: transparent;
-                            animation: neon-glow 3s ease-in-out infinite;
-                            background-size: 200% auto;
-                        }
-
-                        #stats-modal-body {
-                            color: color-mix(in oklab, var(--txt-body) 80%, transparent);
-                            font-size: 1rem;
-                            line-height: 1.7;
-                        }
-
-                        html[data-theme="dark"] #stats-modal-body {
-                            color: #d1d5db;
-                        }
-
-                        html[data-theme="light"] #stats-modal-body {
-                            color: #374151;
-                        }
-
-                        #stats-modal-body strong {
-                            color: var(--txt-body);
-                            font-weight: 700;
-                        }
-
-                        #stats-modal-body ul {
-                            margin: 1rem 0;
-                            padding-left: 1.5rem;
-                        }
-
-                        #stats-modal-body li {
-                            margin-bottom: 0.5rem;
-                            color: var(--muted);
-                        }
-
-                        #stats-modal-close {
-                            position: absolute;
-                            right: 1.5rem;
-                            top: 1.5rem;
-                            width: 44px;
-                            height: 44px;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            background: color-mix(in oklab, var(--card) 10%, transparent);
-                            border: 1px solid rgba(249, 115, 22, 0.3);
-                            color: #f97316;
-                            font-size: 1.5rem;
-                            cursor: pointer;
-                            transition: all 0.3s ease;
-                            z-index: 2;
-                        }
-
-                        /* Dark/Light mode adjustment */
-                        html[data-theme="dark"] #stats-modal-close {
-                            background: rgba(255, 255, 255, 0.1);
-                        }
-
-                        html[data-theme="light"] #stats-modal-close {
-                            background: rgba(0, 0, 0, 0.05);
-                            color: #b7410e;
-                            border-color: rgba(183, 65, 14, 0.3);
-                        }
-
-                        #stats-modal-close:hover {
-                            background: rgba(249, 115, 22, 0.9);
-                            color: white;
-                            transform: rotate(90deg);
-                            border-color: #f97316;
-                        }
-
-                        /* Responsive */
-                        @media (max-width: 768px) {
-                            #stats .stat-number {
-                                font-size: 2.5rem;
-                            }
-
-                            #stats .chart-wrapper {
-                                height: 200px;
-                            }
-
-                            #stats-modal {
-                                padding: 1.5rem;
-                            }
-                        }
-                    </style>
-
-                    {{-- TIGA CARD UTAMA --}}
-                    <div class="grid gap-6 lg:grid-cols-3 mb-8">
-                        {{-- Pulau di Indonesia --}}
-                        <button type="button" class="stat-card stat-card--red text-left text-white" data-stat="islands">
-                            <div class="flex items-start justify-between gap-3">
-                                <div class="flex-1">
-                                    <div class="stat-number">17.380</div>
-                                    <div class="stat-label">Pulau di Indonesia (2024)</div>
-                                    <p class="mt-2 text-white/80">
-                                        Jumlah pulau bernama dan berkoordinat menurut BIG. Angka ini
-                                        terus diperbarui karena dinamika geografis dan verifikasi di lapangan.
-                                    </p>
-                                </div>
-                                <div class="opacity-90">
-                                    <svg viewBox="0 0 24 24" class="w-12 h-12" fill="white" opacity="0.9">
-                                        <path d="M11 3a9 9 0 1 0 9 9h-9z" />
-                                        <path d="M13 3.055V11h7.945A9.002 9.002 0 0 0 13 3.055z" opacity="0.7" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="stat-more">
-                                Detail Info
-                                <span class="stat-more-icon">➜</span>
-                            </div>
-                        </button>
-
-                        {{-- Warisan Budaya Takbenda UNESCO --}}
-                        <button type="button" class="stat-card stat-card--purple text-left text-white" data-stat="unesco">
-                            <div class="flex items-start justify-between gap-3">
-                                <div class="flex-1">
-                                    <div class="stat-number">16</div>
-                                    <div class="stat-label">WBTb diakui UNESCO</div>
-                                    <p class="mt-2 text-white/80">
-                                        Termasuk Keris, Batik, Angklung, Tari Saman, Gamelan, Reog
-                                        Ponorogo, Kebaya, dan lainnya yang tercatat hingga 2024.
-                                    </p>
-                                </div>
-                                <div class="opacity-90">
-                                    <svg viewBox="0 0 24 24" class="w-12 h-12" fill="white" opacity="0.9">
-                                        <circle cx="12" cy="12" r="9" />
-                                        <path d="M12 3v9l7.8 4.5A9 9 0 0 0 12 3z" opacity="0.7" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="stat-more">
-                                Detail Info
-                                <span class="stat-more-icon">➜</span>
-                            </div>
-                        </button>
-
-                        {{-- Jumlah Penduduk Indonesia --}}
-                        <button type="button" class="stat-card stat-card--green text-left text-white" data-stat="population">
-                            <div class="flex items-start justify-between gap-3">
-                                <div class="flex-1">
-                                    <div class="stat-number">287,6 Jt</div>
-                                    <div class="stat-label">Perkiraan penduduk (Nov 2025)</div>
-                                    <p class="mt-2 text-white/80">
-                                        Berbasis data Kemendagri dan BPS, penduduk Indonesia terus
-                                        bertambah sejak Sensus 2020 yang mencatat 270,20 juta jiwa.
-                                    </p>
-                                </div>
-                                <div class="opacity-90">
-                                    <svg viewBox="0 0 24 24" class="w-12 h-12" fill="white" opacity="0.9">
-                                        <rect x="3" y="10" width="4" height="9" rx="1" />
-                                        <rect x="10" y="7" width="4" height="12" rx="1" opacity="0.7" />
-                                        <rect x="17" y="4" width="4" height="15" rx="1" opacity="0.9" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="stat-more">
-                                Detail Info
-                                <span class="stat-more-icon">➜</span>
-                            </div>
-                        </button>
-                    </div>
-
-                    {{-- TIGA CHART: SUKU (BAR), BAHASA (DONUT), AGAMA (PIE) --}}
-                    <div class="grid gap-6 lg:grid-cols-3 mb-6">
-                        {{-- 1. SUKU BANGSA – BAR CHART --}}
-                        <div class="chart-card">
-                            <div class="flex items-center justify-between mb-3">
-                                <p class="chart-title">14 Suku Terbesar (persentase penduduk)</p>
-                                <span class="chart-subtitle">Bar chart</span>
-                            </div>
-                            <div class="chart-wrapper">
-                                <canvas id="ethnicChart"></canvas>
-                            </div>
-                            <p class="mt-3 text-sm text-[var(--muted)]">
-                                Data diadaptasi dari sensus: Jawa &gt;40%, diikuti Sunda, Melayu, Batak,
-                                dan suku-suku besar lainnya. Slice terakhir = <em>Lainnya</em>.
-                            </p>
-                        </div>
-
-                        {{-- 2. BAHASA SEHARI-HARI – DONUT CHART --}}
-                        <div class="chart-card">
-                            <div class="flex items-center justify-between mb-3">
-                                <p class="chart-title">Bahasa yang Paling Banyak Digunakan</p>
-                                <span class="chart-subtitle">Donut chart</span>
-                            </div>
-                            <div class="chart-wrapper">
-                                <canvas id="languageChart"></canvas>
-                            </div>
-                            <p class="mt-3 text-sm text-[var(--muted)]">
-                                14 bahasa dengan penutur terbanyak, berdasarkan persentase penggunaan
-                                sehari-hari. Sisanya digabung sebagai <em>Lainnya</em>.
-                            </p>
-                        </div>
-
-                        {{-- 3. AGAMA – PIE CHART --}}
-                        <div class="chart-card">
-                            <div class="flex items-center justify-between mb-3">
-                                <p class="chart-title">Komposisi Agama di Indonesia (±2021)</p>
-                                <span class="chart-subtitle">Pie chart</span>
-                            </div>
-                            <div class="chart-wrapper">
-                                <canvas id="religionChart"></canvas>
-                            </div>
-                            <p class="mt-3 text-sm text-[var(--muted)]">
-                                Islam mendominasi populasi, diikuti Protestan, Katolik, Hindu, Buddha,
-                                Konghucu, dan agama lainnya.
-                            </p>
-                        </div>
-                    </div>
-
-                    <p class="mt-4 text-xs text-[var(--muted)] opacity-70 text-center">
-                        *Angka dibulatkan. Persentase dan jumlah bisa sedikit berbeda antar sumber resmi,
-                        tetapi kisaran nilainya tetap sama.
-                    </p>
-
-                    {{-- POPUP DETAIL UNTUK SEMUA CARD --}}
-                    <div id="stats-modal-backdrop" class="fixed inset-0 z-50 items-center justify-center px-4"
-                        aria-hidden="true">
-                        <div id="stats-modal" class="relative">
-                            <button type="button" id="stats-modal-close" aria-label="Tutup">
-                                ×
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach ($islandCards as $c)
+                        <div class="nus-card text-[var(--txt-body)]">
+                            {{-- THUMB (klik -> modal) --}}
+                            <button type="button"
+                                    class="island-thumb w-full"
+                                    data-island-modal="1"
+                                    data-title="{{ $c['name'] }}"
+                                    data-desc="{{ $c['desc'] }}"
+                                    data-img="{{ $c['img'] }}"
+                                    aria-label="Lihat gambar {{ $c['name'] }}">
+                                <img src="{{ $c['img'] }}"
+                                     alt="Peta 3D {{ $c['name'] }}"
+                                     loading="lazy">
+                                <span class="thumb-hint">Klik untuk zoom</span>
                             </button>
 
-                            <h3 id="stats-modal-title" class="text-xl sm:text-2xl font-semibold mb-4">
-                                Detail Statistik
+                            <h3 class="nus-card-title">
+                                {{ $c['name'] }}
                             </h3>
 
-                            <div id="stats-modal-body" class="space-y-4 leading-relaxed">
-                                {{-- konten diisi via JS --}}
+                            <p class="text-sm sm:text-base text-[var(--muted)] leading-relaxed mb-4">
+                                {{ $c['desc'] }}
+                            </p>
+
+                            <a href="{{ $c['href'] }}" class="nus-card-link text-sm">
+                                Selengkapnya
+                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 1v14M1 8h14"/>
+                                </svg>
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+
+                {{-- MODAL POPUP (gambar pulau) --}}
+                <div id="island-modal-backdrop"
+                     class="fixed inset-0 z-50 items-center justify-center px-4"
+                     aria-hidden="true">
+                    <div id="island-modal" class="w-full">
+                        <div class="flex items-start justify-between gap-4 p-6 border-b"
+                             style="border-color: rgba(249, 115, 22, 0.2);">
+                            <div>
+                                <h3 id="island-modal-title" class="text-xl sm:text-2xl font-extrabold">Detail Pulau</h3>
+                                <p id="island-modal-subtitle" class="text-sm mt-1"></p>
                             </div>
 
-                            <p class="mt-6 text-xs text-[var(--muted)] opacity-50">
-                                Ringkasan berdasarkan data lembaga resmi Indonesia, UNESCO, dan publikasi terkait.
-                            </p>
+                            <button type="button"
+                                    class="island-modal-close"
+                                    id="island-modal-close"
+                                    aria-label="Tutup">
+                                ✕
+                            </button>
+                        </div>
+
+                        <img id="island-modal-image" src="" alt="Gambar Pulau" />
+
+                        <div class="p-6">
+                            <div class="flex items-center justify-between gap-3">
+                                <p class="text-xs text-[var(--muted)]">
+                                    Tip: tekan <strong>Esc</strong> atau klik area gelap untuk menutup.
+                                </p>
+                                <button type="button"
+                                        id="island-modal-open-new"
+                                        class="text-sm font-bold px-4 py-2 rounded-lg transition-all hover:scale-105 active:scale-95 relative overflow-hidden"
+                                        style="background: linear-gradient(135deg, #f97316, #fb923c); color: white; box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);">
+                                    <span class="relative z-2">Buka Gambar Lengkap</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    {{-- SCRIPT POPUP + CHART.JS --}}
-                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                {{-- SCRIPT MODAL (ringan, no library) --}}
+                <script>
+                    (function () {
+                        const backdrop = document.getElementById('island-modal-backdrop');
+                        const modalImg = document.getElementById('island-modal-image');
+                        const modalTitle = document.getElementById('island-modal-title');
+                        const modalSub = document.getElementById('island-modal-subtitle');
+                        const closeBtn = document.getElementById('island-modal-close');
+                        const openNewBtn = document.getElementById('island-modal-open-new');
 
-                    <script>
-                        (function() {
-                            /* ================= DETAIL MODAL UNTUK 3 CARD ================= */
-                            const detailMap = {
-                                islands: {
-                                    title: 'Jumlah Pulau di Indonesia',
-                                    body: `
-                                        <p>Menurut penelahaan <strong>Badan Informasi Geospasial (BIG)</strong>,
-                                        jumlah pulau di Indonesia pada tahun 2024 mencapai
-                                        <strong>17.380 pulau</strong>. Angka ini mencakup pulau yang memiliki
-                                        <em>nama</em> dan <em>koordinat</em> resmi.</p>
-                                        <p>Jika dibandingkan dengan tahun 2023 (17.374 pulau), terdapat
-                                        penambahan pulau baru akibat dinamika geografis dan verifikasi di
-                                        lapangan, misalnya di <strong>Kepulauan Bangka Belitung</strong>,
-                                        <strong>Sulawesi Tenggara</strong>, <strong>Maluku Utara</strong>, dan
-                                        <strong>Kalimantan Barat</strong>.</p>
-                                        <ul class="mt-3 list-disc list-inside space-y-2">
-                                            <li>Pulau harus berupa daratan yang terbentuk alami.</li>
-                                            <li>Dikelilingi air dan tetap muncul saat pasang tertinggi.</li>
-                                            <li>Pulau bisa hilang atau menyatu karena abrasi, sedimentasi,
-                                                dan perubahan ekosistem.</li>
-                                        </ul>
-                                        <p class="mt-4">Data pulau Indonesia terus dimutakhirkan setiap tahun
-                                        melalui platform resmi BIG seperti <em>sipulau.big.go.id</em> dan
-                                        <em>Gazeter Republik Indonesia</em>.</p>
-                                    `
-                                },
-                                unesco: {
-                                    title: 'Warisan Budaya Takbenda Indonesia',
-                                    body: `
-                                        <p>Hingga Desember 2024, terdapat <strong>16 Warisan Budaya Takbenda
-                                        (WBTb) Indonesia</strong> yang telah diakui UNESCO, antara lain:</p>
-                                        <ul class="mt-3 list-disc list-inside space-y-2">
-                                            <li><strong>2008</strong>: Keris; Pertunjukan Wayang.</li>
-                                            <li><strong>2009</strong>: Batik; Pendidikan dan Pelatihan Batik.</li>
-                                            <li><strong>2010</strong>: Angklung.</li>
-                                            <li><strong>2011</strong>: Tari Saman.</li>
-                                            <li><strong>2012</strong>: Noken (tas tradisional Papua).</li>
-                                            <li><strong>2017</strong>: Tiga genre tari tradisional Bali;
-                                                Seni Pembuatan Kapal Pinisi.</li>
-                                            <li><strong>2019</strong>: Tradisi Pencak Silat.</li>
-                                            <li><strong>2020</strong>: Pantun.</li>
-                                            <li><strong>2021</strong>: Gamelan.</li>
-                                            <li><strong>2023</strong>: Jamu.</li>
-                                            <li><strong>2024</strong>: Kesenian Reog Ponorogo; Kebaya.</li>
-                                        </ul>
-                                        <p class="mt-4">Di tingkat nasional, Kementerian Pendidikan, Kebudayaan,
-                                        Riset, dan Teknologi mencatat dan menetapkan WBTb Indonesia:</p>
-                                        <ul class="mt-3 list-disc list-inside space-y-2">
-                                            <li><strong>Nov 2022</strong>: 11.622 warisan budaya dicatat,
-                                                <strong>1.728</strong> telah ditetapkan.</li>
-                                            <li><strong>2023</strong>: bertambah 213 menjadi
-                                                <strong>1.941</strong> WBTb yang ditetapkan.</li>
-                                            <li><strong>2024</strong>: bertambah 272 menjadi
-                                                <strong>2.213</strong> penetapan.</li>
-                                            <li><strong>2025</strong>: penambahan 514, sehingga total
-                                                <strong>2.727 WBTb</strong> Indonesia yang ditetapkan
-                                                (periode 2013–2025).</li>
-                                        </ul>
-                                    `
-                                },
-                                population: {
-                                    title: 'Jumlah Penduduk Indonesia',
-                                    body: `
-                                        <p>Jumlah penduduk Indonesia terus meningkat setiap tahun:</p>
-                                        <ul class="mt-3 list-disc list-inside space-y-2">
-                                            <li><strong>Sensus Penduduk 2020</strong>:
-                                                sekitar <strong>270,20 juta jiwa</strong>.</li>
-                                            <li><strong>Data Kemendagri (30 Juni 2025)</strong>:
-                                                <strong>286.693.693 jiwa</strong>.</li>
-                                            <li><strong>Estimasi BPS (13 November 2025)</strong>:
-                                                sekitar <strong>287,6 juta jiwa</strong>.</li>
-                                        </ul>
-                                        <p class="mt-4">Perbedaan angka antara Kemendagri dan BPS wajar terjadi
-                                        karena perbedaan waktu rujukan dan metode penghitungan. Namun, semuanya
-                                        menunjukkan tren yang sama: penduduk Indonesia terus bertambah sejak 2020.</p>
-                                        <p class="mt-3">Data ini penting untuk perencanaan kebijakan, mulai dari
-                                        pendidikan, kesehatan, hingga pembangunan infrastruktur di seluruh
-                                        wilayah Indonesia.</p>
-                                    `
-                                }
+                        if (!backdrop || !modalImg || !modalTitle || !modalSub || !closeBtn || !openNewBtn) return;
+
+                        function openModal({ title, desc, img }) {
+                            modalTitle.textContent = title || 'Detail Pulau';
+                            modalSub.textContent = desc || '';
+                            modalImg.src = img || '';
+                            modalImg.alt = title ? ('Peta 3D ' + title) : 'Gambar Pulau';
+                            openNewBtn.onclick = () => {
+                                if (img) window.open(img, '_blank');
                             };
 
-                            const backdrop = document.getElementById('stats-modal-backdrop');
-                            const modal = document.getElementById('stats-modal');
-                            const modalTitle = document.getElementById('stats-modal-title');
-                            const modalBody = document.getElementById('stats-modal-body');
-                            const closeBtn = document.getElementById('stats-modal-close');
+                            backdrop.classList.add('is-open');
+                            document.body.classList.add('overflow-hidden');
+                        }
 
-                            function openModal(statKey) {
-                                const data = detailMap[statKey];
-                                if (!data) return;
+                        function closeModal() {
+                            backdrop.classList.remove('is-open');
+                            document.body.classList.remove('overflow-hidden');
+                            modalImg.src = '';
+                        }
 
-                                modalTitle.textContent = data.title;
-                                modalBody.innerHTML = data.body;
-
-                                backdrop.classList.add('is-open');
-                                document.body.classList.add('overflow-hidden');
-                            }
-
-                            function closeModal() {
-                                backdrop.classList.remove('is-open');
-                                document.body.classList.remove('overflow-hidden');
-                            }
-
-                            document.querySelectorAll('#stats .stat-card[data-stat]').forEach(function(card) {
-                                card.addEventListener('click', function() {
-                                    const key = card.getAttribute('data-stat');
-                                    openModal(key);
+                        document.querySelectorAll('#islands [data-island-modal="1"]').forEach(btn => {
+                            btn.addEventListener('click', () => {
+                                openModal({
+                                    title: btn.getAttribute('data-title'),
+                                    desc: btn.getAttribute('data-desc'),
+                                    img: btn.getAttribute('data-img'),
                                 });
                             });
+                        });
 
-                            closeBtn.addEventListener('click', closeModal);
-                            backdrop.addEventListener('click', function(e) {
-                                if (e.target === backdrop) closeModal();
-                            });
-                            document.addEventListener('keydown', function(e) {
-                                if (e.key === 'Escape') closeModal();
-                            });
+                        closeBtn.addEventListener('click', closeModal);
+                        backdrop.addEventListener('click', (e) => {
+                            if (e.target === backdrop) closeModal();
+                        });
+                        document.addEventListener('keydown', (e) => {
+                            if (e.key === 'Escape') closeModal();
+                        });
+                    })();
+                </script>
+            </section>
 
-                            /* ================= CHART: DATA ================= */
-                            // Palette warna sama dengan quiz
-                            const neonPalette = [
-                                '#f97316', '#22d3ee', '#34d399', '#fb923c', '#0ea5e9',
-                                '#84cc16', '#8b5cf6', '#ef4444', '#f59e0b', '#06b6d4',
-                                '#10b981', '#6366f1', '#ec4899', '#14b8a6', '#9ca3af'
-                            ];
+            {{-- ================= STATISTIK INDONESIA (NEON THEME) ================= --}}
+<section id="stats" class="py-12">
+    <h2 class="neon-title">
+        Statistik Budaya Indonesia
+    </h2>
+    <div class="title-decoration"></div>
+    <p class="neon-subtitle">
+Gambaran menyeluruh tentang keragaman Indonesia, mencakup sebaran pulau, warisan budaya takbenda yang diakui dunia, serta komposisi penduduk berdasarkan suku, bahasa, dan agama. Data disajikan untuk membantu memahami dinamika sosial dan budaya Nusantara secara utuh.
+    </p>
 
-                            const ethnicLabels = [
-                                'Jawa', 'Sunda', 'Melayu', 'Batak', 'Madura',
-                                'Betawi', 'Minangkabau', 'Bugis', 'Banten', 'Banjar',
-                                'Bali', 'Makassar', 'Aceh', 'Sasak', 'Lainnya'
-                            ];
-                            const ethnicData = [
-                                40.06, 15.51, 3.70, 3.58, 3.03,
-                                2.88, 2.73, 2.71, 1.96, 1.74,
-                                1.50, 1.40, 1.30, 1.10, 17.50
-                            ];
+    {{-- CSS STATISTIK DENGAN EFEK NEON --}}
+    <style>
+        /* =========================================================
+        NEON RING BORDER SAMA PERSIS DENGAN QUIZ DAN PULAU
+        ========================================================= */
+        @property --neon-angle {
+            syntax: "<angle>";
+            inherits: false;
+            initial-value: 0deg;
+        }
 
-                            const languageLabels = [
-                                'Jawa', 'Indonesia', 'Sunda', 'Melayu', 'Madura',
-                                'Minangkabau', 'Banjar', 'Bugis', 'Bali',
-                                'Batak', 'Cirebon', 'NTT Lain',
-                                'Sasak', 'Aceh', 'Lainnya'
-                            ];
-                            const languageData = [
-                                31.79, 19.94, 15.14, 3.69, 3.62,
-                                1.98, 1.71, 1.64, 1.57,
-                                1.55, 1.44, 1.40,
-                                1.26, 12.08
-                            ];
+        /* ================= STAT CARD UTAMA ================= */
+        #stats .stat-card {
+            position: relative;
+            border-radius: 26px;
+            padding: 1.5rem;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 
-                            const religionLabels = [
-                                'Islam', 'Protestan', 'Katolik',
-                                'Hindu', 'Buddha', 'Konghucu', 'Agama Lainnya'
-                            ];
-                            const religionData = [86.93, 7.47, 3.08, 1.71, 0.74, 0.05, 0.03];
+            /* Base gradient background */
+            background: linear-gradient(135deg,
+                rgba(249, 115, 22, 0.9),
+                rgba(34, 211, 238, 0.8),
+                rgba(52, 211, 153, 0.9)
+            );
+            border: 1px solid rgba(255, 255, 255, 0.1);
 
-                            const commonOptions = {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                animation: {
-                                    duration: 1000,
-                                    easing: 'easeOutQuart'
+            opacity: 0;
+            transform: translateY(20px);
+            animation: statsFadeUp 0.7s ease-out forwards;
+        }
+
+        /* EFEK NEON BORDER SAMA DENGAN QUIZ */
+        #stats .stat-card::before {
+            content: "";
+            position: absolute;
+            inset: -6px;
+            border-radius: inherit;
+            padding: 10px;
+            pointer-events: none;
+            z-index: 0;
+            background: conic-gradient(
+                from var(--neon-angle),
+                rgba(249, 115, 22, 0) 0deg,
+                rgba(249, 115, 22, 0.20) 22deg,
+                #f97316 55deg,
+                #22d3ee 110deg,
+                #34d399 165deg,
+                rgba(34, 211, 238, 0.20) 220deg,
+                #f97316 300deg,
+                rgba(249, 115, 22, 0) 360deg
+            );
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            filter: blur(6px);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            animation: neon-spin 7.5s linear infinite paused;
+        }
+
+        #stats .stat-card:hover::before {
+            opacity: 0.95;
+            animation-play-state: running;
+        }
+
+        @keyframes neon-spin {
+            to { --neon-angle: 360deg; }
+        }
+
+        /* Konten card di atas neon */
+        #stats .stat-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Efek hover card */
+        #stats .stat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(249, 115, 22, 0.3);
+        }
+
+        /* Animasi klik */
+        #stats .stat-card:active {
+            animation: stat-click 0.3s ease-out;
+        }
+
+        @keyframes stat-click {
+            0% { transform: translateY(-10px) scale(1.02); }
+            50% {
+                transform: translateY(-10px) scale(0.98);
+                box-shadow:
+                    0 40px 100px rgba(249, 115, 22, 0.4),
+                    0 0 60px rgba(249, 115, 22, 0.5);
+            }
+            100% { transform: translateY(-10px) scale(1.02); }
+        }
+
+        /* Variasi warna untuk setiap card */
+        #stats .stat-card--red {
+            background: linear-gradient(135deg,
+                rgba(249, 115, 22, 0.9),
+                rgba(220, 38, 38, 0.8),
+                rgba(251, 146, 60, 0.9)
+            );
+        }
+
+        #stats .stat-card--purple {
+            background: linear-gradient(135deg,
+                rgba(124, 58, 237, 0.9),
+                rgba(139, 92, 246, 0.8),
+                rgba(168, 85, 247, 0.9)
+            );
+        }
+
+        #stats .stat-card--green {
+            background: linear-gradient(135deg,
+                rgba(5, 150, 105, 0.9),
+                rgba(16, 185, 129, 0.8),
+                rgba(34, 197, 94, 0.9)
+            );
+        }
+
+        /* Stat number styling */
+        #stats .stat-number {
+            font-size: 3rem;
+            line-height: 1;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 0.5rem;
+        }
+
+        #stats .stat-label {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 1rem;
+        }
+
+        #stats .stat-card p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 1.5rem;
+        }
+
+        #stats .stat-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        #stats .stat-card:hover .stat-more {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(5px);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        #stats .stat-more-icon {
+            transition: transform 0.3s ease;
+        }
+
+        #stats .stat-card:hover .stat-more-icon {
+            transform: translateX(4px) rotate(45deg);
+        }
+
+        /* ================= CHART CARD ================= */
+        #stats .chart-card {
+            position: relative;
+            border-radius: 26px;
+            padding: 1.5rem;
+            background: linear-gradient(145deg,
+                color-mix(in oklab, var(--card) 90%, transparent),
+                color-mix(in oklab, var(--card-bg-dark) 90%, transparent)
+            );
+            border: 1px solid rgba(249, 115, 22, 0.2);
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.06);
+            overflow: hidden;
+            transition: all 0.3s ease;
+
+            opacity: 0;
+            transform: translateY(20px);
+            animation: statsFadeUp 0.7s ease-out forwards;
+            color: var(--txt-body);
+
+            cursor: pointer;
+        }
+
+        /* Dark/Light mode adjustment */
+        html[data-theme="dark"] #stats .chart-card {
+            background: linear-gradient(145deg, #111827, #020617);
+            color: white;
+        }
+
+        html[data-theme="light"] #stats .chart-card {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            color: #0f172a;
+        }
+
+        /* Neon border untuk chart card */
+        #stats .chart-card::before {
+            content: "";
+            position: absolute;
+            inset: -6px;
+            border-radius: inherit;
+            padding: 10px;
+            pointer-events: none;
+            z-index: 0;
+            background: conic-gradient(
+                from var(--neon-angle),
+                rgba(249, 115, 22, 0) 0deg,
+                rgba(249, 115, 22, 0.15) 22deg,
+                #f97316 55deg,
+                #22d3ee 110deg,
+                #34d399 165deg,
+                rgba(34, 211, 238, 0.15) 220deg,
+                #f97316 300deg,
+                rgba(249, 115, 22, 0) 360deg
+            );
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            filter: blur(4px);
+            opacity: 0.7;
+            animation: neon-spin 10s linear infinite;
+        }
+
+        #stats .chart-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        #stats .chart-card:hover {
+            transform: translateY(-8px);
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(249, 115, 22, 0.25);
+        }
+
+        #stats .chart-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: var(--txt-body);
+        }
+
+        html[data-theme="light"] #stats .chart-title {
+            color: #0f172a;
+        }
+
+        #stats .chart-subtitle {
+            font-size: 0.8rem;
+            color: var(--muted);
+            background: rgba(249, 115, 22, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        #stats .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 240px;
+            margin: 1rem 0;
+        }
+
+        /* ================= ANIMASI ================= */
+        @keyframes statsFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Stagger animation delay */
+        #stats .stat-card[data-stat="islands"] { animation-delay: 0.1s; }
+        #stats .stat-card[data-stat="unesco"] { animation-delay: 0.2s; }
+        #stats .stat-card[data-stat="population"] { animation-delay: 0.3s; }
+
+        #stats .chart-card[data-chart="ethnic"] { animation-delay: 0.4s; }
+        #stats .chart-card[data-chart="language"] { animation-delay: 0.5s; }
+        #stats .chart-card[data-chart="religion"] { animation-delay: 0.6s; }
+
+        /* ================= MODAL ================= */
+        #stats-modal-backdrop {
+            display: none;
+            backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        #stats-modal-backdrop.is-open {
+            display: flex;
+        }
+
+        /* ✅ Saat modal open: turunkan z-index navbar agar close button tidak ketutup */
+        html.stats-modal-open .site-header {
+            z-index: 10 !important;
+        }
+
+        #stats-modal {
+            position: relative;
+            border-radius: 26px;
+            background: linear-gradient(145deg,
+                color-mix(in oklab, var(--card) 95%, transparent),
+                color-mix(in oklab, var(--card-bg-dark) 95%, transparent)
+            );
+            color: var(--txt-body);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(255, 255, 255, 0.06);
+            transform: translateY(20px) scale(0.97);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+            max-width: 860px;
+            width: 90%;
+            padding: 2rem;
+        }
+
+        /* Dark/Light mode adjustment */
+        html[data-theme="dark"] #stats-modal {
+            background: linear-gradient(145deg, #111827, #020617);
+            color: white;
+        }
+
+        html[data-theme="light"] #stats-modal {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            color: #0f172a;
+        }
+
+        /* Neon border untuk modal */
+        #stats-modal::before {
+            content: "";
+            position: absolute;
+            inset: -6px;
+            border-radius: inherit;
+            padding: 10px;
+            pointer-events: none;
+            z-index: 0;
+            background: conic-gradient(
+                from var(--neon-angle),
+                rgba(249, 115, 22, 0) 0deg,
+                rgba(249, 115, 22, 0.20) 22deg,
+                #f97316 55deg,
+                #22d3ee 110deg,
+                #34d399 165deg,
+                rgba(34, 211, 238, 0.20) 220deg,
+                #f97316 300deg,
+                rgba(249, 115, 22, 0) 360deg
+            );
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            filter: blur(6px);
+            opacity: 0.8;
+            animation: neon-spin 7.5s linear infinite;
+        }
+
+        #stats-modal > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        #stats-modal-backdrop.is-open #stats-modal {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        #stats-modal-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, #f97316, #22d3ee, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: neon-glow 3s ease-in-out infinite;
+            background-size: 200% auto;
+        }
+
+        #stats-modal-body {
+            color: color-mix(in oklab, var(--txt-body) 80%, transparent);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        html[data-theme="dark"] #stats-modal-body {
+            color: #d1d5db;
+        }
+
+        html[data-theme="light"] #stats-modal-body {
+            color: #374151;
+        }
+
+        #stats-modal-body strong {
+            color: var(--txt-body);
+            font-weight: 700;
+        }
+
+        #stats-modal-body ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        #stats-modal-body li {
+            margin-bottom: 0.5rem;
+            color: var(--muted);
+        }
+
+        #stats-modal-body a{
+            color: #f97316;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        html[data-theme="dark"] #stats-modal-body a{
+            color: #fdba74;
+        }
+
+        #stats-modal-close {
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: color-mix(in oklab, var(--card) 10%, transparent);
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            color: #f97316;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        /* Dark/Light mode adjustment */
+        html[data-theme="dark"] #stats-modal-close {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        html[data-theme="light"] #stats-modal-close {
+            background: rgba(0, 0, 0, 0.05);
+            color: #b7410e;
+            border-color: rgba(183, 65, 14, 0.3);
+        }
+
+        #stats-modal-close:hover {
+            background: rgba(249, 115, 22, 0.9);
+            color: white;
+            transform: rotate(90deg);
+            border-color: #f97316;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #stats .stat-number {
+                font-size: 2.5rem;
+            }
+
+            #stats .chart-wrapper {
+                height: 200px;
+            }
+
+            #stats-modal {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+
+    {{-- TIGA CARD UTAMA --}}
+    <div class="grid gap-6 lg:grid-cols-3 mb-8">
+        {{-- Pulau di Indonesia --}}
+        <button type="button" class="stat-card stat-card--red text-left text-white" data-stat="islands">
+            <div class="flex items-start justify-between gap-3">
+                <div class="flex-1">
+                    <div class="stat-number">17.380</div>
+                    <div class="stat-label">Pulau di Indonesia (2024)</div>
+                    <p class="mt-2 text-white/80">
+                        Jumlah pulau bernama dan berkoordinat menurut BIG. Angka ini
+                        terus diperbarui karena dinamika geografis dan verifikasi di lapangan.
+                    </p>
+                </div>
+                <div class="opacity-90">
+                    <svg viewBox="0 0 24 24" class="w-12 h-12" fill="white" opacity="0.9">
+                        <path d="M11 3a9 9 0 1 0 9 9h-9z" />
+                        <path d="M13 3.055V11h7.945A9.002 9.002 0 0 0 13 3.055z" opacity="0.7" />
+                    </svg>
+                </div>
+            </div>
+            <div class="stat-more">
+                Detail Info
+                <span class="stat-more-icon">➜</span>
+            </div>
+        </button>
+
+        {{-- Warisan Budaya Takbenda UNESCO --}}
+        <button type="button" class="stat-card stat-card--purple text-left text-white" data-stat="unesco">
+            <div class="flex items-start justify-between gap-3">
+                <div class="flex-1">
+                    <div class="stat-number">16</div>
+                    <div class="stat-label">WBTb diakui UNESCO</div>
+                    <p class="mt-2 text-white/80">
+                        Termasuk Wayang, Keris, Batik, Angklung, Tari Saman, Gamelan,
+                        Jamu, Kebaya, Reog Ponorogo, dan lainnya.
+                    </p>
+                </div>
+                <div class="opacity-90">
+                    <svg viewBox="0 0 24 24" class="w-12 h-12" fill="white" opacity="0.9">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M12 3v9l7.8 4.5A9 9 0 0 0 12 3z" opacity="0.7" />
+                    </svg>
+                </div>
+            </div>
+            <div class="stat-more">
+                Detail Info
+                <span class="stat-more-icon">➜</span>
+            </div>
+        </button>
+
+        {{-- Jumlah Penduduk Indonesia --}}
+        <button type="button" class="stat-card stat-card--green text-left text-white" data-stat="population">
+            <div class="flex items-start justify-between gap-3">
+                <div class="flex-1">
+                    <div class="stat-number">286,69 Jt</div>
+                    <div class="stat-label">Penduduk (Semester I 2025)</div>
+                    <p class="mt-2 text-white/80">
+                        Berdasarkan rilis Dukcapil Kemendagri per 30 Juni 2025,
+                        penduduk Indonesia mencapai 286.693.693 jiwa.
+                    </p>
+                </div>
+                <div class="opacity-90">
+                    <svg viewBox="0 0 24 24" class="w-12 h-12" fill="white" opacity="0.9">
+                        <rect x="3" y="10" width="4" height="9" rx="1" />
+                        <rect x="10" y="7" width="4" height="12" rx="1" opacity="0.7" />
+                        <rect x="17" y="4" width="4" height="15" rx="1" opacity="0.9" />
+                    </svg>
+                </div>
+            </div>
+            <div class="stat-more">
+                Detail Info
+                <span class="stat-more-icon">➜</span>
+            </div>
+        </button>
+    </div>
+
+    {{-- TIGA CHART: SUKU (BAR), BAHASA (DONUT), AGAMA (PIE) --}}
+    <div class="grid gap-6 lg:grid-cols-3 mb-6">
+        {{-- 1. SUKU BANGSA – BAR CHART --}}
+        <div class="chart-card" role="button" tabindex="0" data-chart="ethnic" aria-label="Buka detail chart suku">
+            <div class="flex items-center justify-between mb-3">
+                <p class="chart-title">Komposisi Suku (SP2010)</p>
+                <span class="chart-subtitle">Bar chart</span>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="ethnicChart"></canvas>
+            </div>
+            <p class="mt-3 text-sm text-[var(--muted)]">
+                Persentase suku terbesar berdasarkan Sensus Penduduk 2010 (BPS).
+                Klik card untuk detail & sumber data.
+            </p>
+        </div>
+
+        {{-- 2. BAHASA SEHARI-HARI – DONUT CHART --}}
+        <div class="chart-card" role="button" tabindex="0" data-chart="language" aria-label="Buka detail chart bahasa">
+            <div class="flex items-center justify-between mb-3">
+                <p class="chart-title">Bahasa Sehari-hari (SP2010)</p>
+                <span class="chart-subtitle">Donut chart</span>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="languageChart"></canvas>
+            </div>
+            <p class="mt-3 text-sm text-[var(--muted)]">
+                14 bahasa dengan penutur terbanyak berdasarkan publikasi BPS SP2010.
+                Klik card untuk detail & sumber data.
+            </p>
+        </div>
+
+        {{-- 3. AGAMA – PIE CHART --}}
+        <div class="chart-card" role="button" tabindex="0" data-chart="religion" aria-label="Buka detail chart agama">
+            <div class="flex items-center justify-between mb-3">
+                <p class="chart-title">Komposisi Agama (Dukcapil 2021)</p>
+                <span class="chart-subtitle">Pie chart</span>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="religionChart"></canvas>
+            </div>
+            <p class="mt-3 text-sm text-[var(--muted)]">
+                Komposisi agama penduduk berdasarkan agregat Dukcapil (2021).
+                Tekan card untuk detail & sumber data.
+            </p>
+        </div>
+    </div>
+
+
+    {{-- POPUP DETAIL UNTUK SEMUA CARD + CHART --}}
+    <div id="stats-modal-backdrop" class="fixed inset-0 z-50 items-center justify-center px-4"
+        aria-hidden="true">
+        <div id="stats-modal" class="relative" role="dialog" aria-modal="true" aria-labelledby="stats-modal-title">
+            <button type="button" id="stats-modal-close" aria-label="Tutup">
+                ×
+            </button>
+
+            <h3 id="stats-modal-title" class="text-xl sm:text-2xl font-semibold mb-4">
+                Detail Statistik
+            </h3>
+
+            <div id="stats-modal-body" class="space-y-4 leading-relaxed">
+                {{-- konten diisi via JS --}}
+            </div>
+
+            <p class="mt-6 text-xs text-[var(--muted)] opacity-50">
+                Ringkasan berdasarkan sumber resmi/tepercaya (BIG/Antara, UNESCO, BPS, Dukcapil/Kemendagri, dll).
+            </p>
+        </div>
+    </div>
+
+    {{-- SCRIPT POPUP + CHART.JS --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        (function() {
+            /* ================= DETAIL MODAL UNTUK STAT CARD ================= */
+            const detailMap = {
+                islands: {
+                    title: 'Jumlah Pulau di Indonesia (BIG, 2024)',
+                    body: `
+                        <p>Badan Informasi Geospasial (BIG) menyampaikan bahwa jumlah pulau Indonesia yang telah memiliki <strong>nama</strong> dan <strong>koordinat resmi</strong> pada tahun 2024 mencapai <strong>17.380 pulau</strong>.</p>
+
+                        <p>Penambahan ini terjadi karena proses identifikasi, verifikasi, dan pembaruan data geospasial di lapangan (termasuk wilayah seperti Bangka Belitung, Sulawesi Tenggara, Maluku Utara, dan Kalimantan Barat).</p>
+
+                        <ul class="mt-3 list-disc list-inside space-y-2">
+                            <li>Pulau adalah daratan alami yang dikelilingi air dan tetap muncul saat pasang tertinggi.</li>
+                            <li>Jumlah pulau bisa berubah karena abrasi, sedimentasi, dan pemutakhiran data.</li>
+                            <li>Data diperkaya melalui citra satelit dan verifikasi pemerintah daerah.</li>
+                        </ul>
+
+                        <p class="mt-4"><strong>Sumber:</strong>
+                            <a href="https://ramadhan.antaranews.com/video/4525867/big-ungkap-jumlah-pulau-di-indonesia-tahun-2024-capai-17380" target="_blank" rel="noopener">ANTARA (video) – Pernyataan BIG (12 Des 2024)</a>
+                            •
+                            <a href="https://nasional.kontan.co.id/news/resmi-dari-badan-geospasial-ini-jumlah-pulau-di-seluruh-indonesia-tahun-2024" target="_blank" rel="noopener">Kontan – Ringkasan berita jumlah pulau 2024</a>
+                        </p>
+                    `
+                },
+                unesco: {
+                    title: 'Warisan Budaya Takbenda Indonesia di UNESCO (ICH)',
+                    body: `
+                        <p>UNESCO mencatat Indonesia memiliki <strong>16 elemen</strong> Warisan Budaya Takbenda (Intangible Cultural Heritage) yang terinskripsi (gabungan dari <em>Representative List</em> dan <em>Urgent Safeguarding List</em>).</p>
+
+                        <p>Contoh elemen yang terkenal: <strong>Wayang</strong>, <strong>Keris</strong>, <strong>Batik</strong>, <strong>Angklung</strong>, <strong>Tari Saman</strong>, <strong>Noken</strong>, <strong>Gamelan</strong>, <strong>Jamu</strong>, <strong>Kebaya</strong>, dan <strong>Reog Ponorogo</strong>.</p>
+
+                        <p class="mt-3">Daftar resmi & pembaruan status terbaik adalah halaman UNESCO ICH (negara: Indonesia).</p>
+
+                        <p class="mt-4"><strong>Sumber (resmi):</strong>
+                            <a href="https://ich.unesco.org/en/state/indonesia-ID" target="_blank" rel="noopener">UNESCO ICH – Indonesia (jumlah elemen)</a>
+                            •
+                            <a href="https://ich.unesco.org/en/state/indonesia-ID?info=elements-on-the-lists" target="_blank" rel="noopener">UNESCO ICH – Daftar elemen per tahun</a>
+                        </p>
+                    `
+                },
+                population: {
+                    title: 'Jumlah Penduduk Indonesia (Dukcapil Kemendagri)',
+                    body: `
+                        <p>Menurut rilis Direktorat Jenderal Dukcapil Kementerian Dalam Negeri, jumlah penduduk Indonesia per <strong>30 Juni 2025</strong> adalah <strong>286.693.693 jiwa</strong>.</p>
+
+                        <p>Angka ini merupakan data administrasi kependudukan (berbasis pencatatan Dukcapil) dan lazim digunakan untuk kebutuhan kebijakan publik serta layanan kependudukan.</p>
+
+                        <p class="mt-4"><strong>Sumber:</strong>
+                            <a href="https://www.cnnindonesia.com/ekonomi/20250711131422-532-1249573/penduduk-ri-tembus-286-juta-orang-pada-2025" target="_blank" rel="noopener">CNN Indonesia – Kutipan angka Dukcapil (11 Jul 2025)</a>
+                            •
+                            <a href="https://www.bps.go.id/id/statistics-table/2/MTk3NSMy/jumlah-penduduk-pertengahan-tahun--ribu-jiwa-.html" target="_blank" rel="noopener">BPS – Tabel jumlah penduduk pertengahan tahun (referensi statistik)</a>
+                        </p>
+                    `
+                }
+            };
+
+            /* ================= DETAIL MODAL UNTUK CHART ================= */
+            const chartDetailMap = {
+                ethnic: {
+                    title: 'Chart: Komposisi Suku (Sensus Penduduk 2010)',
+                    body: `
+                        <p>Data suku/etnis pada chart ini mengacu pada ringkasan publikasi BPS terkait hasil <strong>Sensus Penduduk 2010 (SP2010)</strong>. Dalam rilis BPS, <strong>Suku Jawa</strong> adalah yang terbesar sekitar <strong>40%</strong>, disusul <strong>Suku Sunda</strong> sekitar <strong>15%</strong>.</p>
+
+                        <p>Catatan: pengelompokan suku di SP2010 dilakukan melalui kerja sama BPS dan ISEAS, dan hasilnya juga digunakan dalam analisis demografi etnis.</p>
+
+                        <p class="mt-4"><strong>Sumber (resmi/tepercaya):</strong>
+                            <a href="https://www.bps.go.id/id/news/2015/11/18/127/mengulik-data-suku-di-indonesia.html" target="_blank" rel="noopener">BPS – “Mengulik Data Suku di Indonesia” (berbasis SP2010)</a>
+                            •
+                            <a href="https://sp2010.bps.go.id/" target="_blank" rel="noopener">BPS – Portal SP2010</a>
+                        </p>
+                    `
+                },
+                language: {
+                    title: 'Chart: Bahasa Sehari-hari (Hasil SP2010)',
+                    body: `
+                        <p>Data bahasa sehari-hari pada chart ini merujuk pada publikasi BPS yang membahas <strong>kewarganegaraan, suku bangsa, agama, dan bahasa sehari-hari</strong> (hasil SP2010).</p>
+
+                        <p>Secara umum, publikasi BPS menunjukkan penggunaan bahasa daerah masih dominan dalam komunikasi harian, dengan bahasa Jawa menjadi salah satu yang terbesar dalam jumlah penutur.</p>
+
+                        <p class="mt-4"><strong>Sumber (resmi):</strong>
+                            <a href="https://www.bps.go.id/id/publication/2012/05/23/55eca38b7fe0830834605b35/kewarganegaraan-suku-bangsa-agama-dan-bahasa-sehari-hari-penduduk-indonesia.html" target="_blank" rel="noopener">BPS – Publikasi “Kewarganegaraan, Suku Bangsa, Agama, dan Bahasa Sehari-hari…” (SP2010)</a>
+                        </p>
+                    `
+                },
+                religion: {
+                    title: 'Chart: Komposisi Agama (Dukcapil, 2021)',
+                    body: `
+                        <p>Komposisi agama pada chart ini mengacu pada agregat data Dukcapil yang sering diringkas dalam berbagai publikasi data (misalnya ringkasan berbasis data Dukcapil per akhir 2021).</p>
+
+                        <p>Mayoritas penduduk Indonesia beragama Islam (sekitar 86%), disusul Protestan dan Katolik, kemudian Hindu, Buddha, dan Konghucu.</p>
+
+                        <p class="mt-4"><strong>Sumber (tepercaya):</strong>
+                            <a href="https://databoks.katadata.co.id/demografi/statistik/e158869f40c2acf/sebanyak-8693-penduduk-indonesia-beragama-islam-pada-31-desember-2021" target="_blank" rel="noopener">Katadata Databoks – Ringkasan komposisi agama (data Dukcapil)</a>
+                            •
+                            <a href="https://id.wikipedia.org/wiki/Agama_di_Indonesia" target="_blank" rel="noopener">Wikipedia – Agama di Indonesia (menyebut sumber Dukcapil 2021)</a>
+                        </p>
+                    `
+                }
+            };
+
+            const backdrop = document.getElementById('stats-modal-backdrop');
+            const modalTitle = document.getElementById('stats-modal-title');
+            const modalBody = document.getElementById('stats-modal-body');
+            const closeBtn = document.getElementById('stats-modal-close');
+
+            function openModalByHtml(title, bodyHtml) {
+                modalTitle.textContent = title;
+                modalBody.innerHTML = bodyHtml;
+
+                backdrop.classList.add('is-open');
+                document.body.classList.add('overflow-hidden');
+                document.documentElement.classList.add('stats-modal-open');
+
+                // set aria
+                backdrop.setAttribute('aria-hidden', 'false');
+
+                // focus close for accessibility
+                setTimeout(() => {
+                    if (closeBtn) closeBtn.focus();
+                }, 0);
+            }
+
+            function openModal(statKey) {
+                const data = detailMap[statKey];
+                if (!data) return;
+                openModalByHtml(data.title, data.body);
+            }
+
+            function openChartModal(chartKey) {
+                const data = chartDetailMap[chartKey];
+                if (!data) return;
+                openModalByHtml(data.title, data.body);
+            }
+
+            function closeModal() {
+                backdrop.classList.remove('is-open');
+                document.body.classList.remove('overflow-hidden');
+                document.documentElement.classList.remove('stats-modal-open');
+                backdrop.setAttribute('aria-hidden', 'true');
+            }
+
+            // Stat cards
+            document.querySelectorAll('#stats .stat-card[data-stat]').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const key = card.getAttribute('data-stat');
+                    openModal(key);
+                });
+            });
+
+            // Chart cards (klik card -> detail)
+            document.querySelectorAll('#stats .chart-card[data-chart]').forEach(function(card) {
+                const key = card.getAttribute('data-chart');
+
+                card.addEventListener('click', function(e) {
+                    // kalau user klik canvas, tetap buka detail
+                    openChartModal(key);
+                });
+
+                // Enter/Space accessibility
+                card.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openChartModal(key);
+                    }
+                });
+            });
+
+            // Close actions
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            if (backdrop) {
+                backdrop.addEventListener('click', function(e) {
+                    if (e.target === backdrop) closeModal();
+                });
+            }
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            /* ================= CHART: DATA ================= */
+            // Palette warna sama dengan quiz
+            const neonPalette = [
+                '#f97316', '#22d3ee', '#34d399', '#fb923c', '#0ea5e9',
+                '#84cc16', '#8b5cf6', '#ef4444', '#f59e0b', '#06b6d4',
+                '#10b981', '#6366f1', '#ec4899', '#14b8a6', '#9ca3af'
+            ];
+
+            // Suku (ringkasan bergaya SP2010)
+            const ethnicLabels = [
+                'Jawa', 'Sunda', 'Melayu', 'Batak', 'Madura',
+                'Betawi', 'Minangkabau', 'Bugis', 'Banten', 'Banjar',
+                'Bali', 'Makassar', 'Aceh', 'Sasak', 'Lainnya'
+            ];
+            const ethnicData = [
+                40.06, 15.51, 3.70, 3.58, 3.03,
+                2.88, 2.73, 2.71, 1.96, 1.74,
+                1.50, 1.40, 1.30, 1.10, 17.50
+            ];
+
+            // Bahasa (ringkasan hasil SP2010)
+            const languageLabels = [
+                'Jawa', 'Indonesia', 'Sunda', 'Melayu', 'Madura',
+                'Minangkabau', 'Banjar', 'Bugis', 'Bali',
+                'Batak', 'Cirebon', 'NTT Lain',
+                'Sasak', 'Aceh', 'Lainnya'
+            ];
+            const languageData = [
+                31.79, 19.94, 15.14, 3.69, 3.62,
+                1.98, 1.71, 1.64, 1.57,
+                1.55, 1.44, 1.40,
+                1.26, 1.10, 12.08
+            ];
+
+            // Agama (ringkasan Dukcapil 2021)
+            const religionLabels = [
+                'Islam', 'Protestan', 'Katolik',
+                'Hindu', 'Buddha', 'Konghucu', 'Agama Lainnya'
+            ];
+            const religionData = [86.93, 7.47, 3.08, 1.71, 0.74, 0.05, 0.03];
+
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    tooltip: {
+                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                        borderColor: 'rgba(249, 115, 22, 0.5)',
+                        borderWidth: 1,
+                        titleColor: '#f9fafb',
+                        bodyColor: '#d1d5db',
+                        callbacks: {
+                            label: function(ctx) {
+                                const label = ctx.label || '';
+                                const value = ctx.parsed;
+                                return label + ': ' + Number(value).toFixed(2) + '%';
+                            }
+                        }
+                    },
+                    legend: {
+                        labels: {
+                            color: '#d1d5db',
+                            font: { size: 11 }
+                        }
+                    }
+                }
+            };
+
+            // Ethnic Chart
+            const ethnicCanvas = document.getElementById('ethnicChart');
+            if (ethnicCanvas) {
+                const ethnicCtx = ethnicCanvas.getContext('2d');
+                new Chart(ethnicCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ethnicLabels,
+                        datasets: [{
+                            data: ethnicData,
+                            backgroundColor: neonPalette,
+                            borderRadius: 6,
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        ...commonOptions,
+                        plugins: {
+                            ...commonOptions.plugins,
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: '#9ca3af', font: { size: 10 } },
+                                grid: { display: false }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: '#9ca3af',
+                                    callback: value => value + '%'
                                 },
-                                plugins: {
-                                    tooltip: {
-                                        backgroundColor: 'rgba(17, 24, 39, 0.9)',
-                                        borderColor: 'rgba(249, 115, 22, 0.5)',
-                                        borderWidth: 1,
-                                        titleColor: '#f9fafb',
-                                        bodyColor: '#d1d5db',
-                                        callbacks: {
-                                            label: function(ctx) {
-                                                const label = ctx.label || '';
-                                                const value = ctx.parsed;
-                                                return label + ': ' + value.toFixed(2) + '%';
-                                            }
-                                        }
-                                    },
-                                    legend: {
-                                        labels: {
-                                            color: '#d1d5db',
-                                            font: {
-                                                size: 11
-                                            }
-                                        }
-                                    }
-                                }
-                            };
+                                grid: { color: 'rgba(156, 163, 175, 0.1)' }
+                            }
+                        }
+                    }
+                });
+            }
 
-                            // Ethnic Chart
-                            const ethnicCtx = document.getElementById('ethnicChart').getContext('2d');
-                            new Chart(ethnicCtx, {
-                                type: 'bar',
-                                data: {
-                                    labels: ethnicLabels,
-                                    datasets: [{
-                                        data: ethnicData,
-                                        backgroundColor: neonPalette,
-                                        borderRadius: 6,
-                                        borderWidth: 0
-                                    }]
-                                },
-                                options: {
-                                    ...commonOptions,
-                                    plugins: {
-                                        ...commonOptions.plugins,
-                                        legend: { display: false }
-                                    },
-                                    scales: {
-                                        x: {
-                                            ticks: {
-                                                color: '#9ca3af',
-                                                font: { size: 10 }
-                                            },
-                                            grid: { display: false }
-                                        },
-                                        y: {
-                                            beginAtZero: true,
-                                            ticks: {
-                                                color: '#9ca3af',
-                                                callback: value => value + '%'
-                                            },
-                                            grid: {
-                                                color: 'rgba(156, 163, 175, 0.1)'
-                                            }
-                                        }
-                                    }
-                                }
-                            });
+            // Language Chart
+            const languageCanvas = document.getElementById('languageChart');
+            if (languageCanvas) {
+                const languageCtx = languageCanvas.getContext('2d');
+                new Chart(languageCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: languageLabels,
+                        datasets: [{
+                            data: languageData,
+                            backgroundColor: neonPalette,
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        ...commonOptions,
+                        cutout: '55%',
+                        plugins: {
+                            ...commonOptions.plugins,
+                            legend: {
+                                position: 'right',
+                                labels: { padding: 15 }
+                            }
+                        }
+                    }
+                });
+            }
 
-                            // Language Chart
-                            const languageCtx = document.getElementById('languageChart').getContext('2d');
-                            new Chart(languageCtx, {
-                                type: 'doughnut',
-                                data: {
-                                    labels: languageLabels,
-                                    datasets: [{
-                                        data: languageData,
-                                        backgroundColor: neonPalette,
-                                        borderWidth: 0
-                                    }]
-                                },
-                                options: {
-                                    ...commonOptions,
-                                    cutout: '55%',
-                                    plugins: {
-                                        ...commonOptions.plugins,
-                                        legend: {
-                                            position: 'right',
-                                            labels: {
-                                                padding: 15
-                                            }
-                                        }
-                                    }
-                                }
-                            });
+            // Religion Chart
+            const religionCanvas = document.getElementById('religionChart');
+            if (religionCanvas) {
+                const religionCtx = religionCanvas.getContext('2d');
+                new Chart(religionCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: religionLabels,
+                        datasets: [{
+                            data: religionData,
+                            backgroundColor: [
+                                '#22c55e', '#60a5fa', '#4b5563',
+                                '#eab308', '#f97316', '#f97373', '#a855f7'
+                            ],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        ...commonOptions,
+                        plugins: {
+                            ...commonOptions.plugins,
+                            legend: { position: 'right' }
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+</section>
 
-                            // Religion Chart
-                            const religionCtx = document.getElementById('religionChart').getContext('2d');
-                            new Chart(religionCtx, {
-                                type: 'pie',
-                                data: {
-                                    labels: religionLabels,
-                                    datasets: [{
-                                        data: religionData,
-                                        backgroundColor: [
-                                            '#22c55e', '#60a5fa', '#4b5563',
-                                            '#eab308', '#f97316', '#f97373', '#a855f7'
-                                        ],
-                                        borderWidth: 0
-                                    }]
-                                },
-                                options: {
-                                    ...commonOptions,
-                                    plugins: {
-                                        ...commonOptions.plugins,
-                                        legend: {
-                                            position: 'right'
-                                        }
-                                    }
-                                }
-                            });
-                        })();
-                    </script>
-                </section>
 
 
                 @include('partials.camera-ar')
@@ -2685,7 +2766,7 @@
                 </h2>
                 <div class="title-decoration"></div>
                 <p class="neon-subtitle">
-                    Jawab pertanyaan seputar Nusantara. Soal & opsi bisa berupa teks atau gambar.
+                    Kuis ini menyajikan pertanyaan seputar sejarah, dan warisan budaya Nusantara sebagai bagian dari upaya memahami identitas budaya Indonesia.
                 </p>
 
                 @include('partials.quiz-section', ['quiz' => $quiz ?? null])

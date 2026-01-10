@@ -5,7 +5,7 @@
 
     // Mode island = kalau ada $selectedIsland (halaman pulau Sumatera, Jawa, dll)
     $isIslandMode = isset($selectedIsland) && $selectedIsland;
-    $currentIslandName = $isIslandMode ? $selectedIsland->title ?? $selectedIsland->name : null;
+    $currentIslandName = $isIslandMode ? ($selectedIsland->title ?? $selectedIsland->name) : null;
 
     // daftar pulau untuk dropdown navbar (dari DB supaya lengkap)
     $navbarIslands = Island::query()
@@ -17,7 +17,7 @@
     // ===== GAME (PLAYER) =====
     $playerLoggedIn = auth()->guard('player')->check();
     $gameUrl = $playerLoggedIn ? route('game.learn') : route('player.login');
-    $gameLabel = $playerLoggedIn ? 'Game' : 'Game';
+    $gameLabel = $playerLoggedIn ? 'Permainan' : 'Permainan';
 @endphp
 
 <header class="site-header" id="top">
@@ -39,7 +39,7 @@
     <nav class="nav-pill" role="navigation" aria-label="Navigasi utama">
 
         {{-- Brand / Logo - NORMAL UNTUK DESKTOP --}}
-        <a class="brand desktop-only" href="{{ route('home') }}" data-nav="home">
+        <a class="brand desktop-only" href="{{ route('home') }}" data-nav="home" aria-label="Lentara Home">
             <img src="{{ asset('images/icon/icon_lentara.png') }}"
                  alt="Lentara"
                  class="brand-logo">
@@ -51,22 +51,26 @@
             @if (!$isIslandMode)
                 {{-- ================= MODE HOME ================= --}}
 
-                <button class="nav-btn is-active" data-target="#home">
+                <button type="button" class="nav-btn is-active" data-target="#home" data-default="1">
                     <span>Beranda</span>
+                </button>
+
+                <button type="button" class="nav-btn" data-target="#about">
+                    <span>Tentang</span>
                 </button>
 
                 {{-- Pulau + dropdown daftar pulau --}}
                 <div class="nav-dropdown" data-dropdown="islands">
-                    <button class="nav-btn nav-dropdown-toggle"
-                            type="button"
-                            data-target="#islands"
+                    <button type="button"
+                            class="nav-btn nav-dropdown-toggle"
+                            data-nav-key="islands"
                             aria-haspopup="true"
                             aria-expanded="false">
                         <span class="dropdown-label">Pulau</span>
                         <span class="chevron">▾</span>
                     </button>
 
-                    <div class="nav-dropdown-menu" role="menu">
+                    <div class="nav-dropdown-menu" role="menu" aria-label="Daftar Pulau">
                         @foreach ($navbarIslands as $island)
                             @php
                                 $url = route('islands.show', $island->slug);
@@ -83,38 +87,35 @@
                     </div>
                 </div>
 
-                <button class="nav-btn" data-target="#about">
-                    <span>Tentang</span>
-                </button>
-
-                <button class="nav-btn" data-target="#stats">
+                <button type="button" class="nav-btn" data-target="#stats">
                     <span>Statistik</span>
                 </button>
 
                 {{-- ✅ FITUR BARU: Kamera AR (HOME / GENERAL SAJA) --}}
-                <button class="nav-btn" data-target="#camera-ar">
+                <button type="button" class="nav-btn" data-target="#camera-ar">
                     <span>Kamera AR</span>
                 </button>
 
-                <button class="nav-btn" data-target="#quiz">
+                <button type="button" class="nav-btn" data-target="#quiz">
                     <span>Kuis</span>
                 </button>
 
+                                {{-- ================= TESTIMONI (HOME ONLY) ================= --}}
+                <button type="button" class="nav-btn" data-target="#testimoni">
+                    <span>Testimoni</span>
+                </button>
+
                 {{-- ===== GAME / BELAJAR (SETELAH KUIS, SEBELUM TESTIMONI) ===== --}}
-                <button class="nav-btn" data-url="{{ $gameUrl }}">
+                <button type="button" class="nav-btn" data-url="{{ $gameUrl }}">
                     <span>{{ $gameLabel }}</span>
                 </button>
 
-                {{-- ================= TESTIMONI (HOME ONLY) ================= --}}
-                <button class="nav-btn" data-target="#testimoni">
-                    <span>Testimoni</span>
-                </button>
 
             @else
                 {{-- ================= MODE ISLAND ================= --}}
 
                 {{-- Home: balik ke Budaya Indonesia (landing) --}}
-                <button class="nav-btn" data-url="{{ route('home') }}">
+                <button type="button" class="nav-btn" data-url="{{ route('home') }}">
                     <span>Beranda</span>
                 </button>
 
@@ -124,8 +125,9 @@
                      @if ($currentIslandName)
                          data-current-island="{{ $currentIslandName }}"
                      @endif>
-                    <button class="nav-btn nav-dropdown-toggle"
-                            type="button"
+                    <button type="button"
+                            class="nav-btn nav-dropdown-toggle"
+                            data-nav-key="islands"
                             aria-haspopup="true"
                             aria-expanded="false">
                         <span class="dropdown-label">
@@ -134,7 +136,7 @@
                         <span class="chevron">▾</span>
                     </button>
 
-                    <div class="nav-dropdown-menu" role="menu">
+                    <div class="nav-dropdown-menu" role="menu" aria-label="Daftar Pulau">
                         @foreach ($navbarIslands as $island)
                             @php
                                 $url = route('islands.show', $island->slug);
@@ -152,32 +154,32 @@
                 </div>
 
                 {{-- default aktif: Tentang pulau --}}
-                <button class="nav-btn is-active" data-target="#about">
+                <button type="button" class="nav-btn is-active" data-target="#about">
                     <span>Tentang</span>
                 </button>
 
                 {{-- Destinasi pulau --}}
-                <button class="nav-btn" data-target="#destinations">
+                <button type="button" class="nav-btn" data-target="#destinations">
                     <span>Destinasi</span>
                 </button>
 
                 {{-- Kuliner khas pulau --}}
-                <button class="nav-btn" data-target="#foods">
+                <button type="button" class="nav-btn" data-target="#foods">
                     <span>Kuliner</span>
                 </button>
 
                 {{-- Warisan daerah --}}
-                <button class="nav-btn" data-target="#warisan">
+                <button type="button" class="nav-btn" data-target="#warisan">
                     <span>Warisan</span>
                 </button>
 
                 {{-- Kuis pulau --}}
-                <button class="nav-btn" data-target="#quiz">
+                <button type="button" class="nav-btn" data-target="#quiz">
                     <span>Kuis</span>
                 </button>
 
                 {{-- ===== GAME / BELAJAR (SETELAH KUIS) ===== --}}
-                <button class="nav-btn" data-url="{{ $gameUrl }}">
+                <button type="button" class="nav-btn" data-url="{{ $gameUrl }}">
                     <span>{{ $gameLabel }}</span>
                 </button>
             @endif
@@ -189,10 +191,19 @@
         {{-- ================= KANAN: ADMIN + THEME ================= --}}
         <div class="flex items-center gap-2 ml-auto">
             {{-- Toggle Tema (DESKTOP ONLY) --}}
-            <button class="theme-toggle hidden md:flex" id="themeToggle" aria-label="Ubah tema">
-                <span class="sun">☀️</span>
-                <span class="moon">🌙</span>
+            <button type="button" class="theme-toggle hidden md:flex" id="themeToggle" aria-label="Ubah tema">
+                {{-- SUN ICON --}}
+                <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41"></path>
+                </svg>
+            
+                {{-- MOON ICON --}}
+                <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8Z"></path>
+                </svg>
             </button>
+            
         </div>
     </nav>
 
@@ -206,7 +217,7 @@
                      class="drawer-logo">
                 <span class="drawer-title">Menu</span>
             </div>
-            <button id="closeDrawer"
+            <button type="button" id="closeDrawer"
                     class="close-drawer"
                     aria-label="Tutup menu">✕</button>
         </div>
@@ -217,7 +228,6 @@
                 <a href="#home" data-target="#home" class="drawer-link">Beranda</a>
                 <a href="#about" data-target="#about" class="drawer-link">Tentang</a>
                 <a href="#history" data-target="#history" class="drawer-link">Sejarah</a>
-                <a href="#stats" data-target="#stats" class="drawer-link">Statistik</a>
 
                 {{-- Pulau + sub menu --}}
                 <a href="#islands" data-target="#islands" class="drawer-link">Pulau</a>
@@ -236,16 +246,20 @@
                     @endforeach
                 </div>
 
+                <a href="#stats" data-target="#stats" class="drawer-link">Statistik</a>
+
                 {{-- Kamera AR --}}
                 <a href="#camera-ar" data-target="#camera-ar" class="drawer-link">Kamera AR</a>
 
                 <a href="#quiz" data-target="#quiz" class="drawer-link">Kuis</a>
 
-                {{-- ===== GAME / BELAJAR (SETELAH KUIS, SEBELUM TESTIMONI) ===== --}}
+                                {{-- TESTIMONI --}}
+                                <a href="#testimoni" data-target="#testimoni" class="drawer-link">Testimoni</a>
+
+                {{-- ===== GAME / BELAJAR ===== --}}
                 <a href="{{ $gameUrl }}" class="drawer-link">{{ $gameLabel }}</a>
 
-                {{-- TESTIMONI --}}
-                <a href="#testimoni" data-target="#testimoni" class="drawer-link">Testimoni</a>
+
             @else
                 {{-- MODE ISLAND --}}
                 <a href="{{ route('home') }}" class="drawer-link">Beranda</a>
@@ -274,17 +288,30 @@
 
                 <a href="#quiz" data-target="#quiz" class="drawer-link">Kuis</a>
 
-                {{-- ===== GAME / BELAJAR (SETELAH KUIS) ===== --}}
+                {{-- ===== GAME / BELAJAR ===== --}}
                 <a href="{{ $gameUrl }}" class="drawer-link">{{ $gameLabel }}</a>
             @endif
         </div>
 
         <div class="drawer-footer">
             {{-- Toggle Tema (MOBILE) --}}
-            <button class="btn full" id="drawerTheme">
-                <span class="drawer-theme-icon">🌓</span>
+            <button type="button" class="btn full" id="drawerTheme" aria-label="Ganti tema">
+                <span class="drawer-theme-icon" aria-hidden="true">
+                    {{-- SUN --}}
+                    <svg class="icon-sun" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41"></path>
+                    </svg>
+            
+                    {{-- MOON --}}
+                    <svg class="icon-moon" viewBox="0 0 24 24">
+                        <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.5 6.5 0 0 0 9.8 9.8Z"></path>
+                    </svg>
+                </span>
                 <span>Ganti Tema</span>
             </button>
+            
+            
         </div>
     </aside>
 

@@ -198,6 +198,15 @@ html[data-theme="dark"] .circle-logo-img {
   align-items: center;
   gap: 10px;
 
+  @media (min-width: 861px){
+  .nav-pill{
+    display: inline-flex;
+    width: max-content;
+    max-width: calc(100vw - 24px);
+  }
+}
+
+
   /* glass */
   background: rgba(255,255,255,0.06);
   backdrop-filter: blur(12px);
@@ -207,8 +216,11 @@ html[data-theme="dark"] .circle-logo-img {
   border-radius: 999px;
   padding: 8px 10px;
   box-shadow: var(--shadow, 0 20px 50px rgba(0,0,0,.12));
-  max-width: min(1100px, 95vw);
-  width: 100%;
+
+  /* === mirip navbar lama: kapsul ngikut isi, tapi tetap aman di layar === */
+  width: fit-content;
+  max-width: calc(100vw - 24px);
+
   transition: transform .25s ease, padding .25s ease, background .25s ease;
   overflow: visible;
 }
@@ -324,10 +336,53 @@ html[data-theme="dark"] .nav-pill::after{
   background: color-mix(in oklab, var(--brand, #b7410e) 10%, var(--card, #ffffff));
 }
 
-.theme-toggle .sun{ display: inline; }
-.theme-toggle .moon{ display: none; }
-html[data-theme="dark"] .theme-toggle .sun{ display: none; }
-html[data-theme="dark"] .theme-toggle .moon{ display: inline; }
+
+/* ===== ICON THEME (SVG) ===== */
+.theme-toggle svg{
+  width: 18px;
+  height: 18px;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* default (light): tampilkan sun */
+.theme-toggle .icon-sun{ display: block; }
+.theme-toggle .icon-moon{ display: none; }
+
+/* dark: tampilkan moon */
+html[data-theme="dark"] .theme-toggle .icon-sun{ display: none; }
+html[data-theme="dark"] .theme-toggle .icon-moon{ display: block; }
+
+
+/* ===== THEME ICON (drawer) ===== */
+.drawer-theme-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.drawer-theme-icon svg{
+  width:18px;
+  height:18px;
+  display:block;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* default light: sun tampil */
+.drawer-theme-icon .icon-sun{ display:block; }
+.drawer-theme-icon .icon-moon{ display:none; }
+
+/* dark: moon tampil */
+html[data-theme="dark"] .drawer-theme-icon .icon-sun{ display:none; }
+html[data-theme="dark"] .drawer-theme-icon .icon-moon{ display:block; }
 
 /* desktop nav links */
 .nav-links{
@@ -338,8 +393,21 @@ html[data-theme="dark"] .theme-toggle .moon{ display: inline; }
   background: transparent;
   border-radius: 999px;
   padding: 6px;
+
+  flex-wrap: nowrap;
+  white-space: nowrap;
+
   transition: background .2s ease;
 }
+
+/* ✅ Pastikan nav-links tidak ngembang */
+@media (min-width: 861px){
+  .nav-links{
+    flex: 0 0 auto;
+  }
+}
+
+
 html[data-theme="dark"] .nav-links{ background: transparent; }
 
 .nav-links.nav-links--transparent{ background: transparent; }
@@ -364,6 +432,7 @@ html[data-theme="dark"] .nav-links.nav-links--transparent{ background: transpare
 
 .nav-btn.is-active{ color: var(--txt-body, #0f172a); }
 
+/* indicator (mirip navbar lama) */
 .active-indicator{
   position: absolute;
   top: 6px;      /* sama dengan padding .nav-links */
@@ -376,15 +445,15 @@ html[data-theme="dark"] .nav-links.nav-links--transparent{ background: transpare
   transition: transform .35s cubic-bezier(.2,.8,.2,1), width .3s, opacity .3s;
   pointer-events: none;
   opacity: 0;
+  z-index: 1;
 }
-
 
 /* ===== DROPDOWN DI DALAM NAVBAR (desktop) ===== */
 .nav-dropdown{
   position: relative;
   display: flex;
   align-items: center;
-  z-index: 120;
+  z-index: 20; /* di atas indicator */
 }
 
 .nav-dropdown-toggle{ display:flex; align-items:center; }
@@ -398,23 +467,25 @@ html[data-theme="dark"] .nav-links.nav-links--transparent{ background: transpare
 
 .nav-dropdown.open .nav-dropdown-toggle .chevron{ transform: rotate(180deg); }
 
+/* iOS glass dropdown */
 .nav-dropdown-menu{
   position: absolute;
   top: calc(100% + 10px);
   left: 6px;
   min-width: 210px;
 
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255,255,255,0.22);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
 
   border-radius: 18px;
-  border: 1px solid rgba(15, 23, 42, 0.14);
-  box-shadow:
-    0 22px 50px rgba(0,0,0,.22),
-    0 0 0 1px rgba(255,255,255,0.55) inset;
+  border: 1px solid rgba(255,255,255,0.45);
 
-  padding: 8px;
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,0.35);
+
+  padding: 10px;
   opacity: 0;
   transform: translateY(-6px) scale(0.98);
   transform-origin: top left;
@@ -424,11 +495,15 @@ html[data-theme="dark"] .nav-links.nav-links--transparent{ background: transpare
 }
 
 html[data-theme="dark"] .nav-dropdown-menu{
-  background: rgba(2, 6, 23, 0.78);
-  border-color: rgba(148,163,184,0.32);
+  background: rgba(2,6,23,0.32);
+  backdrop-filter: blur(22px) saturate(150%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+
+  border: 1px solid rgba(148,163,184,0.30);
+
   box-shadow:
-    0 22px 55px rgba(0,0,0,.55),
-    0 0 0 1px rgba(148,163,184,0.18) inset;
+    0 30px 70px rgba(0,0,0,.65),
+    inset 0 1px 0 rgba(148,163,184,0.18);
 }
 
 .dropdown-item{
@@ -455,6 +530,17 @@ html[data-theme="dark"] .dropdown-item:hover{
   opacity: 1;
   transform: translateY(0) scale(1);
   pointer-events: auto;
+}
+
+/* hover effect dropdown toggle */
+.nav-dropdown-toggle:hover {
+  background: color-mix(in oklab, var(--brand, #b7410e) 8%, transparent);
+}
+
+/* ketika dropdown open, toggle terlihat beda */
+.nav-dropdown.open .nav-dropdown-toggle {
+  background: color-mix(in oklab, var(--brand, #b7410e) 12%, transparent);
+  color: var(--txt-body, #0f172a);
 }
 
 /* ================= MOBILE DRAWER ================= */
@@ -609,9 +695,11 @@ html[data-theme="dark"] .dropdown-item:hover{
   .circle-logo-container { display: block; }
 
   /* KUNCI FIX 2 NAVBAR: */
-  .nav-pill { display: none !important; }
+  .nav-pill {
+     display: none !important;
+     }
 
-  /* site-header tidak perlu geser kanan lagi */
+  /* site-header tidak perlu center lagi di mobile */
   .site-header {
     justify-content: flex-start;
     padding-right: 0;
@@ -626,59 +714,4 @@ html[data-theme="dark"] .dropdown-item:hover{
   .drawer-overlay {
     display: none;
   }
-
-  .brand { pointer-events: auto; }
-  .brand:hover { transform: none; }
 }
-
-/* =========================
-   NAVBAR AUTO-FIT (NGIKUT JUMLAH MENU) - DESKTOP SAJA
-   ========================= */
-
-.nav-pill{
-  width: fit-content;
-  max-width: calc(100vw - 24px);
-}
-
-.nav-links{
-  flex: 0;
-  justify-content: flex-start;
-}
-
-.nav-pill{ overflow: visible; }
-.nav-links{
-  flex-wrap: nowrap;
-  white-space: nowrap;
-}
-
-/* =========================
-   iOS GLASS DROPDOWN
-   ========================= */
-
-.nav-dropdown-menu{
-  background: rgba(255,255,255,0.22);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.45);
-
-  box-shadow:
-    0 20px 50px rgba(0,0,0,.22),
-    inset 0 1px 0 rgba(255,255,255,0.35);
-
-  padding: 10px;
-}
-
-html[data-theme="dark"] .nav-dropdown-menu{
-  background: rgba(2,6,23,0.32);
-  backdrop-filter: blur(22px) saturate(150%);
-  -webkit-backdrop-filter: blur(22px) saturate(150%);
-
-  border: 1px solid rgba(148,163,184,0.30);
-
-  box-shadow:
-    0 30px 70px rgba(0,0,0,.65),
-    inset 0 1px 0 rgba(148,163,184,0.18);
-}
-

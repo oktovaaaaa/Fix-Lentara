@@ -7,7 +7,9 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Belajar') — Lentara Islands</title>
+    <title>@yield('title', 'Belajar') — Lentara Nusantara</title>
+<link rel="icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
+<link rel="shortcut icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
 
     {{-- ✅ PAKAI THEME YANG SAMA DENGAN HOME --}}
     <script>

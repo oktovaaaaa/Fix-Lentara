@@ -33,6 +33,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Panduan — Lentara Nusantara</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
+<link rel="shortcut icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
 
     {{-- ✅ THEME CONNECT (SAMA DENGAN INDEX): localStorage piforrr-theme --}}
     <script>

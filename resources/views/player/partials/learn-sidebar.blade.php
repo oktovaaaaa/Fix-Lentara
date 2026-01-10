@@ -518,8 +518,8 @@
         if(iconD) iconD.innerHTML = iconHtml;
         if(iconM) iconM.innerHTML = iconHtml;
 
-        if(labelD) labelD.textContent = (t === 'dark') ? 'Dark' : 'Light';
-        if(labelM) labelM.textContent = (t === 'dark') ? 'Dark' : 'Light';
+        if(labelD) labelD.textContent = (t === 'dark') ? 'Gelap' : 'Terang';
+        if(labelM) labelM.textContent = (t === 'dark') ? 'Gelap' : 'Terang';
     }
 
     function toggleTheme(){

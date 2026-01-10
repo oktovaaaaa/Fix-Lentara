@@ -944,8 +944,8 @@ html[data-theme="dark"] .t-detail-close {
             </h2>
             <div class="title-decoration"></div>
             <p class="neon-subtitle">
-                Bagikan pengalamanmu, bantu kami jadi lebih baik.
-            </p>
+Bagikan pengalamanmu menjelajahi budaya Nusantara melalui Lentara. Setiap masukan membantu kami menghadirkan konten yang lebih akurat, informatif, dan bermanfaat bagi semua.
+                </p>
 
             {{-- ===== SUMMARY (TOP) ===== --}}
             <div class="grid gap-6 lg:grid-cols-3 mb-8">

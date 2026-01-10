@@ -2,9 +2,10 @@
 <section id="camera-ar" class="py-12 bg-[var(--bg-body)]">
     <h2 class="neon-title">AR Kamera Nusantara</h2>
     <div class="title-decoration"></div>
-    <p class="neon-subtitle">
-        Aktifkan kamera, pilih filter 3D (peci / tanjak / destar / songkok / iket sunda / blangkon). Mirip IG, tapi versi Nusantara.
-    </p>
+<p class="neon-subtitle">
+Gunakan kamera untuk mengenal warisan budaya Nusantara secara visual melalui filter 3D bertema penutup kepala dan atribut tradisional dari berbagai daerah di Indonesia. Fitur ini menghadirkan pengalaman interaktif yang memadukan teknologi realitas tertambah dengan identitas budaya.
+</p>
+
 
     {{-- Importmap --}}
     <script type="importmap">
@@ -565,17 +566,37 @@
                 --}}
             </div>
 
-            <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <button class="btn" id="btnStartCam" type="button">
-                    <span>🎥 Start Kamera</span>
-                </button>
-                <button class="btn btn-secondary" id="btnCapture" type="button" disabled>
-                    <span>📸 Capture</span>
-                </button>
-                <button class="btn btn-secondary" id="btnStopCam" type="button" disabled>
-                    <span>⏹ Stop</span>
-                </button>
-            </div>
+<div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <button class="btn" id="btnStartCam" type="button">
+        <span class="inline-flex items-center justify-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M16 10l4-2v8l-4-2v-4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            <span>Mulai Kamera</span>
+        </span>
+    </button>
+
+    <button class="btn btn-secondary" id="btnCapture" type="button" disabled>
+        <span class="inline-flex items-center justify-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 7l1.2-2h7.6L17 7h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Ambil Foto</span>
+        </span>
+    </button>
+
+    <button class="btn btn-secondary" id="btnStopCam" type="button" disabled>
+        <span class="inline-flex items-center justify-center gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 7h10v10H7V7Z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Hentikan</span>
+        </span>
+    </button>
+</div>
+
 
             <div class="mt-4">
                 <p class="muted">
@@ -588,17 +609,26 @@
             <div class="mt-6 pt-4 border-t border-gray-800">
                 <div class="flex items-center justify-between mb-3">
                     <div class="section-title mb-0">Pilih Filter</div>
-                    <button class="btn-secondary !w-auto !px-4 !py-2" id="btnClearFilter" type="button">
-                        Clear
-                    </button>
+<button class="btn-secondary !w-auto !px-4 !py-2" id="btnClearFilter" type="button">
+    Bersihkan
+</button>
                 </div>
 
                 <div class="filter-bar mt-2" id="filterBar"></div>
 
                 <div class="mt-4">
-                    <button class="btn btn-secondary" id="btnFlip" type="button" disabled>
-                        🔄 Flip Kamera
-                    </button>
+
+<button class="btn btn-secondary" id="btnFlip" type="button" disabled>
+    <span class="inline-flex items-center justify-center gap-2">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M20 7h-6m6 0-2-2m2 2-2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 17h6m-6 0 2 2m-2-2 2-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M18 9a7 7 0 0 0-12.3-4.7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M6 15a7 7 0 0 0 12.3 4.7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Ganti Kamera</span>
+    </span>
+</button>
                 </div>
             </div>
         </div>
@@ -607,31 +637,46 @@
         <div class="ar-card">
             {{-- ✅ TIPS & TRIK PINDAH KE POSISI FILTER SEBELUMNYA --}}
             <div>
-                <div class="section-title mb-2">Tips & Trik</div>
-                <ul class="muted text-sm space-y-1">
-                    <li>• Pilih filter sebelum mulai kamera</li>
-                    <li>• Pastikan pencahayaan cukup</li>
-                    <li>• Gunakan Flip Kamera untuk selfie/landscape</li>
-                    <li>• Download hasil capture untuk dibagikan</li>
-                </ul>
+<div class="section-title mb-2">Panduan & Saran</div>
+<ul class="muted text-sm space-y-1">
+    <li>• Pilih filter sebelum menyalakan kamera</li>
+    <li>• Pastikan pencahayaan cukup</li>
+    <li>• Gunakan Ganti Kamera untuk beralih depan/belakang</li>
+    <li>• Unduh hasil foto untuk dibagikan</li>
+</ul>
+
             </div>
 
             <div class="mt-6 pt-4 border-t border-gray-800">
                 <div class="section-title mb-3">Hasil Capture</div>
                 <div class="preview">
                     <img id="capturePreview" alt="Preview capture" src="" style="display:none;">
-                    <div id="captureEmpty" class="p-6 text-center muted">
-                        <div class="mb-2">📷</div>
-                        <div>Belum ada capture.</div>
-                        <div class="text-sm mt-1">Klik tombol <strong>Capture</strong> untuk mengambil foto.</div>
-                    </div>
+<div id="captureEmpty" class="p-6 text-center muted">
+    <div class="mb-2 inline-flex justify-center">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M7 7l1.2-2h7.6L17 7h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2Z" stroke="currentColor" stroke-width="2"/>
+            <path d="M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="2"/>
+        </svg>
+    </div>
+    <div>Belum ada foto.</div>
+    <div class="text-sm mt-1">Klik tombol <strong>Ambil Foto</strong> untuk mengambil gambar.</div>
+</div>
+
                 </div>
 
                 <div class="mt-4">
-                    <a class="btn btn-secondary text-center" id="btnDownload" href="#" download="lentara-ar.png"
-                       style="display:none; text-decoration: none;">
-                        ⬇ Download
-                    </a>
+<a class="btn btn-secondary text-center" id="btnDownload" href="#" download="lentara-ar.png"
+   style="display:none; text-decoration: none;">
+    <span class="inline-flex items-center justify-center gap-2 w-full">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M8 11l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span>Unduh</span>
+    </span>
+</a>
+
                 </div>
             </div>
         </div>

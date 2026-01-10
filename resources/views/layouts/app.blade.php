@@ -7,9 +7,10 @@
 
     {{-- penting buat fetch POST --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Lentara Nusantara</title>
 
-    <title>Lentara Islands</title>
-
+<link rel="icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
+<link rel="shortcut icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
     {{-- SET THEME PALING AWAL (default: light) --}}
     <script>
         (function () {
