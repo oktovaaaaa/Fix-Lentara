@@ -165,7 +165,7 @@
             <h2 class="neon-title">Statistik Pulau</h2>
             <div class="title-decoration"></div>
             <p class="neon-subtitle">
-                Informasi kependudukan dan keberagaman Nusantara pada pulau ini, termasuk suku, bahasa, dan agama, yang membantu mengenal budaya Indonesia secara lebih dekat.  
+                Informasi kependudukan dan keberagaman Nusantara pada pulau ini, termasuk suku, bahasa, dan agama, yang membantu mengenal budaya Indonesia secara lebih dekat.
             </p>
 
             {{-- 3 CARD UTAMA --}}
@@ -228,7 +228,7 @@
                             <p class="mt-2">
                                 Menampilkan komposisi bahasa yang digunakan di pulau ini sebagai bagian dari kekayaan bahasa Nusantara.
                               </p>
-                              
+
                         </div>
                         <div class="opacity-90">
                             <svg viewBox="0 0 24 24" class="w-12 h-12" fill="white" opacity="0.9">
@@ -305,6 +305,14 @@
 
                 </div>
             </div>
+
+            <style>
+    /* Saat modal statistik pulau terbuka, navbar jangan menimpa */
+    html.stats-modal-open .site-header {
+        z-index: 10 !important;
+    }
+</style>
+
 
             {{-- SCRIPT: Chart.js --}}
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -415,10 +423,14 @@
                         modalBody.innerHTML = data.body;
                         backdrop.classList.add('is-open');
                         document.body.classList.add('overflow-hidden');
+                        document.documentElement.classList.add('stats-modal-open');
+
                     }
                     function closeModal() {
                         backdrop.classList.remove('is-open');
                         document.body.classList.remove('overflow-hidden');
+                        document.documentElement.classList.remove('stats-modal-open');
+
                     }
 
                     document.querySelectorAll('#stats .stat-card[data-stat]').forEach(function(card) {

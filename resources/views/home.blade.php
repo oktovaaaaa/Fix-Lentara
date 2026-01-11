@@ -1447,6 +1447,9 @@
                     #island-modal-backdrop.is-open {
                         display: flex;
                     }
+                    html.island-modal-open .site-header {
+    z-index: 10 !important;
+}
 
                     #island-modal {
                         position: relative;
@@ -1760,11 +1763,15 @@
 
                             backdrop.classList.add('is-open');
                             document.body.classList.add('overflow-hidden');
+                            document.documentElement.classList.add('island-modal-open');
+
                         }
 
                         function closeModal() {
                             backdrop.classList.remove('is-open');
                             document.body.classList.remove('overflow-hidden');
+                            document.documentElement.classList.remove('island-modal-open');
+
                             modalImg.src = '';
                         }
 
@@ -2397,8 +2404,7 @@
                     <div class="chart-card" role="button" tabindex="0" data-chart="ethnic"
                         aria-label="Buka detail chart suku">
                         <div class="flex items-center justify-between mb-3">
-                            <p class="chart-title">Komposisi Suku (SP2010)</p>
-                            <span class="chart-subtitle">Bar chart</span>
+                            <p class="chart-title">Keberagaman Suku di Indonesia</p>
                         </div>
                         <div class="chart-wrapper">
                             <canvas id="ethnicChart"></canvas>
@@ -2413,8 +2419,7 @@
                     <div class="chart-card" role="button" tabindex="0" data-chart="language"
                         aria-label="Buka detail chart bahasa">
                         <div class="flex items-center justify-between mb-3">
-                            <p class="chart-title">Bahasa Sehari-hari (SP2010)</p>
-                            <span class="chart-subtitle">Donut chart</span>
+                            <p class="chart-title">Keberagaman Bahasa Nusantara</p>
                         </div>
                         <div class="chart-wrapper">
                             <canvas id="languageChart"></canvas>
@@ -2429,8 +2434,7 @@
                     <div class="chart-card" role="button" tabindex="0" data-chart="religion"
                         aria-label="Buka detail chart agama">
                         <div class="flex items-center justify-between mb-3">
-                            <p class="chart-title">Komposisi Agama (Dukcapil 2021)</p>
-                            <span class="chart-subtitle">Pie chart</span>
+                            <p class="chart-title">Keberagaman Agama di Indonesia</p>
                         </div>
                         <div class="chart-wrapper">
                             <canvas id="religionChart"></canvas>
@@ -2500,7 +2504,7 @@
 
                         <p class="mt-3">Daftar resmi & pembaruan status terbaik adalah halaman UNESCO ICH (negara: Indonesia).</p>
 
-                        <p class="mt-4"><strong>Sumber (resmi):</strong>
+                        <p class="mt-4"><strong>Sumber:</strong>
                             <a href="https://ich.unesco.org/en/state/indonesia-ID" target="_blank" rel="noopener">UNESCO ICH – Indonesia (jumlah elemen)</a>
                             •
                             <a href="https://ich.unesco.org/en/state/indonesia-ID?info=elements-on-the-lists" target="_blank" rel="noopener">UNESCO ICH – Daftar elemen per tahun</a>
@@ -2532,7 +2536,7 @@
 
                         <p>Catatan: pengelompokan suku di SP2010 dilakukan melalui kerja sama BPS dan ISEAS, dan hasilnya juga digunakan dalam analisis demografi etnis.</p>
 
-                        <p class="mt-4"><strong>Sumber (resmi/tepercaya):</strong>
+                        <p class="mt-4"><strong>Sumber:</strong>
                             <a href="https://www.bps.go.id/id/news/2015/11/18/127/mengulik-data-suku-di-indonesia.html" target="_blank" rel="noopener">BPS – “Mengulik Data Suku di Indonesia” (berbasis SP2010)</a>
                             •
                             <a href="https://sp2010.bps.go.id/" target="_blank" rel="noopener">BPS – Portal SP2010</a>
@@ -2546,7 +2550,7 @@
 
                         <p>Secara umum, publikasi BPS menunjukkan penggunaan bahasa daerah masih dominan dalam komunikasi harian, dengan bahasa Jawa menjadi salah satu yang terbesar dalam jumlah penutur.</p>
 
-                        <p class="mt-4"><strong>Sumber (resmi):</strong>
+                        <p class="mt-4"><strong>Sumber:</strong>
                             <a href="https://www.bps.go.id/id/publication/2012/05/23/55eca38b7fe0830834605b35/kewarganegaraan-suku-bangsa-agama-dan-bahasa-sehari-hari-penduduk-indonesia.html" target="_blank" rel="noopener">BPS – Publikasi “Kewarganegaraan, Suku Bangsa, Agama, dan Bahasa Sehari-hari…” (SP2010)</a>
                         </p>
                     `
@@ -2558,7 +2562,7 @@
 
                         <p>Mayoritas penduduk Indonesia beragama Islam (sekitar 86%), disusul Protestan dan Katolik, kemudian Hindu, Buddha, dan Konghucu.</p>
 
-                        <p class="mt-4"><strong>Sumber (tepercaya):</strong>
+                        <p class="mt-4"><strong>Sumber:</strong>
                             <a href="https://databoks.katadata.co.id/demografi/statistik/e158869f40c2acf/sebanyak-8693-penduduk-indonesia-beragama-islam-pada-31-desember-2021" target="_blank" rel="noopener">Katadata Databoks – Ringkasan komposisi agama (data Dukcapil)</a>
                             •
                             <a href="https://id.wikipedia.org/wiki/Agama_di_Indonesia" target="_blank" rel="noopener">Wikipedia – Agama di Indonesia (menyebut sumber Dukcapil 2021)</a>
