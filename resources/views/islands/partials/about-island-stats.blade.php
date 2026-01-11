@@ -54,6 +54,278 @@
 <section id="about" class="py-12">
     <div class="max-w-6xl mx-auto space-y-10 px-4">
 
+        {{-- =========================
+           ABOUT UI ONLY
+           RULES DARI KAMU:
+           1) CARD + NEON HANYA KALAU ADA GAMBAR.
+           2) KALAU TIDAK ADA GAMBAR:
+              - kalau ada points/link => 2 kolom (md):
+                deskripsi di kiri, points(+link) di kanan. TANPA CARD.
+              - kalau hanya deskripsi saja (tanpa points & link) => full lebar, TANPA CARD.
+           3) Warna card: normal, sedikit transparan (bukan gradient).
+           4) Neon border mengikuti style conic-gradient muter seperti referensi history.
+           5) Semua teks/warna menyesuaikan theme vars (light/dark) dari :root dan html[data-theme="dark"].
+        ========================= --}}
+        <style>
+            /* ========= ABOUT ITEMS WRAP ========= */
+            #about .about-items {
+                display: flex;
+                flex-direction: column;
+                gap: 1.35rem;
+            }
+
+            #about .about-item-shell {
+                border-radius: 22px;
+                padding: .25rem 0; /* bukan card belakang */
+            }
+
+            /* ========= TYPO (theme-aware) ========= */
+            #about .about-item-title {
+                font-size: 1.15rem;
+                font-weight: 900;
+                color: var(--txt-body);
+                margin: 0 0 .6rem 0;
+                line-height: 1.25;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+            #about .about-item-desc {
+                font-size: 1rem;
+                line-height: 1.85;
+                color: color-mix(in srgb, var(--txt-body) 74%, transparent);
+                margin: 0;
+                white-space: pre-line;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+            /* ========= NEON BORDER (SAMA FEEL DENGAN HISTORY) ========= */
+            @property --about-angle {
+                syntax: "<angle>";
+                inherits: false;
+                initial-value: 0deg;
+            }
+
+            #about .about-neon-wrap {
+                position: relative;
+                border-radius: 22px;
+            }
+
+            /* lapisan neon */
+            #about .about-neon-glow {
+                position: absolute;
+                inset: -5px;
+                border-radius: inherit;
+                padding: 10px;
+                z-index: 0;
+                pointer-events: none;
+
+                background: conic-gradient(from var(--about-angle),
+                    rgba(255, 107, 0, 0),
+                    rgba(255, 140, 66, 0.20) 30deg,
+                    var(--brand) 80deg,
+                    color-mix(in srgb, var(--brand) 70%, white) 120deg,
+                    rgba(255, 140, 66, 0.18) 180deg,
+                    rgba(255, 107, 0, 0) 240deg,
+                    rgba(255, 140, 66, 0.22) 300deg,
+                    var(--brand) 330deg,
+                    rgba(255, 107, 0, 0) 360deg
+                );
+
+                -webkit-mask:
+                    linear-gradient(#000 0 0) content-box,
+                    linear-gradient(#000 0 0);
+                -webkit-mask-composite: xor;
+                mask-composite: exclude;
+
+                filter: blur(4px);
+                opacity: 0.92;
+                animation: about-neon-spin 8.5s linear infinite;
+            }
+
+            @keyframes about-neon-spin {
+                to { --about-angle: 360deg; }
+            }
+
+            #about .about-neon-inner {
+                position: relative;
+                z-index: 1;
+                border-radius: 20px;
+                overflow: hidden;
+            }
+
+            /* ========= IMAGE FRAME (NEON) ========= */
+            #about .about-img {
+                width: 100%;
+                height: 330px;
+                object-fit: cover;
+                display: block;
+                transform: scale(1.001);
+                transition: transform .75s ease;
+            }
+
+            #about .about-neon-inner:hover .about-img {
+                transform: scale(1.05);
+            }
+
+            /* overlay tipis, theme-aware (gelap di dark, halus di light) */
+            #about .about-img-overlay {
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
+                background: linear-gradient(
+                    45deg,
+                    color-mix(in srgb, var(--bg-body) 20%, transparent),
+                    transparent 55%
+                );
+                opacity: .9;
+            }
+
+            /* ========= CARD (HANYA KALAU ADA GAMBAR) ========= */
+            #about .about-card {
+                position: relative;
+                border-radius: 20px;
+                padding: 1.25rem 1.25rem;
+                overflow: hidden;
+
+                /* NORMAL (bukan gradient) + sedikit transparan, theme-aware */
+                background: color-mix(in srgb, var(--card) 82%, transparent);
+
+                /* garis halus */
+                border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+
+                box-shadow: var(--shadow);
+                backdrop-filter: blur(10px);
+            }
+
+            html[data-theme="dark"] #about .about-card {
+                background: color-mix(in srgb, var(--card) 72%, transparent);
+                border-color: color-mix(in srgb, var(--line) 70%, transparent);
+            }
+
+            /* accent glow lembut di dalam card (bukan gradient) */
+            #about .about-card::before {
+                content: "";
+                position: absolute;
+                inset: -40px;
+                background: radial-gradient(closest-side,
+                    color-mix(in srgb, var(--brand) 35%, transparent),
+                    transparent 70%);
+                opacity: 0.55;
+                filter: blur(10px);
+                pointer-events: none;
+                transform: translate(18px, -14px);
+            }
+
+            #about .about-card > * {
+                position: relative;
+                z-index: 1;
+            }
+
+            /* ========= POINTS (theme-aware) ========= */
+            #about .about-points {
+                margin-top: .95rem;
+                display: grid;
+                gap: .65rem;
+            }
+
+            #about .about-point {
+                display: flex;
+                gap: .7rem;
+                align-items: flex-start;
+                font-size: .95rem;
+                line-height: 1.65;
+                color: color-mix(in srgb, var(--txt-body) 80%, transparent);
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+            #about .about-check {
+                width: 22px;
+                height: 22px;
+                min-width: 22px;
+                border-radius: 999px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                margin-top: 2px;
+
+                background: color-mix(in srgb, var(--brand) 18%, transparent);
+                border: 1px solid color-mix(in srgb, var(--brand) 28%, transparent);
+                color: var(--brand);
+                font-weight: 900;
+            }
+
+            /* ========= LINK (theme-aware, tidak gradient) ========= */
+            #about .about-link {
+                margin-top: 1rem;
+                display: inline-flex;
+                align-items: center;
+                gap: .55rem;
+
+                padding: .85rem 1.15rem;
+                border-radius: 999px;
+
+                border: 1px solid color-mix(in srgb, var(--brand) 45%, transparent);
+                background: color-mix(in srgb, var(--brand) 12%, transparent);
+                color: var(--txt-body);
+
+                font-weight: 900;
+                font-size: .95rem;
+                text-decoration: none;
+
+                transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+                width: fit-content;
+            }
+
+            #about .about-link:hover {
+                transform: translateY(-2px);
+                background: color-mix(in srgb, var(--brand) 18%, transparent);
+                border-color: color-mix(in srgb, var(--brand) 62%, transparent);
+                box-shadow: 0 16px 44px rgba(0,0,0,0.18);
+            }
+
+            #about .about-link .about-link-icon {
+                color: var(--brand);
+                font-weight: 900;
+            }
+
+            /* ========= NO IMAGE MODE (2 kolom: desc kiri, points+link kanan) ========= */
+            #about .about-split {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 1.1rem;
+                align-items: start;
+            }
+
+            @media (min-width: 768px) {
+                #about .about-split {
+                    grid-template-columns: 1fr 1fr;
+                    gap: 1.75rem;
+                }
+            }
+
+            /* kolom kanan “rapih” tanpa card, hanya divider halus */
+            #about .about-right-panel {
+                padding-left: 0;
+                border-left: none;
+            }
+
+            @media (min-width: 768px) {
+                #about .about-right-panel {
+                    padding-left: 1.25rem;
+                    border-left: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+                }
+            }
+
+            /* kecilin sedikit di mobile biar padat */
+            @media (max-width: 480px) {
+                #about .about-card { padding: 1rem 1rem; }
+                #about .about-img { height: 260px; }
+            }
+        </style>
+
         {{-- HEADER (ABOUT PULAU) --}}
         <div class="text-center">
             <div class="inline-block text-xs tracking-[0.18em] uppercase font-semibold px-3 py-1 rounded"
@@ -68,11 +340,11 @@
             </div>
 
             @if($heroDesc)
-            <p class="neon-subtitle whitespace-pre-line break-words">
-                {!! nl2br(e($heroDesc)) !!}
-            </p>
-        @else
-                        {{-- kalau tidak ada subtitle dari admin, kita buat default supaya konsisten dengan HOME --}}
+                <p class="neon-subtitle whitespace-pre-line break-words">
+                    {!! nl2br(e($heroDesc)) !!}
+                </p>
+            @else
+                {{-- kalau tidak ada subtitle dari admin, kita buat default supaya konsisten dengan HOME --}}
                 <p class="neon-subtitle">
                     Pulau ini merupakan bagian dari kekayaan Nusantara yang memiliki keberagaman budaya dan alam, tercermin dari suku-suku yang hidup dan berkembang, kuliner khas daerah, destinasi wisata, serta flora dan fauna yang menjadi identitas pulau ini.
                 </p>
@@ -90,7 +362,7 @@
         </div>
 
         {{-- ITEMS --}}
-        <div class="space-y-6">
+        <div class="about-items">
             @forelse($aboutIslandItems as $it)
                 @php
                     $title = $it->title ?: null;
@@ -98,57 +370,116 @@
                     $img   = $it->image ?: null;
                     $link  = $it->more_link ?: null;
 
-                    $pointsArr = method_exists($it, 'pointsArray') ? $it->pointsArray() : (is_string($it->points ?? null) ? preg_split("/\r\n|\n|\r/", trim($it->points)) : []);
-                    $pointsArr = array_values(array_filter(array_map('trim', (array)$pointsArr), fn($x)=>$x!==''));
+                    $pointsArr = method_exists($it, 'pointsArray')
+                        ? $it->pointsArray()
+                        : (is_string($it->points ?? null) ? preg_split("/\r\n|\n|\r/", trim($it->points)) : []);
+                    $pointsArr = array_values(array_filter(array_map('trim', (array)$pointsArr), fn($x)=>$x!==''));;
                     $hasPoints = !empty($pointsArr);
                     $hasImage  = !empty($img);
+
+                    // mode: hanya deskripsi (no image, no points, no link) => full
+                    $plainOnly = (!$hasImage && !$hasPoints && empty($link));
                 @endphp
 
-<div class="rounded-2xl p-4 sm:p-6 bg-transparent border-0">
+                <div class="about-item-shell">
+                    {{-- ======================================
+                       CASE A: ADA GAMBAR
+                       - KIRI: gambar (NEON)
+                       - KANAN: CARD (NEON + BG NORMAL TRANSPARAN)
+                       - points + link tetap di dalam card (kanan)
+                    ======================================= --}}
+                    @if($hasImage)
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
+                            {{-- IMAGE (NEON) --}}
+                            <div class="about-neon-wrap">
+                                <div class="about-neon-glow"></div>
+                                <div class="about-neon-inner">
+                                    <img src="{{ $img }}" alt="{{ $title ?? 'Gambar' }}" class="about-img">
+                                    <div class="about-img-overlay"></div>
+                                </div>
+                            </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
-                        {{-- Gambar (opsional) --}}
-                        @if($hasImage)
-                            <div class="rounded-xl overflow-hidden border border-[var(--line)]">
-                                <img src="{{ $img }}" alt="{{ $title ?? 'Gambar' }}" class="w-full h-64 object-cover">
+                            {{-- CARD (NEON) --}}
+                            <div class="about-neon-wrap">
+                                <div class="about-neon-glow"></div>
+                                <div class="about-neon-inner">
+                                    <div class="about-card">
+                                        @if($title)
+                                            <h3 class="about-item-title">{{ $title }}</h3>
+                                        @endif
+
+                                        <p class="about-item-desc">{{ $desc }}</p>
+
+                                        @if($hasPoints)
+                                            <div class="about-points">
+                                                @foreach($pointsArr as $p)
+                                                    <div class="about-point">
+                                                        <span class="about-check">✓</span>
+                                                        <span class="text-[var(--txt-body)]/80">{{ $p }}</span>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+
+                                        @if($link)
+                                            <a href="{{ $link }}" target="_blank" rel="noopener" class="about-link">
+                                                Baca Cerita <span class="about-link-icon" aria-hidden="true">↗</span>
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    @else
+                        {{-- ======================================
+                           CASE B: TIDAK ADA GAMBAR
+                           - Kalau hanya deskripsi => FULL (tanpa card)
+                           - Kalau ada points dan/atau link => 2 kolom:
+                             kiri deskripsi, kanan points + (link)
+                           - TANPA CARD.
+                        ======================================= --}}
+                        @if($plainOnly)
+                            <div>
+                                @if($title)
+                                    <h3 class="about-item-title">{{ $title }}</h3>
+                                @endif
+                                <p class="about-item-desc">{{ $desc }}</p>
+                            </div>
+                        @else
+                            <div class="about-split">
+                                {{-- LEFT: DESKRIPSI --}}
+                                <div>
+                                    @if($title)
+                                        <h3 class="about-item-title">{{ $title }}</h3>
+                                    @endif
+                                    <p class="about-item-desc">{{ $desc }}</p>
+                                </div>
+
+                                {{-- RIGHT: POINTS + LINK --}}
+                                <div class="about-right-panel">
+                                    @if($hasPoints)
+                                        <div class="about-points" style="margin-top: 0;">
+                                            @foreach($pointsArr as $p)
+                                                <div class="about-point">
+                                                    <span class="about-check">✓</span>
+                                                    <span class="text-[var(--txt-body)]/80">{{ $p }}</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+
+                                    @if($link)
+                                        <a href="{{ $link }}" target="_blank" rel="noopener" class="about-link">
+                                            Baca Cerita <span class="about-link-icon" aria-hidden="true">↗</span>
+                                        </a>
+                                    @endif
+                                </div>
                             </div>
                         @endif
-
-                        <div class="{{ $hasImage ? '' : 'md:col-span-2' }}">
-                            @if($title)
-                                <h3 class="text-lg font-semibold mb-2">{{ $title }}</h3>
-                            @endif
-
-                            <p class="text-sm text-[var(--muted)] leading-relaxed whitespace-pre-line">
-                                {{ $desc }}
-                            </p>
-
-                            @if($hasPoints)
-                                <div class="mt-4 space-y-2">
-                                    @foreach($pointsArr as $p)
-                                        <div class="flex gap-2 items-start text-sm">
-                                            <span class="mt-0.5 inline-flex w-5 h-5 items-center justify-center rounded-full"
-                                                  style="background: color-mix(in srgb, var(--brand) 25%, transparent); color: var(--brand);">
-                                                ✓
-                                            </span>
-                                            <span class="text-[var(--txt-body)]/80">{{ $p }}</span>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            @endif
-
-                            @if($link)
-                                <div class="mt-4">
-                                    <a href="{{ $link }}" target="_blank" rel="noopener"
-                                       class="inline-flex items-center gap-2 px-4 py-2 rounded-full border"
-                                       style="border-color: color-mix(in srgb, var(--brand) 45%, transparent); color: var(--brand);">
-                                        Selengkapnya <span aria-hidden="true">→</span>
-                                    </a>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
+                    @endif
                 </div>
+
             @empty
                 <div class="border border-[var(--line)] rounded-2xl bg-[var(--card)] p-6 text-center">
                     <p class="text-sm text-[var(--muted)]">
@@ -249,8 +580,7 @@
                 {{-- 1. SUKU – BAR --}}
                 <div class="chart-card">
                     <div class="flex items-center justify-between mb-3">
-                        <p class="chart-title">Komposisi Suku (Top + Lainnya)</p>
-                        <span class="chart-subtitle">Bar chart</span>
+                        <p class="chart-title">Keberagaman Suku di Indonesia</p>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="ethnicChart"></canvas>
@@ -263,8 +593,7 @@
                 {{-- 2. BAHASA – DONUT --}}
                 <div class="chart-card">
                     <div class="flex items-center justify-between mb-3">
-                        <p class="chart-title">Komposisi Bahasa (Top + Lainnya)</p>
-                        <span class="chart-subtitle">Donut chart</span>
+                        <p class="chart-title">Keberagaman Bahasa Nusantara</p>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="languageChart"></canvas>
@@ -277,8 +606,7 @@
                 {{-- 3. AGAMA – PIE --}}
                 <div class="chart-card">
                     <div class="flex items-center justify-between mb-3">
-                        <p class="chart-title">Komposisi Agama (Top + Lainnya)</p>
-                        <span class="chart-subtitle">Pie chart</span>
+                        <p class="chart-title">Keberagaman Agama di Indonesia</p>
                     </div>
                     <div class="chart-wrapper">
                         <canvas id="religionChart"></canvas>
@@ -301,18 +629,15 @@
                     <div id="stats-modal-body" class="space-y-4 leading-relaxed">
                         {{-- konten diisi via JS --}}
                     </div>
-
-
                 </div>
             </div>
 
             <style>
-    /* Saat modal statistik pulau terbuka, navbar jangan menimpa */
-    html.stats-modal-open .site-header {
-        z-index: 10 !important;
-    }
-</style>
-
+                /* Saat modal statistik pulau terbuka, navbar jangan menimpa */
+                html.stats-modal-open .site-header {
+                    z-index: 10 !important;
+                }
+            </style>
 
             {{-- SCRIPT: Chart.js --}}
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

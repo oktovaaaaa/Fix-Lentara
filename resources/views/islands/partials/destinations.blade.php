@@ -46,9 +46,16 @@
     $featured = $sorted->first();
     $others   = $sorted->slice(1)->values();
 
-    $getImg = function ($d) {
-        return $d->image_display_url ?? null;
-    };
+$getImg = function ($d) {
+    // 1) eksternal dulu
+    if (!empty($d->image_url)) return $d->image_url;
+
+    // 2) kalau upload (storage)
+    if (!empty($d->image_path)) return asset('storage/' . ltrim($d->image_path, '/'));
+
+    return null;
+};
+
 
     // 360 helpers (AMAN)
     $getPanoEmbed = function ($d) {

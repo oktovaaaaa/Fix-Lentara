@@ -1,8 +1,9 @@
 {{-- resources/views/player/login.blade.php (contoh) --}}
 @extends('layouts.auth')
 
-@section('title', 'Masuk')
-
+@section('title', 'Masuk - Lentara Nusantara')
+<link rel="icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
+<link rel="shortcut icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
 @section('content')
 <div class="auth-page">
 
@@ -528,5 +529,62 @@ html[data-theme="light"]{
   .auth-form{ padding: 10px 18px 20px; }
   .auth-title{ font-size: 1.42rem; }
 }
+
+/* ================================
+   LIGHT MODE READABILITY FIX
+   ================================ */
+html[data-theme="light"] .auth-title{
+  /* biar judul tetap pop di light */
+  filter: saturate(1.15) contrast(1.05);
+}
+
+html[data-theme="light"] .auth-subtitle{
+  /* subtitle kamu terlalu "muted" -> bikin lebih gelap */
+  color: rgba(30, 41, 59, .82);
+}
+
+html[data-theme="light"] .auth-label{
+  /* label biar tegas */
+  color: rgba(15, 23, 42, .92);
+}
+
+html[data-theme="light"] .auth-inputWrap{
+  /* input wrapper di light jangan ikut bg-body (terlalu pucat) */
+  background: rgba(255,255,255,.92);
+  border-color: rgba(255,107,0,.25);
+  box-shadow: 0 8px 24px rgba(2,6,23,.06);
+}
+
+html[data-theme="light"] .auth-input{
+  color: rgba(15,23,42,.96);
+}
+
+html[data-theme="light"] .auth-input::placeholder{
+  color: rgba(71,85,105,.65);
+}
+
+html[data-theme="light"] .auth-ico{
+  color: rgba(180,65,14,.95);
+  background: rgba(255,107,0,.10);
+  border-color: rgba(255,107,0,.22);
+}
+
+html[data-theme="light"] .auth-back{
+  /* link biar tajam */
+  color: rgba(180,65,14,.95);
+}
+
+html[data-theme="light"] .auth-error{
+  /* ini bagian yang paling bikin sulit kebaca di light */
+  background: rgba(239,68,68,.10);
+  border-color: rgba(239,68,68,.38);
+  color: rgba(127,29,29,.92);  /* teks merah tua biar jelas */
+}
+
+html[data-theme="light"] .auth-error__dot{
+  background: #ef4444;
+  box-shadow: 0 0 14px rgba(239,68,68,.25);
+}
+
 </style>
 @endsection

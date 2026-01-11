@@ -2,7 +2,8 @@
 @extends('layouts.auth')
 
 @section('title', 'Login Admin')
-
+    <link rel="icon" type="image/png" href="{{ asset('images/icon/icon_lentara.PNG') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/icon/icon_lentara.PNG') }}">
 @section('content')
 <div class="auth-page">
 

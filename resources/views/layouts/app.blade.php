@@ -9,8 +9,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Lentara Nusantara</title>
 
-<link rel="icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
-<link rel="shortcut icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
+
     {{-- SET THEME PALING AWAL (default: light) --}}
     <script>
         (function () {
@@ -260,12 +261,62 @@ html{
   .garuda-cursor,
   .garuda-particles{ display: none !important; }
 }
+
+/* ==========================================
+   ANTI INSPECT (UX BLOCKER)
+   - hanya menghambat user awam (bukan 100% secure)
+========================================== */
+.antiinspect-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0,0,0,.92);
+  color: #fff;
+  text-align: center;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+}
+.antiinspect-card{
+  width: min(720px, 92vw);
+  border-radius: 18px;
+  padding: 22px 18px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+}
+.antiinspect-title{
+  margin: 0 0 10px;
+  font-size: 18px;
+  letter-spacing: .2px;
+  color: #f97316;
+  text-shadow: 0 0 16px rgba(249,115,22,.25);
+}
+.antiinspect-desc{
+  margin: 0;
+  line-height: 1.6;
+  font-size: 14px;
+  color: rgba(255,255,255,.85);
+}
 </style>
 
 </head>
 <body class="antialiased">
     <div id="garudaCursor" class="garuda-cursor" aria-hidden="true"></div>
     <div id="garudaParticles" class="garuda-particles" aria-hidden="true"></div>
+
+    {{-- ✅ ANTI-INSPECT OVERLAY (muncul saat DevTools terdeteksi) --}}
+    <div id="antiInspectOverlay" class="antiinspect-overlay" aria-hidden="true">
+      <div class="antiinspect-card" role="alert" aria-live="assertive">
+        <h3 class="antiinspect-title">DevTools terdeteksi ⚠️</h3>
+        <p class="antiinspect-desc">
+          Halaman ini dilindungi untuk pengalaman pengguna yang lebih baik.
+          Silakan tutup DevTools untuk melanjutkan.
+        </p>
+      </div>
+    </div>
 
     <div class="min-h-screen flex flex-col">
 
@@ -281,10 +332,8 @@ html{
 
         </main>
 
-
-
-
     </div>
+
 <footer class="w-full border-t border-slate-800/40 bg-[var(--bg-body)] relative overflow-hidden">
 
     {{-- GARIS NEON TIPIS --}}
@@ -440,16 +489,11 @@ html{
 
 </footer>
 
-
-
         {{-- === MUSIC FLOATING BUTTON === --}}
 @include('components.music-toggle')
 
     {{-- === CHATBOT FLOATING NUSANTARA AI (di luar container utama) === --}}
     @include('components.nusantara-chatbot')
-
-
-
 
     {{-- scripts tambahan dari child view --}}
     @stack('scripts')
@@ -734,7 +778,6 @@ document.addEventListener("click", function (e) {
   setTimeout(() => { location.href = url.href; }, 90);
 }, true);
 
-
   let navStart = null;
   try { navStart = sessionStorage.getItem(KEY_START); } catch(e) { navStart = null; }
 
@@ -833,6 +876,85 @@ document.addEventListener("click", function (e) {
 
   document.addEventListener("mouseleave", () => cursor.style.opacity = "0", true);
   document.addEventListener("mouseenter", () => cursor.style.opacity = "", true);
+})();
+</script>
+
+{{-- ✅ ANTI INSPECT JS (INTERNAL) --}}
+<script>
+(function () {
+  const overlay = document.getElementById('antiInspectOverlay');
+
+  // ====== 1) Block right click ======
+  document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+  }, { capture: true });
+
+  // ====== 2) Block common DevTools shortcuts ======
+  document.addEventListener('keydown', function (e) {
+    const key = (e.key || '').toLowerCase();
+
+    // F12
+    if (e.key === 'F12') {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // Ctrl/Meta + Shift + (I/J/C)
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (key === 'i' || key === 'j' || key === 'c')) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // Ctrl/Meta + U (view-source)
+    if ((e.ctrlKey || e.metaKey) && key === 'u') {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // Ctrl/Meta + S (save)
+    if ((e.ctrlKey || e.metaKey) && key === 's') {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }, { capture: true });
+
+  // ====== 3) Detect DevTools opened (heuristic) ======
+  // Note: ini hanya menghambat user awam, bukan 100% secure.
+  function showOverlay() {
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    overlay.setAttribute('aria-hidden', 'false');
+
+    // opsional: kunci scroll biar makin "kerasa"
+    document.documentElement.style.overflow = 'hidden';
+  }
+
+  function hideOverlay() {
+    if (!overlay) return;
+    overlay.style.display = 'none';
+    overlay.setAttribute('aria-hidden', 'true');
+
+    document.documentElement.style.overflow = '';
+  }
+
+  const TH = 160; // threshold perbedaan outer-inner
+  let lastState = false;
+
+  setInterval(() => {
+    const widthDiff  = window.outerWidth  - window.innerWidth;
+    const heightDiff = window.outerHeight - window.innerHeight;
+
+    const opened = (widthDiff > TH) || (heightDiff > TH);
+
+    if (opened !== lastState) {
+      lastState = opened;
+      opened ? showOverlay() : hideOverlay();
+    }
+  }, 450);
 })();
 </script>
 

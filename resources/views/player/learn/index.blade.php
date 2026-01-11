@@ -1,4 +1,9 @@
 {{-- resources/views/player/learn/index.blade.php (REPLACE FULL) --}}
+
+@extends('layouts.game')
+
+@section('title', 'Belajar')
+
 @php
 use Illuminate\Support\Facades\Route;
 
@@ -100,22 +105,8 @@ foreach ($islands as $isl) {
 $refillUrl = Route::has('game.hearts.refill') ? route('game.hearts.refill') : null;
 @endphp
 
-<!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Belajar — Lentara Nusantara</title>
 
-    {{-- ✅ THEME CONNECT DENGAN HOME (localStorage: piforrr-theme) --}}
-    <script>
-        (function () {
-            const saved = localStorage.getItem('piforrr-theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', saved);
-        })();
-    </script>
-
+@push('styles')
     <style>
         /* ====== THEME GLOBAL (LIGHT & DARK) ====== */
         :root{
@@ -164,9 +155,11 @@ $refillUrl = Route::has('game.hearts.refill') ? route('game.hearts.refill') : nu
 
     {{-- ✅ SIDEBAR CSS (INCLUDE) --}}
     @include('player.partials.learn-sidebar', ['mode' => 'css'])
-</head>
+@endpush
 
-<body>
+
+@section('content')
+
     {{-- ✅ MOBILE BAR + MOBILE DRAWER (INCLUDE) --}}
     @include('player.partials.learn-sidebar', ['mode' => 'mobile'])
 
@@ -686,6 +679,10 @@ $refillUrl = Route::has('game.hearts.refill') ? route('game.hearts.refill') : nu
         </div>
     </div>
 
+@endsection
+
+
+@push('scripts')
     {{-- ✅ SIDEBAR JS (INCLUDE) --}}
     @include('player.partials.learn-sidebar', ['mode' => 'scripts'])
 
@@ -869,5 +866,4 @@ $refillUrl = Route::has('game.hearts.refill') ? route('game.hearts.refill') : nu
         window.addEventListener('resize', rebuildAll);
     })();
     </script>
-</body>
-</html>
+@endpush

@@ -1,4 +1,6 @@
 {{-- resources/views/player/learn/guide.blade.php (REPLACE FULL) --}}
+<link rel="icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
+<link rel="shortcut icon" type="image/png" href="{{ asset('images/icon/icon_lentara.png') }}">
 @php
     $player = $player ?? (object)[
         'display_name' => 'Player',
@@ -277,9 +279,9 @@
         </section>
 
         <section class="content-card">
-            <div style="font-weight:950;font-size:18px;">FAQ Panduan (Dropdown)</div>
+            <div style="font-weight:950;font-size:18px;">FAQ Panduan</div>
             <div class="hint">
-                Klik pertanyaan untuk membuka jawaban. Semua aturan mengikuti flow di controller kamu: XP, hearts, lulus/gagal, reward pulau, dan isi ulang hearts.
+                Klik pertanyaan untuk membuka jawaban.
             </div>
 
             <div class="qa" id="qaRoot">
@@ -382,9 +384,7 @@
 
             </div>
 
-            <div class="hint" style="margin-top:14px;">
-                Tip: Kalau kamu mau, nanti bisa aku tambahkan kategori dropdown (XP / Hearts / Reward / Unlock) tanpa mengubah flow game.
-            </div>
+
         </section>
     </main>
 </div>

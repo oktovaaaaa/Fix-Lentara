@@ -174,531 +174,530 @@
 
   </div>
 
-  <style>
-    /* =========================================================
-       NEON RING BORDER (ANIM) - TETAP ADA
-    ========================================================= */
-    @property --neon-angle {
-      syntax: "<angle>";
-      inherits: false;
-      initial-value: 0deg;
-    }
+<style>
+  /* =========================================================
+     NEON RING BORDER (ANIM) - 2 WARNA (ORANGE + HIJAU)
+  ========================================================= */
+  @property --neon-angle {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+  }
 
-    .quiz-neon-card{
-      position:relative;
-      border-radius:26px;
-      padding:20px;
-      background:var(--card);
-      box-shadow:0 0 0 1px rgba(255,255,255,.06),
-                 0 30px 60px rgba(0,0,0,.45);
-      overflow:hidden;
-    }
+  .quiz-neon-card{
+    --quiz-accent: #f97316;   /* ORANGE */
+    --quiz-accent-2: #22c55e; /* HIJAU */
 
-    .quiz-neon-card::before{
-      content:"";
-      position:absolute;
-      inset:-6px;
-      border-radius:inherit;
-      padding:10px;
-      pointer-events:none;
-      z-index:0;
+    position:relative;
+    border-radius:26px;
+    padding:20px;
+    background:var(--card);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.06),
+      0 30px 60px rgba(0,0,0,.28);
+    overflow:hidden;
+  }
 
-      background: conic-gradient(
-        from var(--neon-angle),
-        rgba(249,115,22,0) 0deg,
-        rgba(249,115,22,.20) 22deg,
-        #f97316 55deg,
-        #22d3ee 110deg,
-        #34d399 165deg,
-        rgba(34,211,238,.20) 220deg,
-        #f97316 300deg,
-        rgba(249,115,22,0) 360deg
-      );
+  .quiz-neon-card::before{
+    content:"";
+    position:absolute;
+    inset:-6px;
+    border-radius:inherit;
+    padding:10px;
+    pointer-events:none;
+    z-index:0;
 
-      -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
+    /* ✅ 2 warna saja: ORANGE + HIJAU (tanpa cyan/blue) */
+    background: conic-gradient(
+      from var(--neon-angle),
+      rgba(249,115,22,0) 0deg,
+      rgba(249,115,22,.18) 18deg,
+      rgba(249,115,22,.90) 60deg,
 
-      filter: blur(6px);
-      opacity: .95;
-      animation: neon-spin 7.5s linear infinite;
-    }
-    @keyframes neon-spin { to { --neon-angle: 360deg; } }
+      rgba(34,197,94,.18) 120deg,
+      rgba(34,197,94,.90) 170deg,
 
-    .quiz-neon-card > *{ position:relative; z-index:1; }
+      rgba(249,115,22,.18) 230deg,
+      rgba(249,115,22,.90) 300deg,
+      rgba(249,115,22,0) 360deg
+    );
 
-    /* =========================================================
-       HEADER (lebih rapi + pusat)
-    ========================================================= */
-    .quiz-header{
-      display:grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items:center;
-      gap:12px;
-      padding-top: 2px;
-    }
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
 
+    filter: blur(6px);
+    opacity: .95;
+    animation: neon-spin 7.5s linear infinite;
+  }
+  @keyframes neon-spin { to { --neon-angle: 360deg; } }
+
+  .quiz-neon-card > *{ position:relative; z-index:1; }
+
+  /* =========================================================
+     HEADER
+  ========================================================= */
+  .quiz-header{
+    display:grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items:center;
+    gap:12px;
+    padding-top: 2px;
+  }
+
+  .quiz-header__center{
+    grid-column: 2;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    min-width: 260px;
+  }
+
+  .quiz-title{
+    font-size:1.25rem;
+    font-weight:900;
+    letter-spacing:-.01em;
+    line-height:1.2;
+  }
+
+  .quiz-hudline{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    color: var(--muted);
+    font-size:.82rem;
+  }
+
+  .hud-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 10px;
+    border-radius:999px;
+    background: color-mix(in oklab, var(--bg-body) 70%, var(--card) 30%);
+    border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+    box-shadow: 0 10px 22px rgba(0,0,0,.18);
+    color: color-mix(in oklab, var(--txt-body) 70%, var(--muted) 30%);
+  }
+  .hud-chip b{ color: var(--txt-body); font-weight: 900; }
+
+  .hud-dot{
+    width:6px;height:6px;border-radius:999px;
+    background: rgba(249,115,22,.55);
+    box-shadow: 0 0 0 4px rgba(249,115,22,.12);
+  }
+
+  /* Score badge: boleh tetap gradient (kamu gak minta ubah), tapi kalau mau 1 warna bilang */
+  .quiz-score-badge{
+    grid-column: 3;
+    justify-self:end;
+    border-radius:14px;
+    padding:10px 14px;
+    text-align:center;
+    color:#fff;
+    background: linear-gradient(135deg, #f97316, #fb923c);
+    box-shadow: 0 18px 34px rgba(249,115,22,.22);
+    border: 1px solid rgba(255,255,255,.06);
+    min-width: 92px;
+  }
+  .quiz-score-label{ font-size:.78rem; opacity:.95; font-weight:800; }
+  .quiz-score-value{ font-weight:900; font-size: 1.05rem; }
+
+  .q-divider{
+    height:1px;
+    background:color-mix(in oklab, var(--line) 80%, transparent);
+    margin:16px 0 0;
+  }
+
+  @media (max-width: 640px){
+    .quiz-header{ grid-template-columns: 1fr auto; }
     .quiz-header__center{
-      grid-column: 2;
-      text-align:center;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:6px;
-      min-width: 260px;
+      grid-column: 1 / -1;
+      order: 1;
+      min-width: unset;
     }
-
-    .quiz-title{
-      font-size:1.25rem;
-      font-weight:900;
-      letter-spacing:-.01em;
-      line-height:1.2;
-    }
-
-    .quiz-hudline{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      flex-wrap:wrap;
-      color: var(--muted);
-      font-size:.82rem;
-    }
-
-    .hud-chip{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:6px 10px;
-      border-radius:999px;
-      background: color-mix(in oklab, var(--bg-body) 70%, var(--card) 30%);
-      border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
-      box-shadow: 0 10px 22px rgba(0,0,0,.18);
-      color: color-mix(in oklab, var(--txt-body) 70%, var(--muted) 30%);
-    }
-    .hud-chip b{ color: var(--txt-body); font-weight: 900; }
-
-    .hud-dot{
-      width:6px;height:6px;border-radius:999px;
-      background: rgba(249,115,22,.55);
-      box-shadow: 0 0 0 4px rgba(249,115,22,.12);
-    }
-
     .quiz-score-badge{
-      grid-column: 3;
+      grid-column: 2;
+      order: 0;
       justify-self:end;
-      border-radius:14px;
-      padding:10px 14px;
-      text-align:center;
-      color:#fff;
-      background: linear-gradient(135deg, #f97316, #fb923c);
-      box-shadow: 0 18px 34px rgba(249,115,22,.22);
-      border: 1px solid rgba(255,255,255,.06);
-      min-width: 92px;
     }
-    .quiz-score-label{ font-size:.78rem; opacity:.95; font-weight:800; }
-    .quiz-score-value{ font-weight:900; font-size: 1.05rem; }
+  }
 
-    .q-divider{
-      height:1px;
-      background:color-mix(in oklab, var(--line) 80%, transparent);
-      margin:16px 0 0;
-    }
+  /* =========================================================
+     PROGRESS (JANGAN DIKURANGI)
+     (Tetap boleh sedikit warna, karena kamu gak minta ubah bagian ini)
+  ========================================================= */
+  .quiz-progress{
+    margin:14px 0 12px;
+    height:10px;
+    border-radius:999px;
+    background: color-mix(in oklab, var(--bg-body) 78%, var(--card) 22%);
+    border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+    overflow:hidden;
+    position:relative;
+  }
+  .quiz-progress-bar{
+    height:100%;
+    width:0%;
+    border-radius:999px;
+    background: linear-gradient(90deg, var(--quiz-accent), var(--quiz-accent-2));
+    transition: width .45s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .quiz-progress-bar::after{
+    content:"";
+    position:absolute;
+    inset:-40% -20%;
+    background:
+      linear-gradient(115deg,
+        transparent 0%,
+        rgba(255,255,255,.20) 18%,
+        transparent 36%,
+        rgba(255,255,255,.12) 52%,
+        transparent 70%);
+    transform: translateX(-60%);
+    animation: quizShimmer 1.25s linear infinite;
+    opacity:.75;
+    pointer-events:none;
+    mix-blend-mode: screen;
+  }
+  .quiz-progress-glow{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 40% 50%, rgba(249,115,22,.18), transparent 58%),
+      radial-gradient(circle at 70% 50%, rgba(34,197,94,.16), transparent 58%);
+    pointer-events:none;
+    opacity:.75;
+  }
+  @keyframes quizShimmer{ to { transform: translateX(140%); } }
 
-    @media (max-width: 640px){
-      .quiz-header{
-        grid-template-columns: 1fr auto;
-      }
-      .quiz-header__center{
-        grid-column: 1 / -1;
-        order: 1;
-        min-width: unset;
-      }
-      .quiz-score-badge{
-        grid-column: 2;
-        order: 0;
-        justify-self:end;
-      }
-    }
+  /* =========================================================
+     TOP ROW
+  ========================================================= */
+  .q-toprow{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom: 10px;
+  }
+  .q-status{
+    font-size:12px;
+    color: var(--muted);
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+    background: color-mix(in oklab, var(--bg-body) 70%, var(--card) 30%);
+    white-space: nowrap;
+  }
 
-    /* =========================================================
-       PROGRESS (TIDAK DIKURANGI) + NEON SHIMMER
-    ========================================================= */
-    .quiz-progress{
-      margin:14px 0 12px;
-      height:10px;
-      border-radius:999px;
-      background: color-mix(in oklab, var(--bg-body) 78%, var(--card) 22%);
-      border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
-      overflow:hidden;
-      position:relative;
-    }
-    .quiz-progress-bar{
-      height:100%;
-      width:0%;
-      border-radius:999px;
-      background: linear-gradient(90deg, #f97316, #22d3ee, #34d399);
-      transition: width .45s ease;
-      position:relative;
-      overflow:hidden;
-    }
-    .quiz-progress-bar::after{
-      content:"";
-      position:absolute;
-      inset:-40% -20%;
-      background:
-        linear-gradient(115deg,
-          transparent 0%,
-          rgba(255,255,255,.20) 18%,
-          transparent 36%,
-          rgba(255,255,255,.12) 52%,
-          transparent 70%);
-      transform: translateX(-60%);
-      animation: quizShimmer 1.25s linear infinite;
-      opacity:.75;
-      pointer-events:none;
-      mix-blend-mode: screen;
-    }
-    .quiz-progress-glow{
-      position:absolute; inset:0;
-      background:
-        radial-gradient(circle at 25% 50%, rgba(34,211,238,.22), transparent 55%),
-        radial-gradient(circle at 55% 50%, rgba(249,115,22,.20), transparent 58%),
-        radial-gradient(circle at 80% 50%, rgba(52,211,153,.16), transparent 55%);
-      pointer-events:none;
-      opacity:.75;
-      filter: blur(0.2px);
-    }
-    @keyframes quizShimmer{ to { transform: translateX(140%); } }
+  /* =========================================================
+     BUTTONS
+  ========================================================= */
+  .q-btn{
+    border-radius: 14px;
+    padding: 10px 14px;
+    font-weight: 800;
+    border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+    transition: transform .14s ease, opacity .18s ease, box-shadow .18s ease, filter .18s ease;
+    user-select:none;
+  }
+  .q-btn:active{ transform: translateY(1px); }
+  .q-btn:disabled{ opacity:.45; cursor:not-allowed; }
 
-    /* =========================================================
-       TOP ROW (pill + status) rapih
-    ========================================================= */
-    .q-toprow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom: 10px;
-    }
-    .q-status{
-      font-size:12px;
-      color: var(--muted);
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
-      background: color-mix(in oklab, var(--bg-body) 70%, var(--card) 30%);
-      white-space: nowrap;
-    }
+  .q-btn-ghost{
+    background: color-mix(in oklab, var(--card) 92%, transparent);
+    color: var(--txt-body);
+  }
+  .q-btn-ghost:hover{
+    border-color: rgba(249,115,22,.55);
+    box-shadow: 0 0 0 4px rgba(249,115,22,.12);
+  }
 
-    /* =========================================================
-       BUTTONS - ORANGE ONLY
-    ========================================================= */
-    .q-btn{
-      border-radius: 14px;
-      padding: 10px 14px;
-      font-weight: 800;
-      border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
-      transition: transform .14s ease, opacity .18s ease, box-shadow .18s ease, filter .18s ease;
-      user-select:none;
-    }
-    .q-btn:active{ transform: translateY(1px); }
-    .q-btn:disabled{ opacity:.45; cursor:not-allowed; }
+  .q-btn-primary{
+    border: 0;
+    color:#fff;
+    background: linear-gradient(135deg, #f97316, #fb923c);
+    box-shadow:
+      0 18px 34px rgba(249,115,22,.22),
+      0 0 0 1px rgba(255,255,255,.06);
+  }
+  .q-btn-primary:hover{
+    filter: brightness(1.05);
+    box-shadow:
+      0 20px 40px rgba(249,115,22,.30),
+      0 0 0 1px rgba(255,255,255,.08);
+  }
 
-    .q-btn-ghost{
-      background: color-mix(in oklab, var(--card) 92%, transparent);
-      color: var(--txt-body);
-    }
-    .q-btn-ghost:hover{
-      border-color: rgba(249,115,22,.55);
-      box-shadow: 0 0 0 4px rgba(249,115,22,.12);
-    }
+  .q-actions{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .q-actions--center{
+    justify-content:center;
+    flex-wrap:wrap;
+  }
 
-    .q-btn-primary{
-      border: 0;
-      color:#fff;
-      background: linear-gradient(135deg, #f97316, #fb923c);
-      box-shadow:
-        0 18px 34px rgba(249,115,22,.22),
-        0 0 0 1px rgba(255,255,255,.06);
-    }
-    .q-btn-primary:hover{
-      filter: brightness(1.05);
-      box-shadow:
-        0 20px 40px rgba(249,115,22,.30),
-        0 0 0 1px rgba(255,255,255,.08);
-    }
+  /* =========================================================
+     OPTIONS
+  ========================================================= */
+  .q-opt{
+    text-align:left;
+    border-radius: 18px;
+    border: 1px solid rgba(249,115,22,.22);
+    background: color-mix(in oklab, var(--card) 92%, transparent);
+    padding: 0;
+    transition: transform .15s ease, box-shadow .18s ease, border-color .18s ease, filter .18s ease;
+    position: relative;
+    overflow:hidden;
+  }
+  .q-opt:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 16px 34px rgba(249,115,22,.18);
+    border-color: rgba(249,115,22,.45);
+    filter: brightness(1.03);
+  }
+  .q-opt.is-locked{ pointer-events:none; opacity:.94; }
 
-    .q-actions{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
-    .q-actions--center{
-      justify-content:center;
-      flex-wrap:wrap;
-    }
+  .q-opt__inner{display:flex;gap:12px;align-items:flex-start;padding:14px;position:relative;}
+  .q-opt__badge{
+    width: 34px; height: 34px; border-radius: 12px;
+    display:grid; place-items:center;
+    font-weight: 900;
+    color: #0b1220;
+    background: linear-gradient(135deg, #f97316, #fb923c);
+    box-shadow: 0 10px 18px rgba(249,115,22,.16);
+    flex: 0 0 auto;
+  }
+  .q-opt__content{ flex:1 1 auto; min-width:0; }
 
-    /* =========================================================
-       OPTIONS - ORANGE THEME
-    ========================================================= */
-    .q-opt{
-      text-align:left;
-      border-radius: 18px;
-      border: 1px solid rgba(249,115,22,.22);
-      background: color-mix(in oklab, var(--card) 92%, transparent);
-      padding: 0;
-      transition: transform .15s ease, box-shadow .18s ease, border-color .18s ease, filter .18s ease;
-      position: relative;
-      overflow:hidden;
-    }
-    .q-opt:hover{
-      transform: translateY(-1px);
-      box-shadow: 0 16px 34px rgba(249,115,22,.18);
-      border-color: rgba(249,115,22,.45);
-      filter: brightness(1.03);
-    }
-    .q-opt.is-locked{ pointer-events:none; opacity:.94; }
+  .q-opt__text{
+    font-size:14px;font-weight:800;color:var(--txt-body);line-height:1.35;
+    overflow-wrap:anywhere;   /* ✅ FIX teks panjang */
+    word-break:break-word;    /* ✅ FIX teks panjang */
+    white-space: normal;
+  }
+  .q-opt__img{
+    width:100%;
+    border-radius:14px;
+    border:1px solid color-mix(in oklab, var(--line) 85%, transparent);
+    display:block;
+  }
 
-    .q-opt__inner{display:flex;gap:12px;align-items:flex-start;padding:14px;position:relative;}
-    .q-opt__badge{
-      width: 34px; height: 34px; border-radius: 12px;
-      display:grid; place-items:center;
-      font-weight: 900;
-      color: #0b1220;
-      background: linear-gradient(135deg, #f97316, #fb923c);
-      box-shadow: 0 10px 18px rgba(249,115,22,.16);
-      flex: 0 0 auto;
-    }
-    .q-opt__content{ flex:1 1 auto; min-width:0; }
-    .q-opt__text{ font-size:14px;font-weight:800;color:var(--txt-body);line-height:1.35;word-break:break-word; }
-    .q-opt__img{ width:100%; border-radius:14px; border:1px solid color-mix(in oklab, var(--line) 85%, transparent); display:block; }
+  .q-opt::after{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(circle at top right, rgba(249,115,22,.14), transparent 55%);
+    opacity:0;
+    transition: opacity .18s ease;
+    pointer-events:none;
+  }
+  .q-opt:hover::after{ opacity:1; }
 
-    .q-opt::after{
-      content:"";
-      position:absolute; inset:0;
-      background: radial-gradient(circle at top right, rgba(249,115,22,.14), transparent 55%);
-      opacity:0;
-      transition: opacity .18s ease;
-      pointer-events:none;
-    }
-    .q-opt:hover::after{ opacity:1; }
+  .q-opt__mark{
+    flex: 0 0 auto;
+    width: 30px;
+    display:grid;
+    place-items:center;
+    opacity: 0;
+    transform: translateX(6px);
+    transition: all .18s ease;
+    font-weight: 900;
+  }
+  .q-opt__mark-ok, .q-opt__mark-no{ display:none; font-size: 18px; }
 
-    .q-opt__mark{
-      flex: 0 0 auto;
-      width: 30px;
-      display:grid;
-      place-items:center;
-      opacity: 0;
-      transform: translateX(6px);
-      transition: all .18s ease;
-      font-weight: 900;
-    }
-    .q-opt__mark-ok, .q-opt__mark-no{ display:none; font-size: 18px; }
+  .q-opt.is-correct{
+    border-color: rgba(34,197,94,.7);
+    box-shadow: 0 0 0 4px rgba(34,197,94,.12), 0 18px 34px rgba(0,0,0,.18);
+  }
+  .q-opt.is-correct .q-opt__mark{ opacity:1; transform:translateX(0); color: rgba(34,197,94,1); }
+  .q-opt.is-correct .q-opt__mark-ok{ display:inline; }
 
-    .q-opt.is-correct{
-      border-color: rgba(34,197,94,.7);
-      box-shadow: 0 0 0 4px rgba(34,197,94,.12), 0 18px 34px rgba(0,0,0,.18);
-    }
-    .q-opt.is-correct .q-opt__mark{ opacity:1; transform:translateX(0); color: rgba(34,197,94,1); }
-    .q-opt.is-correct .q-opt__mark-ok{ display:inline; }
+  .q-opt.is-wrong{
+    border-color: rgba(239,68,68,.7);
+    box-shadow: 0 0 0 4px rgba(239,68,68,.10), 0 18px 34px rgba(0,0,0,.18);
+  }
+  .q-opt.is-wrong .q-opt__mark{ opacity:1; transform:translateX(0); color: rgba(239,68,68,1); }
+  .q-opt.is-wrong .q-opt__mark-no{ display:inline; }
 
-    .q-opt.is-wrong{
-      border-color: rgba(239,68,68,.7);
-      box-shadow: 0 0 0 4px rgba(239,68,68,.10), 0 18px 34px rgba(0,0,0,.18);
-    }
-    .q-opt.is-wrong .q-opt__mark{ opacity:1; transform:translateX(0); color: rgba(239,68,68,1); }
-    .q-opt.is-wrong .q-opt__mark-no{ display:inline; }
+  /* =========================================================
+     TYPO + FEEDBACK
+  ========================================================= */
+  .q-pill{
+    font-size:12px;font-weight:800;padding:6px 10px;border-radius:999px;
+    border:1px solid color-mix(in oklab, var(--line) 85%, transparent);
+    background: color-mix(in oklab, var(--bg-body) 70%, var(--card) 30%);
+    color: var(--txt-body);
+    white-space:nowrap;
+  }
+  .q-title{ font-size:18px; line-height:1.35; font-weight:900; letter-spacing:-.01em; }
 
-    /* =========================================================
-       TYPO + FEEDBACK
-    ========================================================= */
-    .q-pill{
-      font-size:12px;font-weight:800;padding:6px 10px;border-radius:999px;
-      border:1px solid color-mix(in oklab, var(--line) 85%, transparent);
-      background: color-mix(in oklab, var(--bg-body) 70%, var(--card) 30%);
-      color: var(--txt-body);
-      white-space:nowrap;
-    }
-    .q-title{ font-size:18px; line-height:1.35; font-weight:900; letter-spacing:-.01em; }
+  .q-feedback{
+    font-weight:900;
+    font-size:14px;
+    min-height:20px;
+    margin-top:14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap: wrap;
+  }
+  .q-feedback .ok{ color:#22c55e; }
+  .q-feedback .no{ color:#ef4444; }
+  .q-feedback .meta{ font-weight:700;color:var(--muted);font-size:12px; }
 
-    .q-feedback{
-      font-weight:900;
-      font-size:14px;
-      min-height:20px;
-      margin-top:14px;
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap: wrap;
-    }
-    .q-feedback .ok{ color:#22c55e; }
-    .q-feedback .no{ color:#ef4444; }
-    .q-feedback .meta{ font-weight:700;color:var(--muted);font-size:12px; }
+  .q-ico{
+    width:18px;height:18px;
+    display:inline-block;
+    vertical-align:-3px;
+  }
 
-    .q-ico{
-      width:18px;height:18px;
-      display:inline-block;
-      vertical-align:-3px;
-    }
+  /* =========================================================
+     ✅ PENJELASAN: BACKGROUND 1 WARNA (NO GRADIENT)
+  ========================================================= */
+  @keyframes explainIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-    /* ===================== EXPLANATION (lebih menarik) ===================== */
-    @keyframes explainIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+  .q-explain{
+    margin-top: 14px;
+    border-radius: 18px;
+    padding: 14px 16px;
+    position: relative;
+    overflow: hidden;
 
-    .q-explain{
-      margin-top: 14px;
-      border-radius: 18px;
-      padding: 14px 16px;
-      position: relative;
-      overflow: hidden;
+    /* ✅ 1 warna saja (mengikuti theme) */
+    background: color-mix(in oklab, var(--card) 88%, var(--bg-body) 12%);
+    border: 1px solid color-mix(in oklab, var(--line) 80%, transparent);
+    box-shadow:
+      0 14px 30px rgba(0,0,0,.18),
+      0 0 0 1px rgba(255,255,255,.06);
 
-      background: color-mix(in oklab, var(--bg-body) 68%, var(--card) 32%);
-      border: 1px solid color-mix(in oklab, var(--line) 80%, transparent);
-      box-shadow:
-        0 14px 30px rgba(0,0,0,.22),
-        0 0 0 1px rgba(255,255,255,.06);
+    animation: explainIn .28s ease-out both;
+  }
 
-      animation: explainIn .28s ease-out both;
-    }
+  /* ✅ hanya border highlight tipis 1 warna (bukan gradient) */
+  .q-explain::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius: inherit;
+    pointer-events:none;
+    box-shadow: inset 0 0 0 1px rgba(249,115,22,.22);
+    opacity: .9;
+  }
 
-    .q-explain::before{
-      content:"";
-      position:absolute;
-      inset:-2px;
-      border-radius: inherit;
-      padding: 2px;
-      pointer-events:none;
+  .q-explain::after{ content:none; } /* ✅ hapus spark rame */
 
-      background: linear-gradient(135deg,
-        rgba(249,115,22,.0) 0%,
-        rgba(249,115,22,.45) 35%,
-        rgba(34,211,238,.22) 55%,
-        rgba(249,115,22,.35) 75%,
-        rgba(249,115,22,.0) 100%
-      );
+  .q-explain__title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, var(--txt-body) 85%, var(--muted) 15%);
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
 
-      -webkit-mask:
-        linear-gradient(#000 0 0) content-box,
-        linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
+  .q-explain__title::before{
+    content:"i";
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    display:grid;
+    place-items:center;
 
-      filter: blur(.6px);
-      opacity: .9;
-    }
+    font-weight: 1000;
+    color: #0b1220;
+    /* ✅ boleh 1 warna */
+    background: var(--quiz-accent);
+    box-shadow: 0 12px 22px rgba(249,115,22,.16);
+  }
 
-    .q-explain::after{
-      content:"";
-      position:absolute;
-      inset:-40px -60px auto -60px;
-      height: 140px;
-      background:
-        radial-gradient(circle at 30% 55%, rgba(249,115,22,.22), transparent 60%),
-        radial-gradient(circle at 70% 45%, rgba(34,211,238,.16), transparent 62%);
-      pointer-events:none;
-      opacity:.9;
-    }
+  .q-explain__text{
+    font-size: 13px;
+    line-height: 1.65;
+    color: color-mix(in oklab, var(--muted) 92%, var(--txt-body) 8%);
+    position: relative;
+    z-index: 1;
 
-    .q-explain__title{
-      display:flex;
-      align-items:center;
-      gap:10px;
+    /* ✅ FIX teks panjang */
+    overflow-wrap:anywhere;
+    word-break:break-word;
+    white-space: normal;
+  }
+  .q-explain__text strong{ color: var(--txt-body); }
 
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: color-mix(in oklab, var(--txt-body) 85%, #fff 15%);
-      margin-bottom: 6px;
-      position: relative;
-      z-index: 1;
-    }
+  @keyframes quizIn { from{opacity:0; transform: translateY(10px);} to{opacity:1; transform: translateY(0);} }
+  @keyframes pop { 0%{transform:scale(.98)} 60%{transform:scale(1.01)} 100%{transform:scale(1)} }
+  .quiz-anim-in{ animation: quizIn .28s ease-out both; }
+  .quiz-pop{ animation: pop .28s ease-out; }
 
-    .q-explain__title::before{
-      content:"i";
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      display:grid;
-      place-items:center;
+  /* =========================================================
+     ✅ RESULT / PEMENANG: BACKGROUND 1 WARNA (NO GRADIENT)
+  ========================================================= */
+  .q-result{
+    text-align:center;
+    padding: 22px 6px 6px;
+    animation: quizIn .28s ease-out both;
+    position:relative;
+    overflow:hidden;
+    border-radius:18px;
 
-      font-weight: 1000;
-      color: #0b1220;
-      background: linear-gradient(135deg, #f97316, #fb923c);
-      box-shadow: 0 12px 22px rgba(249,115,22,.22);
-    }
+    /* ✅ 1 warna saja */
+    background: color-mix(in oklab, var(--card) 88%, var(--bg-body) 12%);
+    border: 1px solid color-mix(in oklab, var(--line) 80%, transparent);
+    box-shadow: 0 14px 30px rgba(0,0,0,.16);
+  }
 
-    .q-explain__text{
-      font-size: 13px;
-      line-height: 1.65;
-      color: color-mix(in oklab, var(--muted) 92%, #fff 8%);
-      position: relative;
-      z-index: 1;
-    }
-    .q-explain__text strong{ color: #fff; }
+  .q-result__spark{ display:none; } /* ✅ hilangin warna-warni */
 
-    @keyframes quizIn { from{opacity:0; transform: translateY(10px);} to{opacity:1; transform: translateY(0);} }
-    @keyframes pop { 0%{transform:scale(.98)} 60%{transform:scale(1.01)} 100%{transform:scale(1)} }
-    .quiz-anim-in{ animation: quizIn .28s ease-out both; }
-    .quiz-pop{ animation: pop .28s ease-out; }
+  /* progress result (dipakai di markup kamu) */
+  .q-progress{
+    margin: 0 auto;
+    height: 12px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--bg-body) 78%, var(--card) 22%);
+    border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
+    overflow:hidden;
+    position:relative;
+  }
+  .q-progress__bar{
+    height:100%;
+    width:0%;
+    border-radius:999px;
+    /* ✅ tetap 2 warna boleh (kalau mau 1 warna bilang) */
+    background: linear-gradient(90deg, var(--quiz-accent), var(--quiz-accent-2));
+    transition: width .45s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .q-progress__glow{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 40% 50%, rgba(249,115,22,.14), transparent 60%),
+      radial-gradient(circle at 70% 50%, rgba(34,197,94,.12), transparent 60%);
+    pointer-events:none;
+    opacity:.75;
+  }
+  .q-progress--big{ height: 12px; }
+</style>
 
-    .q-result{
-      text-align:center;
-      padding: 22px 6px 6px;
-      animation: quizIn .28s ease-out both;
-      position:relative;
-      overflow:hidden;
-      border-radius:18px;
-    }
-    .q-result__spark{
-      position:absolute;
-      inset:-40px;
-      height:200px;
-      background:
-        radial-gradient(circle at 20% 50%, rgba(34,211,238,.20), transparent 60%),
-        radial-gradient(circle at 50% 30%, rgba(249,115,22,.22), transparent 60%),
-        radial-gradient(circle at 80% 55%, rgba(52,211,153,.16), transparent 60%);
-      pointer-events:none;
-      opacity:.9;
-      filter: blur(0px);
-    }
 
-    /* progress result (kelas ini sudah dipakai di markup kamu) */
-    .q-progress{
-      margin: 0 auto;
-      height: 12px;
-      border-radius: 999px;
-      background: color-mix(in oklab, var(--bg-body) 78%, var(--card) 22%);
-      border: 1px solid color-mix(in oklab, var(--line) 85%, transparent);
-      overflow:hidden;
-      position:relative;
-    }
-    .q-progress__bar{
-      height:100%;
-      width:0%;
-      border-radius:999px;
-      background: linear-gradient(90deg, #f97316, #22d3ee, #34d399);
-      transition: width .45s ease;
-      position:relative;
-      overflow:hidden;
-    }
-    .q-progress__glow{
-      position:absolute; inset:0;
-      background:
-        radial-gradient(circle at 25% 50%, rgba(34,211,238,.22), transparent 55%),
-        radial-gradient(circle at 55% 50%, rgba(249,115,22,.20), transparent 58%),
-        radial-gradient(circle at 80% 50%, rgba(52,211,153,.16), transparent 55%);
-      pointer-events:none;
-      opacity:.75;
-    }
-    .q-progress--big{ height: 12px; }
-  </style>
 
   <script>
   (function(){

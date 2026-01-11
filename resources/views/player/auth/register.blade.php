@@ -1,8 +1,9 @@
 {{-- resources/views/player/register.blade.php (contoh) --}}
 @extends('layouts.auth')
 
-@section('title', 'Daftar')
-
+@section('title', 'Daftar - Lentara Nusantara')
+    <link rel="icon" type="image/png" href="{{ asset('images/icon/icon_lentara.PNG') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/icon/icon_lentara.PNG') }}">
 @section('content')
 <div class="auth-page">
 
@@ -171,6 +172,13 @@ html[data-theme="light"]{
   --brand: #ff6b00;
   --brand2:#ff8c42;
   --brand3:#ffaa6b;
+
+    /* ✅ DANGER (light mode) */
+  --danger-bg: rgba(239,68,68,.10);
+  --danger-border: rgba(185,28,28,.28);
+  --danger-text: rgba(127,29,29,.96); /* MERAH GELAP → KEBACA */
+  --danger-dot: #dc2626;
+
 }
 
 .auth-page{
@@ -366,27 +374,33 @@ html[data-theme="light"]{
   color: color-mix(in oklab, var(--muted) 92%, transparent);
 }
 
-/* Error */
+/* Error (THEME SAFE) */
 .auth-error{
   margin: 0 22px 10px;
   padding: 10px 12px;
   border-radius: 14px;
-  border: 1px solid rgba(239,68,68,.45);
-  background: rgba(239,68,68,.12);
+
+  border: 1px solid var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-text);
+
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  color: color-mix(in oklab, #fecaca 88%, white);
   font-size: .86rem;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,.06);
 }
+
 .auth-error__dot{
   width: 10px;
   height: 10px;
   border-radius: 999px;
   margin-top: 4px;
-  background: #ef4444;
-  box-shadow: 0 0 14px rgba(239,68,68,.35);
+  background: var(--danger-dot);
+  box-shadow: 0 0 14px rgba(239,68,68,.30);
 }
+
 
 /* Form */
 .auth-form{

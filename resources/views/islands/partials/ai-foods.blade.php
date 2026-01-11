@@ -278,7 +278,7 @@
                     Rekomendasi kuliner untuk {{ $tribeKey }} minggu ini belum tersedia.
                 </p>
                 <p class="text-xs text-[var(--muted)]">
-                    Admin: jalankan scheduler atau dispatch job generate.
+                    Rekomendasi akan diperbarui setiap minggu pada hari Senin pukul 00:00 WIB.
                 </p>
             </div>
         </div>
